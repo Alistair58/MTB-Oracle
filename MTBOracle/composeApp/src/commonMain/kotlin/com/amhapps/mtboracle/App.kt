@@ -1,5 +1,6 @@
 package com.amhapps.mtboracle
 
+import Bike
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,7 +40,6 @@ import mtboracle.composeapp.generated.resources.mtb_oracle_bike_v1
 import mtboracle.composeapp.generated.resources.transparent_mtb_oracle_bike_v2
 
 //TODO
-// - github
 // - finish the dropdown menu
 // - class for inputs e.g. bikeInputs
 // - finish form and make look pretty
@@ -60,13 +60,13 @@ fun App(web:Boolean){
                 val homepage = if (web) WebHomepage(navController) else Homepage(navController)
                 homepage.ShowHomepage()
             }
-            composable<BrandAndModelScreen>{
+            composable<BrandModelYearScreen>{
                 val form = BrandAndModelForm(navController)
                 form.ShowForm()
             }
-            composable<YearAndMaterialScreen>{
-                val args = it.toRoute<YearAndMaterialScreen>()
-                val form = YearAndMaterialForm(navController,args.brand,args.model)
+            composable<CategoryConditionCountryScreen>{
+                val args = it.toRoute<CategoryConditionCountryScreen>()
+                val form = CategoryConditionCountryForm(navController,args.bike)
                 form.ShowForm()
             }
         }
@@ -78,11 +78,10 @@ fun App(web:Boolean){
 object HomeScreen
 
 @Serializable
-object BrandAndModelScreen
+object BrandModelYearScreen
 
 @Serializable
-data class YearAndMaterialScreen(
-    val brand: String,
-    val model: String
+data class CategoryConditionCountryScreen(
+    val bike:Bike
 )
 

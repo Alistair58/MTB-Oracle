@@ -10,6 +10,7 @@ import androidx.compose.material.TextFieldColors
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
@@ -21,6 +22,8 @@ fun MTBOracleTextInput(  //has correct colouring, rounded corners and removed so
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     label: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    readOnly :Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions(),
     singleLine: Boolean = false,
@@ -31,14 +34,19 @@ fun MTBOracleTextInput(  //has correct colouring, rounded corners and removed so
                 onValueChange = onValueChange,
                 modifier = modifier,
                 label = label,
+                trailingIcon = trailingIcon,
                 keyboardOptions = keyboardOptions,
                 keyboardActions = keyboardActions,
                 singleLine = singleLine,
+                readOnly = readOnly,
                 maxLines = maxLines,
                 minLines = minLines,
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = MTBOracleTheme.colors.forestLight,
-                    unfocusedBorderColor = MTBOracleTheme.colors.forest),
+                    unfocusedBorderColor = Color.Gray,
+                    focusedLabelColor = MTBOracleTheme.colors.forestLight,
+                    unfocusedLabelColor = Color.Gray,
+                    cursorColor = MTBOracleTheme.colors.forestLight),
                 shape = RoundedCornerShape(10.dp)
         )
 }
