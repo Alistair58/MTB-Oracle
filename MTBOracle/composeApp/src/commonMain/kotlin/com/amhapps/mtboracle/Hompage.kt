@@ -84,7 +84,7 @@ open class Homepage(private var navController: NavController){
             fontSize = 20.sp)
         Button(
             onClick = {
-                navController.navigate(BrandAndModelScreen)
+                navController.navigate(BrandModelYearScreen)
             },
             colors = MTBOracleTheme.buttonColors,
 

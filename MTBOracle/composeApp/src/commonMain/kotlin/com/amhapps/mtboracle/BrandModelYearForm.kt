@@ -71,7 +71,7 @@ class BrandAndModelForm(private val navController: NavHostController) {
             Button(
                 onClick = {
                     val yearInt:Int = year.toInt()
-                    val bike:Bike = Bike(yearInt,brand,model)
+                    val bike = Bike(yearInt,brand,model)
                     navController.navigate(CategoryConditionCountryScreen(bike))
                 },
                 colors = MTBOracleTheme.buttonColors,

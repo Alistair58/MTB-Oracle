@@ -30,6 +30,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -69,6 +70,16 @@ fun App(web:Boolean){
                 val form = CategoryConditionCountryForm(navController,args.bike)
                 form.ShowForm()
             }
+            composable<SizeMaterialTravelScreen>{
+                val args = it.toRoute<SizeMaterialTravelScreen>()
+                val form = SizeMaterialTravelForm(navController,args.bike)
+                form.ShowForm()
+            }
+            composable<ValuationScreen>{
+                val args = it.toRoute<ValuationScreen>()
+                val form = SizeMaterialTravelForm(navController,args.bike)
+                form.ShowForm()
+            }
         }
     }
 
@@ -80,8 +91,22 @@ object HomeScreen
 @Serializable
 object BrandModelYearScreen
 
+
 @Serializable
 data class CategoryConditionCountryScreen(
+    @Contextual
+    val bike:Bike
+)
+
+@Serializable
+data class SizeMaterialTravelScreen(
+    @Contextual
+    val bike:Bike
+)
+
+@Serializable
+data class ValuationScreen(
+    @Contextual
     val bike:Bike
 )
 
