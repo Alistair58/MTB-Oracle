@@ -1,6 +1,7 @@
 package com.amhapps.mtboracle
 
 import Bike
+import BikeData
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -71,8 +72,8 @@ class BrandAndModelForm(private val navController: NavHostController) {
             Button(
                 onClick = {
                     val yearInt:Int = year.toInt()
-                    val bike = Bike(yearInt,brand,model)
-                    navController.navigate(CategoryConditionCountryScreen(bike))
+                    val bikeData = BikeData(year=yearInt,brand=brand,model=model)
+                    navController.navigate(CategoryConditionCountryScreen(bikeData = bikeData))
                 },
                 colors = MTBOracleTheme.buttonColors,
                 modifier = Modifier

@@ -91,6 +91,7 @@ android {
 
 dependencies {
     implementation("androidx.navigation:navigation-compose:2.8.4")
+    implementation(libs.androidx.navigation.safe.args.generator)
     debugImplementation(compose.uiTooling)
 }
 

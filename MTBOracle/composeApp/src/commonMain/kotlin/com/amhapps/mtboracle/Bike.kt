@@ -2,88 +2,26 @@ import kotlinx.serialization.Serializable
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.round
+@Serializable
+data class BikeData(
+    var year:Int = -1,
+    var brand: String = "",
+    var model: String = "",
+    var category: String = "",
+    var condition: String = "",
+    var size: String = "",
+    var wheelSize: String = "",
+    var material: String = "",
+    var frontTravel: String = "",
+    var rearTravel: String = "",
+    var country: String = ""
+)
 
 class Bike(
-    year:Int = -1,
-    brand: String = "",
-    model: String = "",
-    category: String = "",
-    condition: String = "",
-    size: String = "",
-    wheelSize: String = "",
-    material: String = "",
-    frontTravel: String = "",
-    rearTravel: String = "",
-    country: String = ""
+    private var bikeData: BikeData
 ) {
-    val name: String
-        get() = year.toString() + " " + this.brand + " " + this.model
-    private var year: Int = year
+    private val name = "${bikeData.year} ${bikeData.brand} ${bikeData.model}"
         get() = field
-        set(value) {
-            field = value
-
-        }
-    private var brand: String = brand
-        get() = field
-        set(value) {
-            field = value
-
-        }
-    private var model: String = model
-        get() = field
-        set(value) {
-            field = value
-
-        }
-    private var category: String = category
-        get() = field
-        set(value) {
-            field = value
-
-        }
-    private var condition: String = condition
-        get() = field
-        set(value) {
-            field = value
-
-        }
-    private var size: String = size
-        get() = field
-        set(value) {
-            field = value
-
-        }
-    private var wheelSize: String = wheelSize
-        get() = field
-        set(value) {
-            field = value
-
-        }
-    private var material: String = material
-        get() = field
-        set(value) {
-            field = value
-
-        }
-    private var frontTravel: String = frontTravel
-        get() = field
-        set(value) {
-            field = value
-
-        }
-    private var rearTravel: String = rearTravel
-        get() = field
-        set(value) {
-            field = value
-
-        }
-    private var country: String = country
-        get() = field
-        set(value) {
-            field = value
-
-        }
 
 
     val values: FloatArray
@@ -118,14 +56,14 @@ class Bike(
             values[16] = countryInfo[4]!! //max 
             values[17] = countryInfo[5]!! //SD
 
-            values[18] = encodeYear(year).toFloat()
-            values[19] = encodeCondition(condition).toFloat()
-            values[20] = encodeCategory(category).toFloat()
-            values[21] = encodeSize(size).toFloat()
-            values[22] = encodeWheelSize(wheelSize).toFloat()
-            values[23] = encodeMaterial(material).toFloat()
-            values[24] = encodeTravel(frontTravel).toFloat()
-            values[25] = encodeTravel(rearTravel).toFloat()
+            values[18] = encodeYear(bikeData.year).toFloat()
+            values[19] = encodeCondition(bikeData.condition).toFloat()
+            values[20] = encodeCategory(bikeData.category).toFloat()
+            values[21] = encodeSize(bikeData.size).toFloat()
+            values[22] = encodeWheelSize(bikeData.wheelSize).toFloat()
+            values[23] = encodeMaterial(bikeData.material).toFloat()
+            values[24] = encodeTravel(bikeData.frontTravel).toFloat()
+            values[25] = encodeTravel(bikeData.rearTravel).toFloat()
 
             return values
         }

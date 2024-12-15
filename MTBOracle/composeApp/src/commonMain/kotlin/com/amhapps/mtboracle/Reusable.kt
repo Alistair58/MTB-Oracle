@@ -122,3 +122,60 @@ fun CompleteDropdown(
         }
     }
 }
+
+@Composable
+fun SearchableDropdown(
+    value: String,
+    onValueChange: (String) -> Unit,
+    onDropdownClick: (String) -> Unit,
+    label:String,
+    items:List<String>,
+    iconContentDescription:String
+){
+    var dropDownExpanded by remember { mutableStateOf(false) }
+    var dropDownSize by remember { mutableStateOf(Size.Zero) }
+    var currentItems by remember{ mutableStateOf(items) }
+    val icon = if (dropDownExpanded)
+        Icons.Filled.KeyboardArrowUp
+    else
+        Icons.Filled.KeyboardArrowDown
+    MTBOracleTextInput(
+        value = value,
+        onValueChange = { newVal ->
+            onValueChange(newVal)
+            currentItems = items.filter { it.lowercase().contains(newVal.lowercase()) }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .onGloballyPositioned { coordinates ->
+                // This value is used to assign to
+                // the DropDown the same width
+                dropDownSize = coordinates.size.toSize()
+            },
+        label = { Text(label) },
+        readOnly = false,
+        trailingIcon = {
+            Icon(icon,iconContentDescription,
+                Modifier.clickable {dropDownExpanded = !dropDownExpanded })
+        }
+    )
+    DropdownMenu(
+        expanded = dropDownExpanded,
+        onDismissRequest = {
+            dropDownExpanded = false
+        },
+        modifier = Modifier
+            .padding(0.dp,20.dp)
+            .width(with(LocalDensity.current){dropDownSize.width.toDp()})
+        //set it to same width as input box
+    ) {
+        currentItems.forEach { materialOption ->
+            DropdownMenuItem(onClick = {
+                onDropdownClick(materialOption)
+                dropDownExpanded = false
+            }) {
+                Text(text = materialOption)
+            }
+        }
+    }
+}

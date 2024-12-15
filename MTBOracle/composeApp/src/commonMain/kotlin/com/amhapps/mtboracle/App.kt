@@ -1,6 +1,7 @@
 package com.amhapps.mtboracle
 
 import Bike
+import BikeData
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,12 +27,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.core.bundle.Bundle
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -39,10 +44,9 @@ import mtboracle.composeapp.generated.resources.Res
 import mtboracle.composeapp.generated.resources.compose_multiplatform
 import mtboracle.composeapp.generated.resources.mtb_oracle_bike_v1
 import mtboracle.composeapp.generated.resources.transparent_mtb_oracle_bike_v2
+import kotlin.reflect.typeOf
 
 //TODO
-// - finish the dropdown menu
-// - class for inputs e.g. bikeInputs
 // - finish form and make look pretty
 // - see if navigation transition is changeable
 // - app icon
@@ -65,21 +69,29 @@ fun App(web:Boolean){
                 val form = BrandAndModelForm(navController)
                 form.ShowForm()
             }
-            composable<CategoryConditionCountryScreen>{
+            composable<CategoryConditionCountryScreen>(
+                typeMap = mapOf(
+                    typeOf<BikeData>() to BikeDataObject.bikeData
+                )
+            ){
                 val args = it.toRoute<CategoryConditionCountryScreen>()
-                val form = CategoryConditionCountryForm(navController,args.bike)
+                val form = CategoryConditionCountryForm(navController,args.bikeData)
                 form.ShowForm()
             }
-            composable<SizeMaterialTravelScreen>{
+            composable<SizeMaterialTravelScreen>(
+                typeMap = mapOf(
+                    typeOf<BikeData>() to BikeDataObject.bikeData
+                )
+            ){
                 val args = it.toRoute<SizeMaterialTravelScreen>()
-                val form = SizeMaterialTravelForm(navController,args.bike)
+                val form = SizeMaterialTravelForm(navController,args.bikeData)
                 form.ShowForm()
             }
-            composable<ValuationScreen>{
-                val args = it.toRoute<ValuationScreen>()
-                val form = SizeMaterialTravelForm(navController,args.bike)
-                form.ShowForm()
-            }
+//            composable<ValuationScreen>{
+//                val args = it.toRoute<ValuationScreen>()
+//                val form = SizeMaterialTravelForm(navController,args.bikeData)
+//                form.ShowForm()
+//            }
         }
     }
 
@@ -91,22 +103,41 @@ object HomeScreen
 @Serializable
 object BrandModelYearScreen
 
+@Serializable
+object BikeDataObject {
+    val bikeData = object : NavType<BikeData>(isNullableAllowed = false) {
+        override fun get(bundle: Bundle, key: String): BikeData? {
+            return Json.decodeFromString(bundle.getString(key) ?: return null)
+        }
+
+        override fun parseValue(value: String): BikeData {
+            return Json.decodeFromString(value) //Uri again
+        }
+
+        override fun put(bundle: Bundle, key: String, value: BikeData) {
+            bundle.putString(key,Json.encodeToString(value))
+        }
+
+        override fun serializeAsValue(value: BikeData): String {
+            return Json.encodeToString(value) //I think it should have Uri but that's an Android thing
+        }
+
+    }
+}
+
 
 @Serializable
 data class CategoryConditionCountryScreen(
-    @Contextual
-    val bike:Bike
+    val bikeData: BikeData
 )
 
 @Serializable
 data class SizeMaterialTravelScreen(
-    @Contextual
-    val bike:Bike
+    val bikeData: BikeData
 )
 
 @Serializable
 data class ValuationScreen(
-    @Contextual
-    val bike:Bike
+    val bikeData: BikeData
 )
 
