@@ -53,78 +53,11 @@ import kotlin.reflect.typeOf
 // - make input boxes look pretty
 
 
-@Composable
-fun App(web:Boolean){
-    MTBOracleTheme{
-        val navController = rememberNavController()
-        NavHost(
-            navController = navController,
-            startDestination = HomeScreen
-        ){
-            composable<HomeScreen>{
-                val homepage = if (web) WebHomepage(navController) else Homepage(navController)
-                homepage.ShowHomepage()
-            }
-            composable<BrandModelYearScreen>{
-                val form = BrandAndModelForm(navController)
-                form.ShowForm()
-            }
-            composable<CategoryConditionCountryScreen>(
-                typeMap = mapOf(
-                    typeOf<BikeData>() to BikeDataObject.bikeData
-                )
-            ){
-                val args = it.toRoute<CategoryConditionCountryScreen>()
-                val form = CategoryConditionCountryForm(navController,args.bikeData)
-                form.ShowForm()
-            }
-            composable<SizeMaterialTravelScreen>(
-                typeMap = mapOf(
-                    typeOf<BikeData>() to BikeDataObject.bikeData
-                )
-            ){
-                val args = it.toRoute<SizeMaterialTravelScreen>()
-                val form = SizeMaterialTravelForm(navController,args.bikeData)
-                form.ShowForm()
-            }
-//            composable<ValuationScreen>{
-//                val args = it.toRoute<ValuationScreen>()
-//                val form = SizeMaterialTravelForm(navController,args.bikeData)
-//                form.ShowForm()
-//            }
-        }
-    }
-
-}
-
 @Serializable
 object HomeScreen
 
 @Serializable
 object BrandModelYearScreen
-
-@Serializable
-object BikeDataObject {
-    val bikeData = object : NavType<BikeData>(isNullableAllowed = false) {
-        override fun get(bundle: Bundle, key: String): BikeData? {
-            return Json.decodeFromString(bundle.getString(key) ?: return null)
-        }
-
-        override fun parseValue(value: String): BikeData {
-            return Json.decodeFromString(value) //Uri again
-        }
-
-        override fun put(bundle: Bundle, key: String, value: BikeData) {
-            bundle.putString(key,Json.encodeToString(value))
-        }
-
-        override fun serializeAsValue(value: BikeData): String {
-            return Json.encodeToString(value) //I think it should have Uri but that's an Android thing
-        }
-
-    }
-}
-
 
 @Serializable
 data class CategoryConditionCountryScreen(

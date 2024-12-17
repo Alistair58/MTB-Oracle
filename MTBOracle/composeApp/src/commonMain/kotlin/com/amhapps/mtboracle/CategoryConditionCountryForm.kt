@@ -45,12 +45,29 @@ class CategoryConditionCountryForm(private val navController: NavHostController,
         ){
             val categories = listOf("Trail","Enduro","XC","Downhill","E-bike","Gravel","Children's","Dirt Jump","Fat bike","Trials","Vintage")
             var category by remember { mutableStateOf("") }
-            CompleteDropdown(category, onValueChange = {category = it}, onDropdownClick = {category = it},"Category",categories,"Category Dropdown")
+            CompleteDropdown(
+                value = category,
+                onValueChange = {category = it},
+                onDropdownClick = {category = it},
+                label = "Category",
+                items = categories,
+                iconContentDescription = "Category Dropdown",
+                modifier = Modifier.padding(0.dp,20.dp)
+            )
+
 
 
             val conditions = listOf("Brand new","Excellent","Good","Poor","For parts/unrideable","Other")
             var condition by remember { mutableStateOf("") }
-            CompleteDropdown(condition, onValueChange = {condition = it}, onDropdownClick = {condition = it},"Condition",conditions,"Condition Dropdown")
+            CompleteDropdown(
+                value = condition,
+                onValueChange = {condition = it},
+                onDropdownClick = {condition = it},
+                label = "Condition",
+                items = conditions,
+                iconContentDescription = "Condition Dropdown",
+                modifier = Modifier.padding(0.dp,20.dp)
+            )
 
             val countries = listOf("Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda","Argentina","Armenia",
                 "Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin",
@@ -71,7 +88,15 @@ class CategoryConditionCountryForm(private val navController: NavHostController,
                 "United Arab Emirates","United Kingdom","United States of America (USA)","Uruguay","Uzbekistan","Vanuatu","Venezuela","Vietnam","Western Sahara","Yemen","Zambia","Zimbabwe"
             )
             var country by remember { mutableStateOf("") }
-            SearchableDropdown(country, onValueChange = {country = it}, onDropdownClick = {country = it},"Country",countries,"Country Dropdown")
+            SearchableDropdown(
+                value = country,
+                onValueChange = {country = it},
+                onDropdownClick = {country = it},
+                label = "Country",
+                items = countries,
+                iconContentDescription = "Country Dropdown",
+                modifier = Modifier.padding(0.dp,20.dp)
+            )
 
             Button(
                 onClick = {
@@ -82,7 +107,7 @@ class CategoryConditionCountryForm(private val navController: NavHostController,
                 },
                 colors = MTBOracleTheme.buttonColors,
                 modifier = Modifier
-                    .padding(0.dp,20.dp)
+                    .padding(0.dp,30.dp)
                     .height(50.dp)
                     .width(100.dp)
                 ){

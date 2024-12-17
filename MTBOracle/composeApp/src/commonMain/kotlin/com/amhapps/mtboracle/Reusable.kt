@@ -2,7 +2,10 @@ package com.amhapps.mtboracle
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,6 +37,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.window.PopupProperties
 
 @Composable
 fun MTBOracleTextInput(  //has correct colouring, rounded corners and removed some unused TextField features
@@ -65,7 +69,8 @@ fun MTBOracleTextInput(  //has correct colouring, rounded corners and removed so
                     unfocusedBorderColor = Color.Gray,
                     focusedLabelColor = MTBOracleTheme.colors.forestLight,
                     unfocusedLabelColor = Color.Gray,
-                    cursorColor = MTBOracleTheme.colors.forestLight),
+                    cursorColor = MTBOracleTheme.colors.forestLight,
+                    placeholderColor = MTBOracleTheme.colors.forestLight),
                 shape = RoundedCornerShape(10.dp)
         )
 }
@@ -76,6 +81,7 @@ fun CompleteDropdown(
     onValueChange: (String) -> Unit,
     onDropdownClick: (String) -> Unit,
     label:String,
+    modifier:Modifier,
     items:List<String>,
     iconContentDescription:String
 ){
@@ -85,39 +91,42 @@ fun CompleteDropdown(
         Icons.Filled.KeyboardArrowUp
     else
         Icons.Filled.KeyboardArrowDown
-    MTBOracleTextInput(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = Modifier
-            .fillMaxWidth()
-            .onGloballyPositioned { coordinates ->
-                // This value is used to assign to
-                // the DropDown the same width
-                dropDownSize = coordinates.size.toSize()
-            },
-        label = { Text(label) },
-        readOnly = true,
-        trailingIcon = {
-            Icon(icon,iconContentDescription,
-                Modifier.clickable {dropDownExpanded = !dropDownExpanded })
-        }
-    )
-    DropdownMenu(
-        expanded = dropDownExpanded,
-        onDismissRequest = {
-            dropDownExpanded = false
-        },
-        modifier = Modifier
-            .padding(0.dp,20.dp)
-            .width(with(LocalDensity.current){dropDownSize.width.toDp()})
-        //set it to same width as input box
-    ) {
-        items.forEach { materialOption ->
-            DropdownMenuItem(onClick = {
-                onDropdownClick(materialOption)
+    Column(modifier = modifier){
+        MTBOracleTextInput(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .onGloballyPositioned { coordinates ->
+                    // This value is used to assign to
+                    // the DropDown the same width
+                    dropDownSize = coordinates.size.toSize()
+                }
+                .clickable { dropDownExpanded = !dropDownExpanded },
+            label = { Text(label) },
+            readOnly = true,
+            trailingIcon = {
+                Icon(icon, iconContentDescription,
+                    Modifier.clickable { dropDownExpanded = !dropDownExpanded })
+            }
+        )
+        DropdownMenu(
+            expanded = dropDownExpanded,
+            onDismissRequest = {
                 dropDownExpanded = false
-            }) {
-                Text(text = materialOption)
+            },
+            modifier = Modifier
+                .padding(0.dp, 20.dp)
+                .width(with(LocalDensity.current) { dropDownSize.width.toDp() })
+                .heightIn(0.dp,300.dp)
+            //set it to same width as input box
+        ) {
+            items.forEach { materialOption ->
+                DropdownMenuItem(onClick = {
+                    onDropdownClick(materialOption)
+                    dropDownExpanded = false
+                }) {
+                    Text(text = materialOption)
+                }
             }
         }
     }
@@ -129,6 +138,7 @@ fun SearchableDropdown(
     onValueChange: (String) -> Unit,
     onDropdownClick: (String) -> Unit,
     label:String,
+    modifier: Modifier,
     items:List<String>,
     iconContentDescription:String
 ){
@@ -139,42 +149,46 @@ fun SearchableDropdown(
         Icons.Filled.KeyboardArrowUp
     else
         Icons.Filled.KeyboardArrowDown
-    MTBOracleTextInput(
-        value = value,
-        onValueChange = { newVal ->
-            onValueChange(newVal)
-            currentItems = items.filter { it.lowercase().contains(newVal.lowercase()) }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .onGloballyPositioned { coordinates ->
-                // This value is used to assign to
-                // the DropDown the same width
-                dropDownSize = coordinates.size.toSize()
+    Box(modifier = modifier){
+        MTBOracleTextInput(
+            value = value,
+            onValueChange = { newVal ->
+                onValueChange(newVal)
+                currentItems = items.filter { it.lowercase().contains(newVal.lowercase()) }
             },
-        label = { Text(label) },
-        readOnly = false,
-        trailingIcon = {
-            Icon(icon,iconContentDescription,
-                Modifier.clickable {dropDownExpanded = !dropDownExpanded })
-        }
-    )
-    DropdownMenu(
-        expanded = dropDownExpanded,
-        onDismissRequest = {
-            dropDownExpanded = false
-        },
-        modifier = Modifier
-            .padding(0.dp,20.dp)
-            .width(with(LocalDensity.current){dropDownSize.width.toDp()})
-        //set it to same width as input box
-    ) {
-        currentItems.forEach { materialOption ->
-            DropdownMenuItem(onClick = {
-                onDropdownClick(materialOption)
+            modifier = Modifier
+                .onGloballyPositioned { coordinates ->
+                    // This value is used to assign to
+                    // the DropDown the same width
+                    dropDownSize = coordinates.size.toSize()
+                }
+                .clickable { dropDownExpanded = !dropDownExpanded },
+            label = { Text(label) },
+            readOnly = false,
+            trailingIcon = {
+                Icon(icon, iconContentDescription,
+                    Modifier.clickable { dropDownExpanded = !dropDownExpanded })
+            }
+        )
+        DropdownMenu(
+            expanded = dropDownExpanded,
+            onDismissRequest = {
                 dropDownExpanded = false
-            }) {
-                Text(text = materialOption)
+            },
+            properties = PopupProperties(focusable = false),
+            modifier = Modifier
+                .padding(0.dp, 20.dp)
+                .width(with(LocalDensity.current) { dropDownSize.width.toDp() })
+                .heightIn(0.dp,300.dp)
+            //set it to same width as input box
+        ) {
+            currentItems.forEach { materialOption ->
+                DropdownMenuItem(onClick = {
+                    onDropdownClick(materialOption)
+                    dropDownExpanded = false
+                }) {
+                    Text(text = materialOption)
+                }
             }
         }
     }

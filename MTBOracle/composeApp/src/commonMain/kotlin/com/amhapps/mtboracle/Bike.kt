@@ -12,8 +12,8 @@ data class BikeData(
     var size: String = "",
     var wheelSize: String = "",
     var material: String = "",
-    var frontTravel: String = "",
-    var rearTravel: String = "",
+    var frontTravel: Int = -1,
+    var rearTravel: Int = -1,
     var country: String = ""
 )
 
@@ -157,18 +157,18 @@ class Bike(
         return encoded
     }
 
-    private fun encodeTravel(travel: String?): Int {
-        var travelInt: Int
-        if (null == travel) return 0
+    private fun encodeTravel(travel: Int?): Int {
+        var encoded:Int
+        if (null == travel || travel < 0) return 0
         try {
-            travelInt =
+            encoded =
                 round(travel.toFloat() / 10.0).toInt() //round to nearest ten and divide by 10 e.g. 123 -> 12
         } catch (e: NumberFormatException) {
             println("Could not encode travel: $travel") //A lot of listings don't have travel
             return 0
         }
-        travelInt = min(travelInt.toDouble(), 25.0).toInt()
-        travelInt = max(travelInt.toDouble(), 0.0).toInt()
-        return travelInt + 1 //reserve neuron 0 for no travel info -therefore max is actually 26
+        encoded = min(encoded.toDouble(), 25.0).toInt()
+        encoded = max(encoded.toDouble(), 0.0).toInt()
+        return encoded + 1 //reserve neuron 0 for no travel info -therefore max is actually 26
     }
 }

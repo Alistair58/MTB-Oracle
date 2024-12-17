@@ -47,12 +47,15 @@ class SizeMaterialTravelForm(private val navController: NavHostController, priva
         ){
             val sizes = listOf("XS","S","M","L","XL","XXL")
             var size by remember { mutableStateOf("") }
-            CompleteDropdown(size,
+            CompleteDropdown(
+                size,
                 onValueChange = { size = it },
                 onDropdownClick = { size = it },
                 iconContentDescription = "Sizes Dropdown",
                 items = sizes,
-                label="Size")
+                label="Size",
+                modifier = Modifier.padding(0.dp,20.dp)
+            )
 
             val wSizes = listOf("<16\"","20\"","24\"","26\"","27.5\"/650B","29\"","650C","700C")
             var wSize by remember { mutableStateOf("") }
@@ -61,13 +64,15 @@ class SizeMaterialTravelForm(private val navController: NavHostController, priva
                 onDropdownClick = { wSize = it },
                 iconContentDescription = "Wheel Sizes Dropdown",
                 items = wSizes,
-                label="Wheel Size")
+                label="Wheel Size",
+                modifier = Modifier.padding(0.dp,20.dp)
+            )
 
             var fTravel by remember { mutableStateOf("") }
             MTBOracleTextInput(
                 value = fTravel,
                 onValueChange = { fTravel = it },
-                label = { Text("Front Suspension Travel:") },
+                label = { Text("Front Suspension Travel (mm):") },
                 modifier = Modifier
                     .padding(0.dp,20.dp),
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
@@ -77,7 +82,7 @@ class SizeMaterialTravelForm(private val navController: NavHostController, priva
             MTBOracleTextInput(
                 value = rTravel,
                 onValueChange = { rTravel = it },
-                label = { Text("Rear Suspension Travel:") },
+                label = { Text("Rear Suspension Travel (mm):") },
                 modifier = Modifier
                     .padding(0.dp,20.dp),
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
@@ -90,14 +95,28 @@ class SizeMaterialTravelForm(private val navController: NavHostController, priva
                 onDropdownClick = { material = it },
                 iconContentDescription = "Materials Dropdown",
                 items = materials,
-                label="Material")
+                label="Material",
+                modifier = Modifier.padding(0.dp,20.dp))
             Button(
                 onClick = {
-                    //navController.navigate(YearAndMaterialScreen(brand,model))
+                    try {
+                        val fTravelInt:Int = fTravel.toInt()
+                        val rTravelInt:Int = rTravel.toInt()
+                        bikeData.size = size
+                        bikeData.wheelSize = wSize
+                        bikeData.frontTravel = fTravelInt
+                        bikeData.rearTravel = rTravelInt
+                        bikeData.material = material
+                        navController.navigate(ValuationScreen(bikeData))
+                    }
+                    catch(e:Exception){
+                        //TODO - official error message
+                    }
+
                 },
                 colors = MTBOracleTheme.buttonColors,
                 modifier = Modifier
-                    .padding(0.dp,20.dp)
+                    .padding(0.dp,30.dp)
                     .height(50.dp)
                     .width(100.dp)
             ){

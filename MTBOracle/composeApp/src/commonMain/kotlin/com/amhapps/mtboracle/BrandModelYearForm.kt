@@ -37,7 +37,9 @@ class BrandAndModelForm(private val navController: NavHostController) {
                 text = "Please enter the following information so" +
                         " that we can accurately estimate the value of your bike" ,
                 fontSize = 14.sp,
-                color = Color.Black
+                color = Color.Black,
+                modifier = Modifier
+                    .padding(40.dp,5.dp)
             )
             var brand by remember { mutableStateOf("") }
             MTBOracleTextInput(
@@ -64,20 +66,29 @@ class BrandAndModelForm(private val navController: NavHostController) {
                     Text("Year:")
                 },
                 modifier = Modifier
-                    .fillMaxWidth()
                     .padding(0.dp,20.dp)
             )
-            Text("Even if you don't know the exact year, putting in a rough year will give a more accurate valuation", fontSize = 12.sp)
+            Text("Even if you don't know the exact year, putting in a rough year will give a more accurate valuation",
+                fontSize = 12.sp,
+                modifier = Modifier
+                    .padding(40.dp,5.dp))
 
             Button(
                 onClick = {
-                    val yearInt:Int = year.toInt()
-                    val bikeData = BikeData(year=yearInt,brand=brand,model=model)
-                    navController.navigate(CategoryConditionCountryScreen(bikeData = bikeData))
+                    try{
+                        val yearInt:Int = year.toInt()
+                        val bikeData = BikeData(year=yearInt,brand=brand,model=model)
+                        navController.navigate(CategoryConditionCountryScreen(bikeData = bikeData))
+                    }
+                    catch(e:Exception){
+                        //TODO official error
+                    }
+
+
                 },
                 colors = MTBOracleTheme.buttonColors,
                 modifier = Modifier
-                    .padding(0.dp,20.dp)
+                    .padding(0.dp,30.dp)
                     .height(50.dp)
                     .width(100.dp)
                 ){

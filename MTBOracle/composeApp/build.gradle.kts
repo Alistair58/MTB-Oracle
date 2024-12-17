@@ -92,6 +92,13 @@ android {
 dependencies {
     implementation("androidx.navigation:navigation-compose:2.8.4")
     implementation(libs.androidx.navigation.safe.args.generator)
+    implementation(libs.gson)
     debugImplementation(compose.uiTooling)
 }
 
+configurations {
+    all {
+        exclude(group =  "xmlpull", module = "xmlpull")
+        exclude(group =  "xpp3", module = "xpp3_main")
+    }
+}
