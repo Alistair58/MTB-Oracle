@@ -17,58 +17,16 @@ data class BikeData(
     var country: String = ""
 )
 
-class Bike(
+abstract class Bike(
     private var bikeData: BikeData
 ) {
     private val name = "${bikeData.year} ${bikeData.brand} ${bikeData.model}"
         get() = field
 
 
-    val values: FloatArray
-        get() {
-            var brandInfo = arrayOfNulls<Float>(6)
-            var modelInfo = arrayOfNulls<Float>(6)
-            var countryInfo = arrayOfNulls<Float>(6)
-            //brandInfo = Dataset.getBrandStats(brand).toArray(brandInfo) //min,LQ,median,UQ,max,SD
-            //modelInfo = Dataset.getModelStats(brand, model).toArray(modelInfo)
-            //countryInfo = Dataset.getCountryStats(country).toArray(countryInfo)
+    abstract fun getValues(): FloatArray
 
-            val values = FloatArray(26)
-            values[0] = brandInfo[0]!! //min BRAND
-            values[1] = brandInfo[1]!! //LQ
-            values[2] = brandInfo[2]!! //median
-            values[3] = brandInfo[3]!! //UQ
-            values[4] = brandInfo[4]!! //max 
-            values[5] = brandInfo[5]!! //SD
-
-            values[6] = modelInfo[0]!! //min MODEL
-            values[7] = modelInfo[1]!! //LQ
-            values[8] = modelInfo[2]!! //median
-            values[9] = modelInfo[3]!! //UQ
-            values[10] = modelInfo[4]!! //max 
-            values[11] = modelInfo[5]!! //SD
-
-
-            values[12] = countryInfo[0]!! //min COUNTRY
-            values[13] = countryInfo[1]!! //LQ
-            values[14] = countryInfo[2]!! //median
-            values[15] = countryInfo[3]!! //UQ
-            values[16] = countryInfo[4]!! //max 
-            values[17] = countryInfo[5]!! //SD
-
-            values[18] = encodeYear(bikeData.year).toFloat()
-            values[19] = encodeCondition(bikeData.condition).toFloat()
-            values[20] = encodeCategory(bikeData.category).toFloat()
-            values[21] = encodeSize(bikeData.size).toFloat()
-            values[22] = encodeWheelSize(bikeData.wheelSize).toFloat()
-            values[23] = encodeMaterial(bikeData.material).toFloat()
-            values[24] = encodeTravel(bikeData.frontTravel).toFloat()
-            values[25] = encodeTravel(bikeData.rearTravel).toFloat()
-
-            return values
-        }
-
-    private fun encodeYear(year: Int): Int {
+    protected fun encodeYear(year: Int): Int {
         val encoded = if (year >= 1960 && year < 1970) 1
         else if (year >= 1970 && year < 1986) 2
         else if (year >= 1986 && year < 1991) 3
@@ -80,7 +38,7 @@ class Bike(
     }
 
 
-    private fun encodeCategory(category: String?): Int {
+    protected fun encodeCategory(category: String?): Int {
         if (null == category) return 0
         val encoded = when (category) {
             "xc" -> 1
@@ -99,7 +57,7 @@ class Bike(
         return encoded
     }
 
-    private fun encodeCondition(condition: String?): Int {
+    protected fun encodeCondition(condition: String?): Int {
         if (null == condition) return 0
         val encoded = when (condition) {
             "new" -> 1
@@ -113,7 +71,7 @@ class Bike(
         return encoded
     }
 
-    private fun encodeSize(size: String?): Int {
+    protected fun encodeSize(size: String?): Int {
         if (null == size) return 0
         val encoded = when (size) {
             "xs", "12", "13", "14", "43cm", "44cm", "45cm", "46cm", "47cm", "48cm", "49cm", "50cm" -> 1
@@ -127,7 +85,7 @@ class Bike(
         return encoded
     }
 
-    private fun encodeWheelSize(wheelSize: String?): Int {
+    protected fun encodeWheelSize(wheelSize: String?): Int {
         if (null == wheelSize) return 0
         val encoded = when (wheelSize) {
             "16" -> 1
@@ -143,7 +101,7 @@ class Bike(
         return encoded
     }
 
-    private fun encodeMaterial(material: String?): Int {
+    protected fun encodeMaterial(material: String?): Int {
         if (null == material) return 0
         val encoded = when (material) {
             "aluminium" -> 1
@@ -157,7 +115,7 @@ class Bike(
         return encoded
     }
 
-    private fun encodeTravel(travel: Int?): Int {
+    protected fun encodeTravel(travel: Int?): Int {
         var encoded:Int
         if (null == travel || travel < 0) return 0
         try {

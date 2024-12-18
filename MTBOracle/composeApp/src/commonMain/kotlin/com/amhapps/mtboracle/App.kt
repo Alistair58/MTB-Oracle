@@ -41,16 +41,18 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 import mtboracle.composeapp.generated.resources.Res
-import mtboracle.composeapp.generated.resources.compose_multiplatform
-import mtboracle.composeapp.generated.resources.mtb_oracle_bike_v1
-import mtboracle.composeapp.generated.resources.transparent_mtb_oracle_bike_v2
 import kotlin.reflect.typeOf
 
 //TODO
 // - finish form and make look pretty
+// - bike inputs e.g.brand model splitting are not correct
+// - sort out warnings and make robust
 // - see if navigation transition is changeable
 // - app icon
 // - make input boxes look pretty
+
+//Refactor list
+// - duplication of neural network files for android and for wasm
 
 
 @Serializable

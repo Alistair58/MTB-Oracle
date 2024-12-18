@@ -1,7 +1,7 @@
 package com.amhapps.mtboracle
 
 
-internal class Network {
+abstract class NeuralNetwork {
     protected var weights: Array<Array<FloatArray>>
     protected var activations: Array<FloatArray>
     protected var numNeurones: IntArray = intArrayOf(147, 100, 1)
@@ -53,24 +53,7 @@ internal class Network {
     }
 
 
-    fun loadWeights(): Array<Array<FloatArray>> {
-        var lWeights = Array(0) { Array(0) { FloatArray(0) } }
-        try {
-            val myObj = context.("resources/NeuralNetworkRes/weights.json")
-            val myReader: java.util.Scanner = java.util.Scanner(myObj)
-            var data = ""
-            while (myReader.hasNextLine()) {
-                data += myReader.nextLine()
-            }
-            myReader.close()
-            val builder: GsonBuilder = GsonBuilder()
-            val gson :Gson =  builder.create()
-            lWeights = gson.fromJson(data, Array<Array<FloatArray>>::class.java)
-        } catch (e: Exception) {
-            println(e)
-        }
-        return lWeights
-    }
+    abstract fun loadWeights(): Array<Array<FloatArray>>
 
     fun loadActivations(): Array<FloatArray> {
         return Array(numNeurones.size) { FloatArray(largestLayer) }

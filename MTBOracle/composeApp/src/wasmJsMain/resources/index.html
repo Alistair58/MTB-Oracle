@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MTBOracle</title>
     <link type="text/css" rel="stylesheet" href="styles.css">
+    <script>
+
+        let jsonData;
+
+        function getData() {
+            return JSON.stringify(jsonData);
+        }
+        fetch('data.json')
+            .then(response => response.json())
+            .then(data => {
+                jsonData = data;
+            })
+            .catch(error => console.error('Error:', error));
+    </script>
     <script type="application/javascript" src="composeApp.js"></script>
 </head>
 <body>

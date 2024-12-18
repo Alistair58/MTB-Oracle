@@ -92,7 +92,7 @@ android {
 dependencies {
     implementation("androidx.navigation:navigation-compose:2.8.4")
     implementation(libs.androidx.navigation.safe.args.generator)
-    implementation(libs.gson)
+    implementation("com.google.code.gson:gson:2.8.8")
     debugImplementation(compose.uiTooling)
 }
 

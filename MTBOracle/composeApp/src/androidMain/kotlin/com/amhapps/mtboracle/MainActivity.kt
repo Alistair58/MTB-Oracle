@@ -3,6 +3,7 @@ package com.amhapps.mtboracle
 import BikeData
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -20,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,7 +35,6 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mtboracle.composeapp.generated.resources.Res
-import mtboracle.composeapp.generated.resources.mtb_oracle_bike_v1
 import org.jetbrains.compose.resources.painterResource
 import kotlin.reflect.typeOf
 
@@ -80,11 +81,15 @@ fun AndroidApp(){
                 val form = SizeMaterialTravelForm(navController, args.bikeData)
                 form.ShowForm()
             }
-//            composable<ValuationScreen>{
-//                val args = it.toRoute<ValuationScreen>()
-//                val form = SizeMaterialTravelForm(navController,args.bikeData)
-//                form.ShowForm()
-//            }
+            composable<ValuationScreen>(
+                typeMap = mapOf(
+                    typeOf<BikeData>() to BikeDataObject.bikeData
+                )
+            ){
+                val args = it.toRoute<ValuationScreen>()
+                val page = AndroidValuationPage(navController,args.bikeData,LocalContext.current)
+                page.show()
+            }
         }
     }
 }
