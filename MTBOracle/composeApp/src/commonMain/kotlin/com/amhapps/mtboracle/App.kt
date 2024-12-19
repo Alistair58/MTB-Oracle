@@ -44,12 +44,14 @@ import mtboracle.composeapp.generated.resources.Res
 import kotlin.reflect.typeOf
 
 //TODO
+// - fix back navigation - doesn't like passing BikeData
 // - finish form and make look pretty
 // - bike inputs e.g.brand model splitting are not correct
 // - sort out warnings and make robust
 // - see if navigation transition is changeable
 // - app icon
-// - make input boxes look pretty
+// - real time
+
 
 //Refactor list
 // - duplication of neural network files for android and for wasm
@@ -59,7 +61,9 @@ import kotlin.reflect.typeOf
 object HomeScreen
 
 @Serializable
-object BrandModelYearScreen
+data class BrandModelYearScreen(
+    val bikeData: BikeData
+)
 
 @Serializable
 data class CategoryConditionCountryScreen(

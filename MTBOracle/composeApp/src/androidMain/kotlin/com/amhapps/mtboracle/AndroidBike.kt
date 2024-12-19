@@ -2,6 +2,12 @@ package com.amhapps.mtboracle
 
 import Bike
 import BikeData
+import android.net.Uri
+import android.os.Bundle
+import androidx.navigation.NavType
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class AndroidBike(val bikeData: BikeData,val d:AndroidDataset): Bike(bikeData) {
     override fun getValues(): FloatArray{
@@ -45,5 +51,28 @@ class AndroidBike(val bikeData: BikeData,val d:AndroidDataset): Bike(bikeData) {
         values[25] = encodeTravel(bikeData.rearTravel).toFloat()
 
         return values
+    }
+}
+
+
+@Serializable
+object BikeDataObject {
+    val bikeData = object : NavType<BikeData>(isNullableAllowed = false) {
+        override fun get(bundle: Bundle, key: String): BikeData? {
+            return Json.decodeFromString(bundle.getString(key) ?: return null)
+        }
+
+        override fun parseValue(value: String): BikeData {
+            return Json.decodeFromString(Uri.decode(value)) //Uri again
+        }
+
+        override fun put(bundle: Bundle, key: String, value: BikeData) {
+            bundle.putString(key, Json.encodeToString(value))
+        }
+
+        override fun serializeAsValue(value: BikeData): String {
+            return Uri.encode(Json.encodeToString(value)) //Uri is only an Android thing
+        }
+
     }
 }

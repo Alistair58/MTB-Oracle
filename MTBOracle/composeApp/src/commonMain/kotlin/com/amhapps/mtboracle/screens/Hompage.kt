@@ -1,5 +1,6 @@
-package com.amhapps.mtboracle
+package com.amhapps.mtboracle.screens
 
+import BikeData
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -22,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
+import com.amhapps.mtboracle.BrandModelYearScreen
+import com.amhapps.mtboracle.MTBOracleTheme
 import mtboracle.composeapp.generated.resources.Res
 import mtboracle.composeapp.generated.resources.transparent_mtb_oracle_bike_v2
 import org.jetbrains.compose.resources.painterResource
@@ -84,7 +87,9 @@ open class Homepage(private var navController: NavController){
             fontSize = 20.sp)
         Button(
             onClick = {
-                navController.navigate(BrandModelYearScreen)
+                navController.navigate(
+                    BrandModelYearScreen(bikeData = BikeData())
+                )
             },
             colors = MTBOracleTheme.buttonColors,
 

@@ -1,17 +1,8 @@
 package com.amhapps.mtboracle
 
 import BikeData
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Button
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.ComposeViewport
 import androidx.core.bundle.Bundle
 import androidx.navigation.NavType
@@ -19,6 +10,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.amhapps.mtboracle.screens.BrandAndModelForm
+import com.amhapps.mtboracle.screens.CategoryConditionCountryForm
+import com.amhapps.mtboracle.screens.SizeMaterialTravelForm
 import kotlinx.browser.document
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString

@@ -1,25 +1,14 @@
-package com.amhapps.mtboracle
+package com.amhapps.mtboracle.screens
 
-import Bike
 import BikeData
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,26 +16,27 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavHostController
+import androidx.navigation.navOptions
+import com.amhapps.mtboracle.CompleteDropdown
+import com.amhapps.mtboracle.MTBOracleTextInput
+import com.amhapps.mtboracle.MTBOracleTheme
+import com.amhapps.mtboracle.ValuationScreen
 
-class SizeMaterialTravelForm(private val navController: NavHostController, private val bikeData: BikeData) {
+open class SizeMaterialTravelForm(private val navController: NavHostController, private val bikeData: BikeData){
     @Composable
-    fun ShowForm(){
+    open fun ShowForm(){
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
         ){
             val sizes = listOf("XS","S","M","L","XL","XXL")
-            var size by remember { mutableStateOf("") }
+            var size by remember { mutableStateOf(bikeData.size) }
             CompleteDropdown(
                 size,
                 onValueChange = { size = it },
@@ -58,7 +48,7 @@ class SizeMaterialTravelForm(private val navController: NavHostController, priva
             )
 
             val wSizes = listOf("<16\"","20\"","24\"","26\"","27.5\"/650B","29\"","650C","700C")
-            var wSize by remember { mutableStateOf("") }
+            var wSize by remember { mutableStateOf(bikeData.wheelSize) }
             CompleteDropdown(wSize,
                 onValueChange = { wSize = it },
                 onDropdownClick = { wSize = it },
@@ -68,7 +58,7 @@ class SizeMaterialTravelForm(private val navController: NavHostController, priva
                 modifier = Modifier.padding(0.dp,20.dp)
             )
 
-            var fTravel by remember { mutableStateOf("") }
+            var fTravel by remember { mutableStateOf(if (bikeData.frontTravel !=-1) bikeData.frontTravel.toString() else "") }
             MTBOracleTextInput(
                 value = fTravel,
                 onValueChange = { fTravel = it },
@@ -78,7 +68,7 @@ class SizeMaterialTravelForm(private val navController: NavHostController, priva
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
             )
 
-            var rTravel by remember { mutableStateOf("") }
+            var rTravel by remember { mutableStateOf(if (bikeData.rearTravel !=-1) bikeData.rearTravel.toString() else "" ) }
             MTBOracleTextInput(
                 value = rTravel,
                 onValueChange = { rTravel = it },
@@ -89,7 +79,7 @@ class SizeMaterialTravelForm(private val navController: NavHostController, priva
             )
 
             val materials = listOf("Aluminium","Carbon fibre","Chromoly","Steel","Titanium","Other")
-            var material by remember { mutableStateOf("") }
+            var material by remember { mutableStateOf(bikeData.material) }
             CompleteDropdown(material,
                 onValueChange = { material = it },
                 onDropdownClick = { material = it },
@@ -107,7 +97,12 @@ class SizeMaterialTravelForm(private val navController: NavHostController, priva
                         bikeData.frontTravel = fTravelInt
                         bikeData.rearTravel = rTravelInt
                         bikeData.material = material
-                        navController.navigate(ValuationScreen(bikeData))
+                        navController.navigate(
+                            ValuationScreen(bikeData),
+                            navOptions =  navOptions {
+                                restoreState = true
+                            }
+                        )
                     }
                     catch(e:Exception){
                         //TODO - official error message
@@ -126,4 +121,5 @@ class SizeMaterialTravelForm(private val navController: NavHostController, priva
             }
         }
     }
+
 }

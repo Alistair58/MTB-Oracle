@@ -2,16 +2,13 @@ package com.amhapps.mtboracle
 
 
 abstract class NeuralNetwork {
-    protected var weights: Array<Array<FloatArray>>
-    protected var activations: Array<FloatArray>
+    abstract protected var weights: Array<Array<FloatArray>>
+    abstract protected var activations: Array<FloatArray>
     protected var numNeurones: IntArray = intArrayOf(147, 100, 1)
     protected var largestLayer: Int = 147
     protected val inputIndices: IntArray = intArrayOf(18, 53, 59, 71, 78, 87, 93, 120)
 
-    init {
-        this.weights = loadWeights()
-        this.activations = loadActivations()
-    }
+
 
 
     private fun resetActivations() {

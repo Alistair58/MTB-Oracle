@@ -5,17 +5,12 @@ abstract class Dataset {
     protected var countryStats: Map<String, ArrayList<Float>>? = null
     protected val exchangeRates: HashMap<String, Float> =
         HashMap<String, Float>()
-    init {
-        loadModelStats()
-        loadCountryStats()
-        loadExchangeRates()
-    }
 
-    abstract protected fun loadModelStats()
+    protected abstract fun loadModelStats()
 
-    abstract protected fun loadCountryStats()
+    protected abstract fun loadCountryStats()
 
-    abstract protected fun loadExchangeRates()
+    protected abstract fun loadExchangeRates()
 
 
     fun getExchangeRate(currency: String): Float {
@@ -29,7 +24,7 @@ abstract class Dataset {
         var country = country
         country = country.lowercase()
         val stats: ArrayList<Float> = countryStats!![country]?:ArrayList<Float>()
-        if (null == stats) {
+        if (stats.size == 0) {
             println("Could not get stats for $country")
             return modelStats!![""]!![""]?:ArrayList<Float>()
         }

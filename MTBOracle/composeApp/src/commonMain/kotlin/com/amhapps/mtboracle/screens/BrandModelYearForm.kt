@@ -1,10 +1,8 @@
-package com.amhapps.mtboracle
+package com.amhapps.mtboracle.screens
 
-import Bike
 import BikeData
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -23,10 +21,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.navOptions
+import com.amhapps.mtboracle.CategoryConditionCountryScreen
+import com.amhapps.mtboracle.MTBOracleTextInput
+import com.amhapps.mtboracle.MTBOracleTheme
 
-class BrandAndModelForm(private val navController: NavHostController) {
+open class BrandAndModelForm(private val navController: NavHostController, private var bikeData:BikeData){
     @Composable
-    fun ShowForm(){
+    open fun ShowForm(){
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
@@ -41,7 +43,7 @@ class BrandAndModelForm(private val navController: NavHostController) {
                 modifier = Modifier
                     .padding(40.dp,5.dp)
             )
-            var brand by remember { mutableStateOf("") }
+            var brand by remember { mutableStateOf(bikeData.brand) }
             MTBOracleTextInput(
                 value = brand,
                 onValueChange = { brand = it },
@@ -49,7 +51,7 @@ class BrandAndModelForm(private val navController: NavHostController) {
                 modifier = Modifier
                     .padding(0.dp,20.dp)
             )
-            var model by remember { mutableStateOf("") }
+            var model by remember { mutableStateOf(bikeData.model) }
             MTBOracleTextInput(
                 value = model,
                 onValueChange = { model = it },
@@ -57,7 +59,7 @@ class BrandAndModelForm(private val navController: NavHostController) {
                 modifier = Modifier
                     .padding(0.dp,20.dp)
             )
-            var year by remember { mutableStateOf("") }
+            var year by remember { mutableStateOf(if (bikeData.year !=-1) bikeData.year.toString() else "" ) }
             MTBOracleTextInput(
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 value = year,
@@ -76,9 +78,17 @@ class BrandAndModelForm(private val navController: NavHostController) {
             Button(
                 onClick = {
                     try{
-                        val yearInt:Int = year.toInt()
-                        val bikeData = BikeData(year=yearInt,brand=brand,model=model)
-                        navController.navigate(CategoryConditionCountryScreen(bikeData = bikeData))
+                        var yearInt:Int = -1
+                        if(year != "") yearInt = year.toInt()
+                        bikeData.brand = brand.trim()
+                        bikeData.model = model.trim()
+                        bikeData.year = yearInt
+                        navController.navigate(
+                            CategoryConditionCountryScreen(bikeData = bikeData),
+                            navOptions =  navOptions {
+                                restoreState = true
+                            }
+                        )
                     }
                     catch(e:Exception){
                         //TODO official error
@@ -98,4 +108,5 @@ class BrandAndModelForm(private val navController: NavHostController) {
             }
         }
     }
+
 }

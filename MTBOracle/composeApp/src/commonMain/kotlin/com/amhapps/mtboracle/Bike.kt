@@ -2,8 +2,9 @@ import kotlinx.serialization.Serializable
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.round
+
 @Serializable
-data class BikeData(
+data class BikeData (
     var year:Int = -1,
     var brand: String = "",
     var model: String = "",
