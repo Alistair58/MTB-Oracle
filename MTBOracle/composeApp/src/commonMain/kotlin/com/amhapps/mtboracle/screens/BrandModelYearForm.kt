@@ -25,23 +25,24 @@ import androidx.navigation.navOptions
 import com.amhapps.mtboracle.CategoryConditionCountryScreen
 import com.amhapps.mtboracle.MTBOracleTextInput
 import com.amhapps.mtboracle.MTBOracleTheme
+import com.amhapps.mtboracle.WarningDialog
 
-open class BrandAndModelForm(private val navController: NavHostController, private var bikeData:BikeData){
+open class BrandModelYearForm(private val navController: NavHostController, private var bikeData:BikeData){
     @Composable
-    open fun ShowForm(){
+    open fun ShowForm() {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
 
-        ){
+        ) {
             Text(
                 text = "Please enter the following information so" +
-                        " that we can accurately estimate the value of your bike" ,
+                        " that we can accurately estimate the value of your bike",
                 fontSize = 14.sp,
                 color = Color.Black,
                 modifier = Modifier
-                    .padding(40.dp,5.dp)
+                    .padding(40.dp, 5.dp)
             )
             var brand by remember { mutableStateOf(bikeData.brand) }
             MTBOracleTextInput(
@@ -49,7 +50,7 @@ open class BrandAndModelForm(private val navController: NavHostController, priva
                 onValueChange = { brand = it },
                 label = { Text("Brand:") },
                 modifier = Modifier
-                    .padding(0.dp,20.dp)
+                    .padding(0.dp, 20.dp)
             )
             var model by remember { mutableStateOf(bikeData.model) }
             MTBOracleTextInput(
@@ -57,9 +58,9 @@ open class BrandAndModelForm(private val navController: NavHostController, priva
                 onValueChange = { model = it },
                 label = { Text("Model:") },
                 modifier = Modifier
-                    .padding(0.dp,20.dp)
+                    .padding(0.dp, 20.dp)
             )
-            var year by remember { mutableStateOf(if (bikeData.year !=-1) bikeData.year.toString() else "" ) }
+            var year by remember { mutableStateOf(if (bikeData.year != -1) bikeData.year.toString() else "") }
             MTBOracleTextInput(
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 value = year,
@@ -68,13 +69,20 @@ open class BrandAndModelForm(private val navController: NavHostController, priva
                     Text("Year:")
                 },
                 modifier = Modifier
-                    .padding(0.dp,20.dp)
+                    .padding(0.dp, 20.dp)
             )
-            Text("Even if you don't know the exact year, putting in a rough year will give a more accurate valuation",
+            Text(
+                "Even if you don't know the exact year, putting in a rough year will give a more accurate valuation",
                 fontSize = 12.sp,
                 modifier = Modifier
-                    .padding(40.dp,5.dp))
-
+                    .padding(40.dp, 5.dp)
+            )
+            NextButton(brand,model,year)
+        }
+    }
+        @Composable
+        open fun NextButton(brand:String,model:String,year:String){
+            var numberErrorDialog by remember { mutableStateOf(false) }
             Button(
                 onClick = {
                     try{
@@ -90,8 +98,8 @@ open class BrandAndModelForm(private val navController: NavHostController, priva
                             }
                         )
                     }
-                    catch(e:Exception){
-                        //TODO official error
+                    catch(e:NumberFormatException){
+                        numberErrorDialog = true
                     }
 
 
@@ -101,12 +109,21 @@ open class BrandAndModelForm(private val navController: NavHostController, priva
                     .padding(0.dp,30.dp)
                     .height(50.dp)
                     .width(100.dp)
-                ){
+            ){
                 Text(text = "Next",
                     color = Color.White,
                     fontSize = 20.sp)
             }
+            if(numberErrorDialog){
+                WarningDialog(
+                    onConfirmation = {},
+                    dialogTitle = "Year must be a number",
+                    dialogText = "",
+                    confirmExists = false,
+                    dismissColor = MTBOracleTheme.colors.forestLight,
+                    onDismiss = {numberErrorDialog = false}
+                )
+            }
         }
-    }
 
 }

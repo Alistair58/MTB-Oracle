@@ -3,20 +3,20 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.round
 
-@Serializable
-data class BikeData (
-    var year:Int = -1,
-    var brand: String = "",
-    var model: String = "",
-    var category: String = "",
-    var condition: String = "",
-    var size: String = "",
-    var wheelSize: String = "",
-    var material: String = "",
-    var frontTravel: Int = -1,
-    var rearTravel: Int = -1,
-    var country: String = ""
-)
+
+interface  BikeData { //needs to be Serializable AND Parcelable in Android
+    var year:Int
+    var brand: String
+    var model: String
+    var category: String
+    var condition: String
+    var size: String
+    var wheelSize: String
+    var material: String
+    var frontTravel: Float
+    var rearTravel: Float
+    var country: String
+}
 
 abstract class Bike(
     private var bikeData: BikeData
@@ -116,7 +116,7 @@ abstract class Bike(
         return encoded
     }
 
-    protected fun encodeTravel(travel: Int?): Int {
+    protected fun encodeTravel(travel: Float?): Int {
         var encoded:Int
         if (null == travel || travel < 0) return 0
         try {

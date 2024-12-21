@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.amhapps.mtboracle.screens.Homepage
+import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
 class MainActivity : ComponentActivity() {
@@ -28,52 +29,52 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             NavHost(
                 navController = navController,
-                startDestination = HomeScreen
+                startDestination = AndroidHomeScreen
             ) {
-                composable<HomeScreen> {
-                    val homepage = Homepage(navController)
+                composable<AndroidHomeScreen> {
+                    val homepage = AndroidHomepage(navController)
                     homepage.ShowHomepage()
                 }
-                composable<BrandModelYearScreen> (
+                composable<AndroidBrandModelYearScreen> (
                     typeMap = mapOf(
-                        typeOf<BikeData>() to BikeDataObject.bikeData
+                        typeOf<AndroidBikeData>() to AndroidBikeDataObject.bikeData
                     )
                 ){
-                    val prevBikeData = it.savedStateHandle.get<BikeData>("bikeData")
-                    val args = it.toRoute<BrandModelYearScreen>()
+                    val prevBikeData = it.savedStateHandle.get<AndroidBikeData>("bikeData")
+                    val args = it.toRoute<AndroidBrandModelYearScreen>()
                     val bikeData = prevBikeData ?: args.bikeData
-                    val form = AndroidBrandAndModelForm(navController, bikeData)
+                    val form = AndroidBrandModelYearForm(navController, bikeData)
                     form.ShowForm()
                 }
-                composable<CategoryConditionCountryScreen>(
+                composable<AndroidCategoryConditionCountryScreen>(
                     typeMap = mapOf(
-                        typeOf<BikeData>() to BikeDataObject.bikeData
+                        typeOf<AndroidBikeData>() to AndroidBikeDataObject.bikeData
                     )
                 ) {
-                    val prevBikeData = it.savedStateHandle.get<BikeData>("bikeData")
-                    val args = it.toRoute<CategoryConditionCountryScreen>()
+                    val prevBikeData = it.savedStateHandle.get<AndroidBikeData>("bikeData")
+                    val args = it.toRoute<AndroidCategoryConditionCountryScreen>()
                     val bikeData = prevBikeData ?: args.bikeData
                     val form = AndroidCategoryCountryConditionForm(navController, bikeData)
 
                     form.ShowForm()
                 }
-                composable<SizeMaterialTravelScreen>(
+                composable<AndroidSizeMaterialTravelScreen>(
                     typeMap = mapOf(
-                        typeOf<BikeData>() to BikeDataObject.bikeData
+                        typeOf<AndroidBikeData>() to AndroidBikeDataObject.bikeData
                     )
                 ) {
-                    val prevBikeData = it.savedStateHandle.get<BikeData>("bikeData")
-                    val args = it.toRoute<SizeMaterialTravelScreen>()
+                    val prevBikeData = it.savedStateHandle.get<AndroidBikeData>("bikeData")
+                    val args = it.toRoute<AndroidSizeMaterialTravelScreen>()
                     val bikeData = prevBikeData ?: args.bikeData
                     val form = AndroidSizeMaterialTravelForm(navController, bikeData)
                     form.ShowForm()
                 }
-                composable<ValuationScreen>(
+                composable<AndroidValuationScreen>(
                     typeMap = mapOf(
-                        typeOf<BikeData>() to BikeDataObject.bikeData
+                        typeOf<AndroidBikeData>() to AndroidBikeDataObject.bikeData
                     )
                 ) {
-                    val args = it.toRoute<ValuationScreen>()
+                    val args = it.toRoute<AndroidValuationScreen>()
                     val page = AndroidValuationPage(navController, args.bikeData,context)
                     page.show()
                 }
@@ -87,7 +88,27 @@ class MainActivity : ComponentActivity() {
 //        AndroidApp()
 //    }
 }
+@Serializable
+object AndroidHomeScreen
+@Serializable
+data class AndroidBrandModelYearScreen(
+    val bikeData: AndroidBikeData
+)
 
+@Serializable
+data class AndroidCategoryConditionCountryScreen(
+    val bikeData: AndroidBikeData
+)
+
+@Serializable
+data class AndroidSizeMaterialTravelScreen(
+    val bikeData: AndroidBikeData
+)
+
+@Serializable
+data class AndroidValuationScreen(
+    val bikeData: AndroidBikeData
+)
 
 
 

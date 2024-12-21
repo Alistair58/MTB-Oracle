@@ -25,7 +25,7 @@ import com.amhapps.mtboracle.MTBOracleTheme
 import com.amhapps.mtboracle.SearchableDropdown
 import com.amhapps.mtboracle.SizeMaterialTravelScreen
 
-open class CategoryConditionCountryForm(private val navController: NavHostController, private val bikeData: BikeData) {
+abstract class CategoryConditionCountryForm(private val navController: NavHostController, private val bikeData: BikeData) {
     @Composable
     open fun ShowForm(){
         Column(
@@ -88,31 +88,11 @@ open class CategoryConditionCountryForm(private val navController: NavHostContro
                 modifier = Modifier.padding(0.dp,20.dp)
             )
 
-
-
-            Button(
-                onClick = {
-                    bikeData.category = category
-                    bikeData.condition = condition
-                    bikeData.country = country
-                    navController.navigate(
-                        SizeMaterialTravelScreen(bikeData),
-                        navOptions =  navOptions {
-                            restoreState = true
-                        }
-                    )
-                },
-                colors = MTBOracleTheme.buttonColors,
-                modifier = Modifier
-                    .padding(0.dp,30.dp)
-                    .height(50.dp)
-                    .width(100.dp)
-                ){
-                Text(text = "Next",
-                    color = Color.White,
-                    fontSize = 20.sp)
-            }
+            NextButton(category,condition,country)
         }
     }
+
+    @Composable
+    abstract fun NextButton(category:String,condition:String,country:String)
 
 }

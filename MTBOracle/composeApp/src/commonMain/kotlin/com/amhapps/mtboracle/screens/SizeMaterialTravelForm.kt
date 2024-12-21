@@ -27,7 +27,7 @@ import com.amhapps.mtboracle.MTBOracleTextInput
 import com.amhapps.mtboracle.MTBOracleTheme
 import com.amhapps.mtboracle.ValuationScreen
 
-open class SizeMaterialTravelForm(private val navController: NavHostController, private val bikeData: BikeData){
+abstract class SizeMaterialTravelForm(private val navController: NavHostController, private val bikeData: BikeData){
     @Composable
     open fun ShowForm(){
         Column(
@@ -58,7 +58,7 @@ open class SizeMaterialTravelForm(private val navController: NavHostController, 
                 modifier = Modifier.padding(0.dp,20.dp)
             )
 
-            var fTravel by remember { mutableStateOf(if (bikeData.frontTravel !=-1) bikeData.frontTravel.toString() else "") }
+            var fTravel by remember { mutableStateOf(if (bikeData.frontTravel !=-1f) bikeData.frontTravel.toString() else "") }
             MTBOracleTextInput(
                 value = fTravel,
                 onValueChange = { fTravel = it },
@@ -68,7 +68,7 @@ open class SizeMaterialTravelForm(private val navController: NavHostController, 
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
             )
 
-            var rTravel by remember { mutableStateOf(if (bikeData.rearTravel !=-1) bikeData.rearTravel.toString() else "" ) }
+            var rTravel by remember { mutableStateOf(if (bikeData.rearTravel !=-1f) bikeData.rearTravel.toString() else "" ) }
             MTBOracleTextInput(
                 value = rTravel,
                 onValueChange = { rTravel = it },
@@ -87,39 +87,11 @@ open class SizeMaterialTravelForm(private val navController: NavHostController, 
                 items = materials,
                 label="Material",
                 modifier = Modifier.padding(0.dp,20.dp))
-            Button(
-                onClick = {
-                    try {
-                        val fTravelInt:Int = fTravel.toInt()
-                        val rTravelInt:Int = rTravel.toInt()
-                        bikeData.size = size
-                        bikeData.wheelSize = wSize
-                        bikeData.frontTravel = fTravelInt
-                        bikeData.rearTravel = rTravelInt
-                        bikeData.material = material
-                        navController.navigate(
-                            ValuationScreen(bikeData),
-                            navOptions =  navOptions {
-                                restoreState = true
-                            }
-                        )
-                    }
-                    catch(e:Exception){
-                        //TODO - official error message
-                    }
-
-                },
-                colors = MTBOracleTheme.buttonColors,
-                modifier = Modifier
-                    .padding(0.dp,30.dp)
-                    .height(50.dp)
-                    .width(100.dp)
-            ){
-                Text(text = "Next",
-                    color = Color.White,
-                    fontSize = 20.sp)
-            }
+            NextButton(size,wSize,fTravel,rTravel,material)
         }
     }
+
+    @Composable
+    abstract fun NextButton(size:String,wSize:String,fTravel:String,rTravel:String,material:String)
 
 }

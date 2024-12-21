@@ -23,13 +23,17 @@ import org.jetbrains.compose.resources.Font
 @Immutable
 data class ExtendedColors(
     val forest: Color,
-    val forestLight: Color
+    val forestLight: Color,
+    val lightRed: Color,
+    val yellowWarning:Color
 )
 
 val LocalExtendedColors = staticCompositionLocalOf {
     ExtendedColors(
         forest = Color(0xff5b8a6e),
-        forestLight = Color(0xff88b89b)
+        forestLight = Color(0xff88b89b),
+        lightRed = Color(0xffff4747),
+        yellowWarning = Color(0xffffd04e)
     )
 }
 
@@ -59,7 +63,9 @@ fun MTBOracleTheme( //Extends Material Theme
 ) {
     val extendedColors = ExtendedColors(
         forest = Color(0xff5b8a6e),
-        forestLight = Color(0xff88b89b)
+        forestLight = Color(0xff88b89b),
+        lightRed = Color(0xffff4747),
+        yellowWarning = Color(0xffffd04e)
     )
     CompositionLocalProvider(LocalExtendedColors provides extendedColors) {
         MaterialTheme(

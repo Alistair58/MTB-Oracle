@@ -79,4 +79,3 @@ data class SizeMaterialTravelScreen(
 data class ValuationScreen(
     val bikeData: BikeData
 )
-

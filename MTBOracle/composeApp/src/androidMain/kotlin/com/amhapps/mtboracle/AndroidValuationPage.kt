@@ -7,14 +7,14 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import com.amhapps.mtboracle.screens.ValuationPage
 
-class AndroidValuationPage(navController: NavHostController, private val bikeData: BikeData, private val context: Context
+class AndroidValuationPage(navController: NavHostController, private val bikeData: AndroidBikeData, private val context: Context
 ) : ValuationPage(navController, bikeData){
     @Composable
     override fun show(){
         BackHandler {
-//            navController.previousBackStackEntry
-//                ?.savedStateHandle
-//                ?.set("bikeData",bikeData)
+            navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.set("bikeData",bikeData)
             navController.popBackStack()
         }
         super.show()

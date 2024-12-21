@@ -4,10 +4,28 @@ import Bike
 import BikeData
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.navigation.NavType
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+
+@Parcelize
+@Serializable
+class AndroidBikeData (
+    override var year:Int = -1,
+    override var brand: String = "",
+    override var model: String = "",
+    override var category: String = "",
+    override var condition: String = "",
+    override var size: String = "",
+    override var wheelSize: String = "",
+    override var material: String = "",
+    override var frontTravel: Float = -1f,
+    override var rearTravel: Float = -1f,
+    override var country: String = ""
+): Parcelable, BikeData
 
 class AndroidBike(val bikeData: BikeData,val d:AndroidDataset): Bike(bikeData) {
     override fun getValues(): FloatArray{
@@ -56,21 +74,21 @@ class AndroidBike(val bikeData: BikeData,val d:AndroidDataset): Bike(bikeData) {
 
 
 @Serializable
-object BikeDataObject {
-    val bikeData = object : NavType<BikeData>(isNullableAllowed = false) {
-        override fun get(bundle: Bundle, key: String): BikeData? {
+object AndroidBikeDataObject {
+    val bikeData = object : NavType<AndroidBikeData>(isNullableAllowed = false) {
+        override fun get(bundle: Bundle, key: String): AndroidBikeData? {
             return Json.decodeFromString(bundle.getString(key) ?: return null)
         }
 
-        override fun parseValue(value: String): BikeData {
+        override fun parseValue(value: String): AndroidBikeData {
             return Json.decodeFromString(Uri.decode(value)) //Uri again
         }
 
-        override fun put(bundle: Bundle, key: String, value: BikeData) {
+        override fun put(bundle: Bundle, key: String, value: AndroidBikeData) {
             bundle.putString(key, Json.encodeToString(value))
         }
 
-        override fun serializeAsValue(value: BikeData): String {
+        override fun serializeAsValue(value: AndroidBikeData): String {
             return Uri.encode(Json.encodeToString(value)) //Uri is only an Android thing
         }
 

@@ -29,7 +29,7 @@ import mtboracle.composeapp.generated.resources.Res
 import mtboracle.composeapp.generated.resources.transparent_mtb_oracle_bike_v2
 import org.jetbrains.compose.resources.painterResource
 
-open class Homepage(private var navController: NavController){
+abstract class Homepage(private var navController: NavController){
     @Composable
     fun ShowHomepage(){
         MTBOracleTheme{
@@ -52,17 +52,17 @@ open class Homepage(private var navController: NavController){
                 {
                     Text(text="MTB Oracle",
                         color= Color.White,
-                        fontSize = 30.sp)
+                        fontSize = 40.sp)
                     Column(modifier = Modifier.zIndex(2f)){
                         Spacer(modifier = Modifier
-                            .height(30.dp)
+                            .height(40.dp)
                             .width(0.dp))
                         cartoonBike()
 
                     }
                     Column{
                         Spacer(modifier = Modifier
-                            .height(150.dp)
+                            .height(200.dp)
                             .width(0.dp))
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -84,19 +84,15 @@ open class Homepage(private var navController: NavController){
     fun HomepageBody(){
         Text(text="Mountain Bike Valuations",
             color=Color.Black,
-            fontSize = 20.sp)
-        Button(
-            onClick = {
-                navController.navigate(
-                    BrandModelYearScreen(bikeData = BikeData())
-                )
-            },
-            colors = MTBOracleTheme.buttonColors,
-
-            ){
-            Text(text = "Value my bike", color = Color.White)
-        }
+            fontSize = 30.sp)
+        Spacer(modifier = Modifier
+            .height(40.dp)
+            .width(0.dp))
+        ValuationButton()
     }
+
+    @Composable
+    abstract fun ValuationButton()
 
     @Composable
     open fun cartoonBike(){
@@ -104,8 +100,8 @@ open class Homepage(private var navController: NavController){
             painter = painterResource(Res.drawable.transparent_mtb_oracle_bike_v2),
             contentDescription = "Logo",
             modifier = Modifier
-                .height(150.dp)
-                .width(355.dp)
+                .height(200.dp)
+                .width(473.dp)
                 .zIndex(3f) //Will be drawn on top of everything else
         )
     }

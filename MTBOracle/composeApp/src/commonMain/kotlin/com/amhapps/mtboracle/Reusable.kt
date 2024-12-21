@@ -1,5 +1,6 @@
 package com.amhapps.mtboracle
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -13,11 +14,13 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldColors
 import androidx.compose.material.TextFieldDefaults
@@ -35,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
@@ -211,4 +215,61 @@ fun SearchableDropdown(
             }
         }
     }
+}
+
+@Composable
+fun WarningDialog(
+    onConfirmation: () -> Unit,
+    onDismiss: () -> Unit,
+    dialogTitle: String,
+    dialogText: String,
+    confirmExists:Boolean? = true,
+    confirmationColor:Color? = null,
+    dismissColor:Color,
+    modifier:Modifier = Modifier
+) {
+    var show by remember {mutableStateOf(true)}
+    if(show) {
+        val onDismissRequest =  {
+            onDismiss
+            show = false
+        }
+        AlertDialog(
+            title = {
+                Text(text = dialogTitle)
+            },
+            text = {
+                Text(text = dialogText)
+            },
+            onDismissRequest = onDismissRequest,
+            confirmButton = {
+                if(confirmExists == true){ //because it is nullable it actually has to be like this
+                    confirmationColor?.let { Modifier.background(color= it) }?.let {
+                        TextButton(
+                            onClick = {
+                                onConfirmation()
+                                onDismissRequest()
+                            },
+                            modifier = it
+                        ) {
+                            Text("Confirm",color=Color.White)
+                        }
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        onDismissRequest()
+                    },
+                    modifier = Modifier
+                        .background(color=dismissColor)
+                ) {
+                    Text("Dismiss",color=Color.White)
+                }
+            },
+            modifier = modifier
+        )
+    }
+    else return
 }
