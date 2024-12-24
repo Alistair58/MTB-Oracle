@@ -44,13 +44,10 @@ import mtboracle.composeapp.generated.resources.Res
 import kotlin.reflect.typeOf
 
 //TODO
-// - fix back navigation - doesn't like passing BikeData
-// - finish form and make look pretty
-// - bike inputs e.g.brand model splitting are not correct
-// - sort out warnings and make robust
+// - check bike inputs e.g. for parts/
 // - see if navigation transition is changeable
 // - app icon
-// - real time
+// - eBay API
 
 
 //Refactor list

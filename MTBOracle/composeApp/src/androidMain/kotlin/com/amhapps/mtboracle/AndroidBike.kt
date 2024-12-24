@@ -32,9 +32,9 @@ class AndroidBike(val bikeData: BikeData,val d:AndroidDataset): Bike(bikeData) {
         var brandInfo = ArrayList<Float>(6)
         var modelInfo = ArrayList<Float>(6)
         var countryInfo = ArrayList<Float>(6)
-        brandInfo = d.getBrandStats(bikeData.brand) //min,LQ,median,UQ,max,SD
-        modelInfo = d.getModelStats(bikeData.brand, bikeData.model)
-        countryInfo = d.getCountryStats(bikeData.country)
+        brandInfo = d.getBrandStats(bikeData.brand.lowercase().trim()) //min,LQ,median,UQ,max,SD
+        modelInfo = d.getModelStats(bikeData.brand.lowercase().trim(), bikeData.model.lowercase().trim())
+        countryInfo = d.getCountryStats(bikeData.country.lowercase().trim())
 
         val values = FloatArray(26)
         values[0] = brandInfo[0]!! //min BRAND
@@ -60,11 +60,11 @@ class AndroidBike(val bikeData: BikeData,val d:AndroidDataset): Bike(bikeData) {
         values[17] = countryInfo[5]!! //SD
 
         values[18] = encodeYear(bikeData.year).toFloat()
-        values[19] = encodeCondition(bikeData.condition).toFloat()
-        values[20] = encodeCategory(bikeData.category).toFloat()
-        values[21] = encodeSize(bikeData.size).toFloat()
-        values[22] = encodeWheelSize(bikeData.wheelSize).toFloat()
-        values[23] = encodeMaterial(bikeData.material).toFloat()
+        values[19] = encodeCondition(bikeData.condition.lowercase().trim()).toFloat()
+        values[20] = encodeCategory(bikeData.category.lowercase().trim()).toFloat()
+        values[21] = encodeSize(bikeData.size.lowercase().trim()).toFloat()
+        values[22] = encodeWheelSize(bikeData.wheelSize.lowercase().trim()).toFloat()
+        values[23] = encodeMaterial(bikeData.material.lowercase().trim()).toFloat()
         values[24] = encodeTravel(bikeData.frontTravel).toFloat()
         values[25] = encodeTravel(bikeData.rearTravel).toFloat()
 

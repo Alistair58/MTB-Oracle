@@ -1,6 +1,6 @@
 package com.amhapps.mtboracle
 
-import BikeData
+import Dataset
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,21 +10,23 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.amhapps.mtboracle.screens.Homepage
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val context = applicationContext
+        val dataset = AndroidDataset(context)
+        val neuralNetwork = AndroidNeuralNetwork(context)
         setContent {
-            AndroidApp(context)
+            AndroidApp(context,dataset,neuralNetwork)
         }
     }
 
     @Composable
-    fun AndroidApp(context: Context) {
+    fun AndroidApp(context: Context,dataset: AndroidDataset,neuralNetwork: AndroidNeuralNetwork) {
         MTBOracleTheme {
             val navController = rememberNavController()
             NavHost(
@@ -43,7 +45,7 @@ class MainActivity : ComponentActivity() {
                     val prevBikeData = it.savedStateHandle.get<AndroidBikeData>("bikeData")
                     val args = it.toRoute<AndroidBrandModelYearScreen>()
                     val bikeData = prevBikeData ?: args.bikeData
-                    val form = AndroidBrandModelYearForm(navController, bikeData)
+                    val form = AndroidBrandModelYearForm(navController, bikeData,dataset)
                     form.ShowForm()
                 }
                 composable<AndroidCategoryConditionCountryScreen>(
@@ -75,7 +77,7 @@ class MainActivity : ComponentActivity() {
                     )
                 ) {
                     val args = it.toRoute<AndroidValuationScreen>()
-                    val page = AndroidValuationPage(navController, args.bikeData,context)
+                    val page = AndroidValuationPage(navController, args.bikeData,dataset,neuralNetwork)
                     page.show()
                 }
             }

@@ -71,4 +71,49 @@ class AndroidDataset(private val context: Context):Dataset() {
             println(e)
         }
     }
+
+    fun findModels(brand: String?):List<String>{
+        if(null == brand) return emptyList()
+        val brandWords = brand.lowercase().split(" ")
+        val brandFirst = brandWords[0]
+        val modelsMap = modelStats!![brandFirst]
+        try{
+            val possibleModels: List<String> = modelsMap?.keys?.toList() ?: emptyList()
+            if(possibleModels.isEmpty()) return emptyList()
+            if(brandWords.size == 1) return capitalise(possibleModels)
+            val result:MutableList<String> = mutableListOf()
+            for(pModel in possibleModels){
+                if(pModel.startsWith(brandWords[1])){
+                    val pModelWords = pModel.split(" ")
+                    if(pModelWords.size > 1){
+                        result.add(pModelWords[1])
+                    }
+
+                }
+            }
+            return capitalise(result)
+        }
+        catch (e:Exception){
+            return emptyList()
+        }
+
+    }
+
+    private fun capitalise(inp: List<String>):List<String>{
+        val result:MutableList<String> = mutableListOf()
+        for(item in inp){
+            val splitted: MutableList<String> = item.split(" ").toMutableList()
+            splitted.forEachIndexed { i,word ->
+                if(word.length >1){
+                    splitted[i] = word.substring(0, 1).uppercase() + word.substring(1)
+                }
+                else{
+                    splitted[i] = word.uppercase()
+                }
+            }
+            val newItem = splitted.joinToString(separator = " ")
+            result.add(newItem)
+        }
+        return result
+    }
 }

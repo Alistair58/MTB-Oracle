@@ -27,61 +27,11 @@ import com.amhapps.mtboracle.MTBOracleTextInput
 import com.amhapps.mtboracle.MTBOracleTheme
 import com.amhapps.mtboracle.WarningDialog
 
-open class BrandModelYearForm(private val navController: NavHostController, private var bikeData:BikeData){
+abstract class BrandModelYearForm(private val navController: NavHostController, private var bikeData:BikeData){
     @Composable
-    open fun ShowForm() {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-
-        ) {
-            Text(
-                text = "Please enter the following information so" +
-                        " that we can accurately estimate the value of your bike",
-                fontSize = 14.sp,
-                color = Color.Black,
-                modifier = Modifier
-                    .padding(40.dp, 5.dp)
-            )
-            var brand by remember { mutableStateOf(bikeData.brand) }
-            MTBOracleTextInput(
-                value = brand,
-                onValueChange = { brand = it },
-                label = { Text("Brand:") },
-                modifier = Modifier
-                    .padding(0.dp, 20.dp)
-            )
-            var model by remember { mutableStateOf(bikeData.model) }
-            MTBOracleTextInput(
-                value = model,
-                onValueChange = { model = it },
-                label = { Text("Model:") },
-                modifier = Modifier
-                    .padding(0.dp, 20.dp)
-            )
-            var year by remember { mutableStateOf(if (bikeData.year != -1) bikeData.year.toString() else "") }
-            MTBOracleTextInput(
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                value = year,
-                onValueChange = { year = it },
-                label = {
-                    Text("Year:")
-                },
-                modifier = Modifier
-                    .padding(0.dp, 20.dp)
-            )
-            Text(
-                "Even if you don't know the exact year, putting in a rough year will give a more accurate valuation",
-                fontSize = 12.sp,
-                modifier = Modifier
-                    .padding(40.dp, 5.dp)
-            )
-            NextButton(brand,model,year)
-        }
-    }
+    abstract fun ShowForm()
         @Composable
-        open fun NextButton(brand:String,model:String,year:String){
+        open fun NextButton(brand:String,model:String,year:String,models:List<String>){
             var numberErrorDialog by remember { mutableStateOf(false) }
             Button(
                 onClick = {

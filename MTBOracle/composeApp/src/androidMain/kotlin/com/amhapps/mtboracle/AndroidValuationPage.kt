@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import com.amhapps.mtboracle.screens.ValuationPage
 
-class AndroidValuationPage(navController: NavHostController, private val bikeData: AndroidBikeData, private val context: Context
+class AndroidValuationPage(navController: NavHostController, private val bikeData: AndroidBikeData, private val dataset: AndroidDataset,private val neuralNetwork: AndroidNeuralNetwork
 ) : ValuationPage(navController, bikeData){
     @Composable
     override fun show(){
@@ -21,8 +21,6 @@ class AndroidValuationPage(navController: NavHostController, private val bikeDat
 
     }
     override fun valuation():Float {
-        val dataset = AndroidDataset(context)
-        val neuralNetwork = AndroidNeuralNetwork(context)
         val bike = AndroidBike(bikeData,dataset)
         return neuralNetwork.process(bike.getValues())
 

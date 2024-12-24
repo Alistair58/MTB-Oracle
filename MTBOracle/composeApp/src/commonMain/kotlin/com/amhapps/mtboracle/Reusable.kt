@@ -162,18 +162,23 @@ fun SearchableDropdown(
     var dropDownExpanded by remember { mutableStateOf(false) }
     var dropDownSize by remember { mutableStateOf(Size.Zero) }
     var currentItems by remember{ mutableStateOf(items) }
-    val icon = if (dropDownExpanded)
-        Icons.Filled.KeyboardArrowUp
-    else
-        Icons.Filled.KeyboardArrowDown
+//    val icon = if (dropDownExpanded)
+//        Icons.Filled.KeyboardArrowUp
+//    else
+//        Icons.Filled.KeyboardArrowDown
     Box(modifier = modifier){
         MTBOracleTextInput(
             value = value,
             onValueChange = { newVal ->
                 onValueChange(newVal)
                 currentItems = items.filter {
-                    val words = it.lowercase().split(" ")
+                    var words = it.lowercase().split(" ")
                     var valid = false
+                    if(it.length >= newVal.length && it.lowercase().substring(0,newVal.length) == newVal.lowercase()){ //startsWith didn't like spaces
+                        valid = true
+                        dropDownExpanded = true
+                        words = emptyList() //skip the next bit
+                    }
                     for (word: String in words) {
                         if (word.startsWith(newVal.lowercase())) {
                             valid = true
@@ -228,48 +233,40 @@ fun WarningDialog(
     dismissColor:Color,
     modifier:Modifier = Modifier
 ) {
-    var show by remember {mutableStateOf(true)}
-    if(show) {
-        val onDismissRequest =  {
-            onDismiss
-            show = false
-        }
-        AlertDialog(
-            title = {
-                Text(text = dialogTitle)
-            },
-            text = {
-                Text(text = dialogText)
-            },
-            onDismissRequest = onDismissRequest,
-            confirmButton = {
-                if(confirmExists == true){ //because it is nullable it actually has to be like this
-                    confirmationColor?.let { Modifier.background(color= it) }?.let {
-                        TextButton(
-                            onClick = {
-                                onConfirmation()
-                                onDismissRequest()
-                            },
-                            modifier = it
-                        ) {
-                            Text("Confirm",color=Color.White)
-                        }
+    AlertDialog(
+        title = {
+            Text(text = dialogTitle)
+        },
+        text = {
+            Text(text = dialogText)
+        },
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            if(confirmExists == true){ //because it is nullable it actually has to be like this
+                confirmationColor?.let { Modifier.background(color= it) }?.let {
+                    TextButton(
+                        onClick = {
+                            onConfirmation()
+                            onDismiss()
+                        },
+                        modifier = it
+                    ) {
+                        Text("Confirm",color=Color.White)
                     }
                 }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        onDismissRequest()
-                    },
-                    modifier = Modifier
-                        .background(color=dismissColor)
-                ) {
-                    Text("Dismiss",color=Color.White)
-                }
-            },
-            modifier = modifier
-        )
-    }
-    else return
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDismiss()
+                },
+                modifier = Modifier
+                    .background(color=dismissColor)
+            ) {
+                Text("Dismiss",color=Color.White)
+            }
+        },
+        modifier = modifier
+    )
 }
