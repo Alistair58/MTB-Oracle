@@ -20,13 +20,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.navOptions
 import com.amhapps.mtboracle.screens.CategoryConditionCountryForm
 
-class AndroidCategoryCountryConditionForm(private val navController: NavHostController, private var bikeData:AndroidBikeData) : CategoryConditionCountryForm(navController,bikeData) {
+class AndroidCategoryCountryConditionForm(private val navController: NavHostController, private var bikeDataInput:AndroidBikeData) : CategoryConditionCountryForm(navController,bikeDataInput) {
     @Composable
     override fun ShowForm(){
         BackHandler {
             navController.previousBackStackEntry
                 ?.savedStateHandle
-                ?.set("bikeData",bikeData)
+                ?.set("bikeData",bikeDataInput)
             navController.popBackStack()
         }
         super.ShowForm()
@@ -35,6 +35,7 @@ class AndroidCategoryCountryConditionForm(private val navController: NavHostCont
     @Composable
     override fun NextButton(category:String,condition:String,country:String) {
         var lackOfInfo by remember { mutableStateOf(false) }
+        val bikeData by remember { mutableStateOf(bikeDataInput) }
         Button(
             onClick = {
                 bikeData.category = category.trim()

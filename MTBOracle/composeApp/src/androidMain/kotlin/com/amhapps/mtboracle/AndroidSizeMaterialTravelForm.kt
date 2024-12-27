@@ -20,19 +20,20 @@ import androidx.navigation.NavHostController
 import androidx.navigation.navOptions
 import com.amhapps.mtboracle.screens.SizeMaterialTravelForm
 
-class AndroidSizeMaterialTravelForm(private val navController: NavHostController, private var bikeData:AndroidBikeData) : SizeMaterialTravelForm(navController,bikeData) {
+class AndroidSizeMaterialTravelForm(private val navController: NavHostController, private var bikeDataInput:AndroidBikeData) : SizeMaterialTravelForm(navController,bikeDataInput) {
     @Composable
     override fun ShowForm(){
         BackHandler {
             navController.previousBackStackEntry
                 ?.savedStateHandle
-                ?.set("bikeData",bikeData)
+                ?.set("bikeData",bikeDataInput)
             navController.popBackStack()
         }
         super.ShowForm()
     }
     @Composable
     override fun NextButton(size:String,wSize:String,fTravel:String,rTravel:String,material:String){
+        val bikeData by remember { mutableStateOf(bikeDataInput) }
         var numberErrorDialog by remember { mutableStateOf(false) }
         var lackOfInfo by remember {mutableStateOf(false)}
         Button(

@@ -32,8 +32,18 @@ class AndroidBike(val bikeData: BikeData,val d:AndroidDataset): Bike(bikeData) {
         var brandInfo = ArrayList<Float>(6)
         var modelInfo = ArrayList<Float>(6)
         var countryInfo = ArrayList<Float>(6)
-        brandInfo = d.getBrandStats(bikeData.brand.lowercase().trim()) //min,LQ,median,UQ,max,SD
-        modelInfo = d.getModelStats(bikeData.brand.lowercase().trim(), bikeData.model.lowercase().trim())
+        val brandWords = bikeData.brand.split(" ")
+        val nnBrand = brandWords[0] //input allows multi-worded brands, nn doesn't
+        var nnModel = bikeData.model
+        if(brandWords.size>1){
+            nnModel = ""
+            for(i in 1..(brandWords.size-1)){
+                nnModel+=" "+brandWords[i]
+            }
+            nnModel +=" "+ bikeData.model
+        }
+        brandInfo = d.getBrandStats(nnBrand.lowercase().trim()) //min,LQ,median,UQ,max,SD
+        modelInfo = d.getModelStats(nnBrand.lowercase().trim(), nnModel.lowercase().trim())
         countryInfo = d.getCountryStats(bikeData.country.lowercase().trim())
 
         val values = FloatArray(26)

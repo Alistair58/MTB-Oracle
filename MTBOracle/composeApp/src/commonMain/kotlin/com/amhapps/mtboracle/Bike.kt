@@ -41,17 +41,17 @@ abstract class Bike(
 
     protected fun encodeCategory(category: String?): Int {
         if (null == category) return 0
-        val encoded = when (category) {
+        val encoded = when (category) {//DIFFERENT TO JAVA/PINKBIKE ONE - uses my inputs
             "xc" -> 1
             "trail" -> 2
             "enduro" -> 3
             "downhill" -> 4
-            "dirt" -> 5
-            "kids" -> 6
+            "dirt jump" -> 5
+            "children\'s" -> 6
             "vintage" -> 7
-            "ebikes" -> 8
-            "gravel/cx" -> 9
-            "fat" -> 10
+            "e-bike" -> 8
+            "gravel" -> 9
+            "fat bike" -> 10
             "trials" -> 11
             else -> 0
         }
@@ -60,21 +60,20 @@ abstract class Bike(
 
     protected fun encodeCondition(condition: String?): Int {
         if (null == condition) return 0
-        val encoded = when (condition) {
-            "new" -> 1
+        val encoded = when (condition) {//DIFFERENT TO JAVA/PINKBIKE ONE - uses my inputs
+            "brand new" -> 1
             "excellent" -> 2
             "good" -> 3
             "poor" -> 4
-            "for" -> 5
+            "for parts/unrideable" -> 5
             else -> 0
         }
-        //        if(encoded==0) System.out.println("Could not encode condition: "+condition);
         return encoded
     }
 
     protected fun encodeSize(size: String?): Int {
         if (null == size) return 0
-        val encoded = when (size) {
+        val encoded = when (size) { //Only letters are used in my inputs
             "xs", "12", "13", "14", "43cm", "44cm", "45cm", "46cm", "47cm", "48cm", "49cm", "50cm" -> 1
             "s", "15", "15.5", "16", "16.5", "51cm", "52cm", "53cm" -> 2
             "m", "17", "17.5", "18", "18.5", "54cm", "55cm" -> 3
@@ -88,13 +87,13 @@ abstract class Bike(
 
     protected fun encodeWheelSize(wheelSize: String?): Int {
         if (null == wheelSize) return 0
-        val encoded = when (wheelSize) {
-            "16" -> 1
-            "20" -> 2
-            "24" -> 3
-            "26" -> 4
-            "27.5" -> 5
-            "29" -> 6
+        val encoded = when (wheelSize) {//DIFFERENT TO JAVA/PINKBIKE ONE - uses my inputs
+            "<16\"" -> 1
+            "20\"" -> 2
+            "24\"" -> 3
+            "26\"" -> 4
+            "27.5\"/650b" -> 5
+            "29\"" -> 6
             "650c" -> 7
             "700c" -> 8
             else -> 0
@@ -106,7 +105,7 @@ abstract class Bike(
         if (null == material) return 0
         val encoded = when (material) {
             "aluminium" -> 1
-            "carbon" -> 2
+            "carbon fibre" -> 2
             "chromoly" -> 3
             "steel" -> 4
             "titanium" -> 5

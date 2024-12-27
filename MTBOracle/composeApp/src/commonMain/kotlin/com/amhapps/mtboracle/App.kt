@@ -44,6 +44,8 @@ import mtboracle.composeapp.generated.resources.Res
 import kotlin.reflect.typeOf
 
 //TODO
+// -test output page and add notes about accuracy
+// -refactor output page to make neater
 // - check bike inputs e.g. for parts/
 // - see if navigation transition is changeable
 // - app icon

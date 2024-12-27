@@ -25,8 +25,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.navOptions
 import com.amhapps.mtboracle.screens.BrandModelYearForm
 
-class AndroidBrandModelYearForm(private val navController: NavHostController, private var bikeData:AndroidBikeData, private val androidDataset: AndroidDataset):
-    BrandModelYearForm(navController,bikeData){
+class AndroidBrandModelYearForm(private val navController: NavHostController, private var bikeDataInput:AndroidBikeData, private val androidDataset: AndroidDataset):
+    BrandModelYearForm(navController,bikeDataInput){
+
     @Composable
     override fun ShowForm(){
         var showAlert by remember { mutableStateOf(false) }
@@ -50,7 +51,7 @@ class AndroidBrandModelYearForm(private val navController: NavHostController, pr
 
         ) {
 
-            var brand by remember { mutableStateOf(bikeData.brand) }
+            var brand by remember { mutableStateOf(bikeDataInput.brand) }
             var models by remember { mutableStateOf(androidDataset.findModels(brand.trim())) }
             MTBOracleTextInput(
                 value = brand,
@@ -62,7 +63,7 @@ class AndroidBrandModelYearForm(private val navController: NavHostController, pr
                 modifier = Modifier
                     .padding(0.dp, 20.dp)
             )
-            var model by remember { mutableStateOf(bikeData.model) }
+            var model by remember { mutableStateOf(bikeDataInput.model) }
 
             SearchableDropdown(
                 value = model,
@@ -74,7 +75,7 @@ class AndroidBrandModelYearForm(private val navController: NavHostController, pr
                 items = models,
                 iconContentDescription = "Model Dropdown"
             )
-            var year by remember { mutableStateOf(if (bikeData.year != -1) bikeData.year.toString() else "") }
+            var year by remember { mutableStateOf(if (bikeDataInput.year != -1) bikeDataInput.year.toString() else "") }
             MTBOracleTextInput(
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 value = year,
@@ -98,6 +99,7 @@ class AndroidBrandModelYearForm(private val navController: NavHostController, pr
     }
     @Composable
     override fun NextButton(brand:String,model:String,year:String,models:List<String>){
+        val bikeData by remember { mutableStateOf(bikeDataInput) }
         var numberErrorDialog by remember { mutableStateOf(false) }
         var lackOfInfo by remember { mutableStateOf(false) }
         var unknownModel by remember { mutableStateOf(false) }
