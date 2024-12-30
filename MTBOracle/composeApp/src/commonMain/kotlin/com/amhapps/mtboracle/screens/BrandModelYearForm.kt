@@ -27,7 +27,7 @@ import com.amhapps.mtboracle.MTBOracleTextInput
 import com.amhapps.mtboracle.MTBOracleTheme
 import com.amhapps.mtboracle.WarningDialog
 
-abstract class BrandModelYearForm(private val navController: NavHostController, private var bikeData:BikeData){
+abstract class BrandModelYearForm(private val navController: NavHostController, private var bikeData:BikeData,private val valuation:Boolean){
     @Composable
     abstract fun ShowForm()
         @Composable

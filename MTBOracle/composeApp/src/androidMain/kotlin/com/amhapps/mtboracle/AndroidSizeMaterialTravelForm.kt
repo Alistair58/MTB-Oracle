@@ -20,7 +20,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.navOptions
 import com.amhapps.mtboracle.screens.SizeMaterialTravelForm
 
-class AndroidSizeMaterialTravelForm(private val navController: NavHostController, private var bikeDataInput:AndroidBikeData) : SizeMaterialTravelForm(navController,bikeDataInput) {
+class AndroidSizeMaterialTravelForm(private val navController: NavHostController, private var bikeDataInput:AndroidBikeData,private val isValuation:Boolean) : SizeMaterialTravelForm(navController,bikeDataInput,isValuation) {
     @Composable
     override fun ShowForm(){
         BackHandler {
@@ -52,7 +52,10 @@ class AndroidSizeMaterialTravelForm(private val navController: NavHostController
                         || bikeData.rearTravel == -1f || material == "") lackOfInfo = true
                     else{
                         navController.navigate(
-                            AndroidValuationScreen(bikeData),
+                            if(isValuation)
+                                AndroidValuationScreen(bikeData)
+                            else
+                                AndroidSimilarBikesScreen(bikeData),
                             navOptions =  navOptions {
                                 restoreState = true
                             }
@@ -89,7 +92,10 @@ class AndroidSizeMaterialTravelForm(private val navController: NavHostController
             WarningDialog(
                 onConfirmation = {
                     navController.navigate(
-                        AndroidValuationScreen(bikeData),
+                        if(isValuation)
+                            AndroidValuationScreen(bikeData)
+                        else
+                            AndroidSimilarBikesScreen(bikeData),
                         navOptions =  navOptions {
                             restoreState = true
                         }

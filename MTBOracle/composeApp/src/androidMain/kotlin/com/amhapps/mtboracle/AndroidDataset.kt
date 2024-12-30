@@ -74,7 +74,7 @@ class AndroidDataset(private val context: Context):Dataset() {
 
     fun findModels(brand: String?):List<String>{
         if(null == brand) return emptyList()
-        val brandWords = brand.lowercase().split(" ")
+        val brandWords = brand.lowercase().trim().split(" ")
         val brandFirst = brandWords[0]
         val modelsMap = modelStats!![brandFirst]
         try{
@@ -83,10 +83,10 @@ class AndroidDataset(private val context: Context):Dataset() {
             if(brandWords.size == 1) return capitalise(possibleModels)
             val result:MutableList<String> = mutableListOf()
             for(pModel in possibleModels){
-                if(pModel.startsWith(brandWords[1])){
+                if(pModel.startsWith(brandWords.slice(1..<brandWords.size).joinToString(" "))){
                     val pModelWords = pModel.split(" ")
                     if(pModelWords.size > 1){
-                        result.add(pModelWords[1])
+                        result.add(pModelWords[brandWords.size - 1])
                     }
 
                 }

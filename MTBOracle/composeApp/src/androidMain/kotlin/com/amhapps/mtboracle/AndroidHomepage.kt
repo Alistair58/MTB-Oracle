@@ -18,7 +18,7 @@ class AndroidHomepage(private val navController: NavController):Homepage(navCont
         Button(
             onClick = {
                 navController.navigate(
-                    AndroidBrandModelYearScreen(bikeData = AndroidBikeData())
+                    AndroidBrandModelYearScreen(bikeData = AndroidBikeData(),true)
                 )
             },
             colors = MTBOracleTheme.buttonColors,
@@ -29,4 +29,21 @@ class AndroidHomepage(private val navController: NavController):Homepage(navCont
         }
     }
 
+    @Composable
+    override fun SimilarBikesButton() {
+        Button(
+            onClick = {
+                navController.navigate(
+                    AndroidBrandModelYearScreen(bikeData = AndroidBikeData(),false)
+                )
+            },
+            colors = MTBOracleTheme.buttonColors,
+        ){
+            Text(text = "See Similar Bikes",
+                color = Color.White,
+                fontSize = 30.sp)
+        }
+    }
+
 }
+//

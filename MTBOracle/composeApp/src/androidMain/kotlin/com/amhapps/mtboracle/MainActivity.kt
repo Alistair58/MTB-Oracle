@@ -44,8 +44,8 @@ class MainActivity : ComponentActivity() {
                 ){
                     val prevBikeData = it.savedStateHandle.get<AndroidBikeData>("bikeData")
                     val args = it.toRoute<AndroidBrandModelYearScreen>()
-                    val bikeData = prevBikeData ?: args.bikeData
-                    val form = AndroidBrandModelYearForm(navController, bikeData,dataset)
+                    val bikeData = prevBikeData ?: args.bikeData //if we have previous data (due to backwards navigation), use it
+                    val form = AndroidBrandModelYearForm(navController, bikeData,dataset,args.isValuation)
                     form.ShowForm()
                 }
                 composable<AndroidCategoryConditionCountryScreen>(
@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
                     val prevBikeData = it.savedStateHandle.get<AndroidBikeData>("bikeData")
                     val args = it.toRoute<AndroidCategoryConditionCountryScreen>()
                     val bikeData = prevBikeData ?: args.bikeData
-                    val form = AndroidCategoryCountryConditionForm(navController, bikeData)
+                    val form = AndroidCategoryCountryConditionForm(navController, bikeData,args.isValuation)
 
                     form.ShowForm()
                 }
@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
                     val prevBikeData = it.savedStateHandle.get<AndroidBikeData>("bikeData")
                     val args = it.toRoute<AndroidSizeMaterialTravelScreen>()
                     val bikeData = prevBikeData ?: args.bikeData
-                    val form = AndroidSizeMaterialTravelForm(navController, bikeData)
+                    val form = AndroidSizeMaterialTravelForm(navController, bikeData,args.isValuation)
                     form.ShowForm()
                 }
                 composable<AndroidValuationScreen>(
@@ -78,6 +78,15 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val args = it.toRoute<AndroidValuationScreen>()
                     val page = AndroidValuationPage(navController, args.bikeData,dataset,neuralNetwork)
+                    page.show()
+                }
+                composable<AndroidSimilarBikesScreen>(
+                    typeMap = mapOf(
+                        typeOf<AndroidBikeData>() to AndroidBikeDataObject.bikeData
+                    )
+                ) {
+                    val args = it.toRoute<AndroidValuationScreen>()
+                    val page = AndroidSimilarBikesPage(navController, args.bikeData)
                     page.show()
                 }
             }
@@ -94,21 +103,29 @@ class MainActivity : ComponentActivity() {
 object AndroidHomeScreen
 @Serializable
 data class AndroidBrandModelYearScreen(
-    val bikeData: AndroidBikeData
+    val bikeData: AndroidBikeData,
+    val isValuation:Boolean //Is it a valuation or a similar bike search
 )
 
 @Serializable
 data class AndroidCategoryConditionCountryScreen(
-    val bikeData: AndroidBikeData
+    val bikeData: AndroidBikeData,
+    val isValuation:Boolean
 )
 
 @Serializable
 data class AndroidSizeMaterialTravelScreen(
-    val bikeData: AndroidBikeData
+    val bikeData: AndroidBikeData,
+    val isValuation:Boolean
 )
 
 @Serializable
 data class AndroidValuationScreen(
+    val bikeData: AndroidBikeData
+)
+
+@Serializable
+data class AndroidSimilarBikesScreen(
     val bikeData: AndroidBikeData
 )
 

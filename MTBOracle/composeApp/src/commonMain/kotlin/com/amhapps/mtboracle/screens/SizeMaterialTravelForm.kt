@@ -27,7 +27,7 @@ import com.amhapps.mtboracle.MTBOracleTextInput
 import com.amhapps.mtboracle.MTBOracleTheme
 import com.amhapps.mtboracle.ValuationScreen
 
-abstract class SizeMaterialTravelForm(private val navController: NavHostController, private val bikeData: BikeData){
+abstract class SizeMaterialTravelForm(private val navController: NavHostController, private val bikeData: BikeData,private val valuation:Boolean){
     @Composable
     open fun ShowForm(){
         Column(

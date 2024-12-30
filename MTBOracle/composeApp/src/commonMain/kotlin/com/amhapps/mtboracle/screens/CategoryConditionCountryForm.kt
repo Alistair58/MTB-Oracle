@@ -25,7 +25,7 @@ import com.amhapps.mtboracle.MTBOracleTheme
 import com.amhapps.mtboracle.SearchableDropdown
 import com.amhapps.mtboracle.SizeMaterialTravelScreen
 
-abstract class CategoryConditionCountryForm(private val navController: NavHostController, private val bikeData: BikeData) {
+abstract class CategoryConditionCountryForm(private val navController: NavHostController, private val bikeData: BikeData,private val valuation:Boolean) {
     @Composable
     open fun ShowForm(){
         Column(

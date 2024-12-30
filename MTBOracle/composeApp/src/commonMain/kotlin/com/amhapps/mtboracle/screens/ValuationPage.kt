@@ -220,12 +220,6 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
                                         modifier = Modifier
                                             .padding(0.dp, 5.dp)
                                     )
-
-                                }
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth(0.5f)
-                                ){
                                     Text(
                                         text =
                                         buildAnnotatedString {
@@ -242,6 +236,12 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
                                         modifier = Modifier
                                             .padding(0.dp, 5.dp)
                                     )
+
+                                }
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth(0.5f)
+                                ){
                                     Text(
                                         text =
                                         buildAnnotatedString {

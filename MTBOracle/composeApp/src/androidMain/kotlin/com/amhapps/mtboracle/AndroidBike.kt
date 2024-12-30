@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-@Parcelize
+@Parcelize //Parcelize is android only and that's why bikeData is an interface
 @Serializable
 class AndroidBikeData (
     override var year:Int = -1,
@@ -42,6 +42,9 @@ class AndroidBike(val bikeData: BikeData,val d:AndroidDataset): Bike(bikeData) {
             }
             nnModel +=" "+ bikeData.model
         }
+        var modelWords = nnModel.split(" ")
+        if(modelWords.size > 2) nnModel = modelWords.slice(0..1).joinToString(" ")
+        //everything (as of 28/12/24) in the dataset is a max of 2 words
         brandInfo = d.getBrandStats(nnBrand.lowercase().trim()) //min,LQ,median,UQ,max,SD
         modelInfo = d.getModelStats(nnBrand.lowercase().trim(), nnModel.lowercase().trim())
         countryInfo = d.getCountryStats(bikeData.country.lowercase().trim())

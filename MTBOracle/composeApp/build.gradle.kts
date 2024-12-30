@@ -46,6 +46,8 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.ktor.client.okhttp)
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -59,6 +61,12 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.kotlinx.serialization.core)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.core)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.gson.v288)
         }
     }
 }
@@ -91,10 +99,10 @@ android {
 }
 
 dependencies {
-    implementation("androidx.navigation:navigation-compose:2.8.4")
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.navigation.safe.args.generator)
-    implementation("com.google.code.gson:gson:2.8.8")
     debugImplementation(compose.uiTooling)
+    implementation(libs.kotlinx.coroutines.android)
 }
 
 configurations {

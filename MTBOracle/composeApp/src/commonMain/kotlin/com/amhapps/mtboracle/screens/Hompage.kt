@@ -89,10 +89,18 @@ abstract class Homepage(private var navController: NavController){
             .height(40.dp)
             .width(0.dp))
         ValuationButton()
+        Spacer(modifier = Modifier
+            .height(20.dp)
+            .width(0.dp))
+        SimilarBikesButton()
     }
 
     @Composable
     abstract fun ValuationButton()
+
+    @Composable
+    abstract  fun SimilarBikesButton()
+
 
     @Composable
     open fun cartoonBike(){

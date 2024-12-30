@@ -25,8 +25,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.navOptions
 import com.amhapps.mtboracle.screens.BrandModelYearForm
 
-class AndroidBrandModelYearForm(private val navController: NavHostController, private var bikeDataInput:AndroidBikeData, private val androidDataset: AndroidDataset):
-    BrandModelYearForm(navController,bikeDataInput){
+class AndroidBrandModelYearForm(private val navController: NavHostController, private var bikeDataInput:AndroidBikeData, private val androidDataset: AndroidDataset,private val isValuation:Boolean):
+    BrandModelYearForm(navController,bikeDataInput,isValuation){
 
     @Composable
     override fun ShowForm(){
@@ -115,7 +115,7 @@ class AndroidBrandModelYearForm(private val navController: NavHostController, pr
                     if(!models.contains(bikeData.model)) unknownModel = true
                     if(!unknownModel && !lackOfInfo){
                         navController.navigate(
-                            AndroidCategoryConditionCountryScreen(bikeData = bikeData),
+                            AndroidCategoryConditionCountryScreen(bikeData = bikeData,isValuation),
                             navOptions =  navOptions {
                                 restoreState = true
                             }
@@ -158,7 +158,7 @@ class AndroidBrandModelYearForm(private val navController: NavHostController, pr
             WarningDialog(
                 onConfirmation = {
                     navController.navigate(
-                        AndroidCategoryConditionCountryScreen(bikeData = bikeData),
+                        AndroidCategoryConditionCountryScreen(bikeData = bikeData,isValuation),
                         navOptions =  navOptions {
                             restoreState = true
                         }

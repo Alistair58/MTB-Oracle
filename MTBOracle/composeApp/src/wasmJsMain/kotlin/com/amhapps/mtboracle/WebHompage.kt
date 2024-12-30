@@ -1,11 +1,16 @@
 package com.amhapps.mtboracle
 
+import BikeData
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.amhapps.mtboracle.screens.Homepage
@@ -14,6 +19,22 @@ import mtboracle.composeapp.generated.resources.transparent_mtb_oracle_bike_v2
 import org.jetbrains.compose.resources.painterResource
 
 class WebHomepage(private var navController: NavController) : Homepage(navController){
+    @Composable
+    override fun ValuationButton() {
+        Button(
+            onClick = {
+                navController.navigate(
+                    BrandModelYearScreen(bikeData = WebBikeData())
+                )
+            },
+            colors = MTBOracleTheme.buttonColors,
+        ){
+            Text(text = "Value my bike",
+                color = Color.White,
+                fontSize = 30.sp)
+        }
+    }
+
     @Composable
     override fun cartoonBike(){
         Image(
