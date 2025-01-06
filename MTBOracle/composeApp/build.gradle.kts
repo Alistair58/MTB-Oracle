@@ -20,7 +20,6 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "composeApp"
@@ -67,6 +66,14 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.gson.v288)
+            implementation(libs.coil.compose.v304)
+            implementation(libs.coil.network.ktor)
+            implementation(libs.coil.network.okhttp)
+            implementation(libs.kotlinx.coroutines.swing)
+        }
+
+        wasmJsMain.dependencies {
+            implementation(libs.ktor.client.js)
         }
     }
 }

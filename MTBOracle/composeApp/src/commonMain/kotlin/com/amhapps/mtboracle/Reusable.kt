@@ -41,9 +41,15 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.window.PopupProperties
 
@@ -156,8 +162,7 @@ fun SearchableDropdown(
     onDropdownClick: (String) -> Unit,
     label:String,
     modifier: Modifier,
-    items:List<String>,
-    iconContentDescription:String
+    items:List<String>
 ){
     var dropDownExpanded by remember { mutableStateOf(false) }
     var dropDownSize by remember { mutableStateOf(Size.Zero) }
@@ -268,5 +273,23 @@ fun WarningDialog(
             }
         },
         modifier = modifier
+    )
+}
+
+@Composable
+fun SpecText(specName:String,specValue:String,fontSize: TextUnit?=18.sp){
+    Text(
+        text = buildAnnotatedString {
+            append(specName)
+            withStyle(
+                SpanStyle(
+                    fontWeight = FontWeight.Bold,
+                )
+            ) {
+                append(specValue)
+            }
+        },
+        fontSize =fontSize?:18.sp,
+        modifier = Modifier.padding(0.dp,5.dp)
     )
 }

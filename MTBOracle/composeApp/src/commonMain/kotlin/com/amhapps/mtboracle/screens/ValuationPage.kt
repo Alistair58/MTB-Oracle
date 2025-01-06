@@ -28,8 +28,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.TextUnit
 import androidx.navigation.navOptions
 import com.amhapps.mtboracle.MTBOracleTheme
+import com.amhapps.mtboracle.SpecText
 import mtboracle.composeapp.generated.resources.Res
 
 abstract class ValuationPage(protected val navController: NavHostController, private val bikeData: BikeData){
@@ -121,191 +123,23 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
                                     modifier = Modifier
                                         .fillMaxWidth(0.5f)
                                 ){
-                                    Text(
-                                        text =
-                                        buildAnnotatedString {
-                                            append("Brand: ")
-                                            withStyle(
-                                                SpanStyle(
-                                                    fontWeight = FontWeight.Bold,
-                                                    fontSize = brandFontSize
-                                                )
-                                            ) {
-                                                append(brandOutput)
-                                            }
-                                        },
-                                        fontSize = 18.sp,
-                                        modifier = Modifier
-                                            .padding(0.dp, 5.dp)
-                                    )
-                                    Text(
-                                        text =
-                                        buildAnnotatedString {
-                                            append("Model: ")
-                                            withStyle(
-                                                SpanStyle(
-                                                    fontWeight = FontWeight.Bold,
-                                                    fontSize = modelFontSize
-                                                )
-                                            ) {
-                                                append(modelOutput)
-                                            }
-                                        },
-                                        fontSize = 18.sp,
-                                        modifier = Modifier
-                                            .padding(0.dp, 5.dp)
-                                    )
-                                    Text(
-                                        text =
-                                        buildAnnotatedString {
-                                            append("Year: ")
-                                            withStyle(
-                                                SpanStyle(
-                                                    fontWeight = FontWeight.Bold
-                                                )
-                                            ) {
-                                                append(yearOutput)
-                                            }
-                                        },
-                                        fontSize = 18.sp,
-                                        modifier = Modifier
-                                            .padding(0.dp, 5.dp)
-                                    )
-                                    Text(
-                                        text =
-                                        buildAnnotatedString {
-                                            append("Country: ")
-                                            withStyle(
-                                                SpanStyle(
-                                                    fontWeight = FontWeight.Bold,
-                                                    fontSize = countryFontSize,
-                                                )
-                                            ) {
-                                                append(countryOutput)
-                                            }
-                                        },
-                                        fontSize = 18.sp,
-                                        modifier = Modifier
-                                            .padding(0.dp, 5.dp)
-                                    )
-                                    Text(
-                                        text =
-                                        buildAnnotatedString {
-                                            append("Category: ")
-                                            withStyle(
-                                                SpanStyle(
-                                                    fontWeight = FontWeight.Bold
-                                                )
-                                            ) {
-                                                append(bikeData.category)
-                                            }
-                                        },
-                                        fontSize = 18.sp,
-                                        modifier = Modifier
-                                            .padding(0.dp, 5.dp)
-                                    )
-                                    Text(
-                                        text =
-                                        buildAnnotatedString {
-                                            append("Condition: ")
-                                            withStyle(
-                                                SpanStyle(
-                                                    fontWeight = FontWeight.Bold
-                                                )
-                                            ) {
-                                                append(bikeData.condition)
-                                            }
-                                        },
-                                        fontSize = 18.sp,
-                                        modifier = Modifier
-                                            .padding(0.dp, 5.dp)
-                                    )
-                                    Text(
-                                        text =
-                                        buildAnnotatedString {
-                                            append("Size: ")
-                                            withStyle(
-                                                SpanStyle(
-                                                    fontWeight = FontWeight.Bold
-                                                )
-                                            ) {
-                                                append(bikeData.size)
-                                            }
-                                        },
-                                        fontSize = 18.sp,
-                                        modifier = Modifier
-                                            .padding(0.dp, 5.dp)
-                                    )
+                                    SpecText("Brand: ",brandOutput.toString(),brandFontSize)
+                                    SpecText("Model: ",modelOutput.toString(),modelFontSize)
+                                    SpecText("Year: ",yearOutput)
+                                    SpecText("Country: ", countryOutput.toString(),countryFontSize)
+                                    SpecText("Category: ",bikeData.category)
+                                    SpecText("Condition: ",bikeData.condition)
+                                    SpecText("Size: ",bikeData.size)
 
                                 }
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth(0.5f)
                                 ){
-                                    Text(
-                                        text =
-                                        buildAnnotatedString {
-                                            append("Wheel Size: ")
-                                            withStyle(
-                                                SpanStyle(
-                                                    fontWeight = FontWeight.Bold
-                                                )
-                                            ) {
-                                                append(bikeData.wheelSize)
-                                            }
-                                        },
-                                        fontSize = 18.sp,
-                                        modifier = Modifier
-                                            .padding(0.dp, 5.dp)
-                                    )
-                                    Text(
-                                        text =
-                                        buildAnnotatedString {
-                                            append("Material: ")
-                                            withStyle(
-                                                SpanStyle(
-                                                    fontWeight = FontWeight.Bold
-                                                )
-                                            ) {
-                                                append(bikeData.material)
-                                            }
-                                        },
-                                        fontSize = 18.sp,
-                                        modifier = Modifier
-                                            .padding(0.dp, 5.dp)
-                                    )
-                                    Text(
-                                        text =
-                                        buildAnnotatedString {
-                                            append("Front Travel: ")
-                                            withStyle(
-                                                SpanStyle(
-                                                    fontWeight = FontWeight.Bold
-                                                )
-                                            ) {
-                                                append(frontSusOutput)
-                                            }
-                                        },
-                                        fontSize = 18.sp,
-                                        modifier = Modifier
-                                            .padding(0.dp, 5.dp)
-                                    )
-                                    Text(
-                                        text =
-                                        buildAnnotatedString {
-                                            append("Rear Travel: ")
-                                            withStyle(
-                                                SpanStyle(
-                                                    fontWeight = FontWeight.Bold
-                                                )
-                                            ) {
-                                                append(rearSusOutput)
-                                            }
-                                        },
-                                        fontSize = 18.sp,
-                                        modifier = Modifier
-                                            .padding(0.dp, 5.dp)
-                                    )
+                                    SpecText("Wheel Size: ",bikeData.wheelSize)
+                                    SpecText("Material: ",bikeData.material)
+                                    SpecText("Front Travel: ",frontSusOutput)
+                                    SpecText("Rear Travel: ",rearSusOutput)
                                 }
                             }
                         }
@@ -325,4 +159,6 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
     abstract fun valuation():Float
     @Composable
     abstract fun HomeButton()
+
+
 }

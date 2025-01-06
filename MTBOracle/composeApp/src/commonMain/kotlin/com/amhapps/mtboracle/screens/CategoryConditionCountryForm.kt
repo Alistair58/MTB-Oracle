@@ -58,7 +58,6 @@ abstract class CategoryConditionCountryForm(private val navController: NavHostCo
                 onDropdownClick = {country = it},
                 label = "Country",
                 items = countries,
-                iconContentDescription = "Country Dropdown",
                 modifier = Modifier.padding(0.dp,20.dp)
             )
 

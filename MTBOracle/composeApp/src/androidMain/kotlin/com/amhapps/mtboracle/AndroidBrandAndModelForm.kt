@@ -73,7 +73,6 @@ class AndroidBrandModelYearForm(private val navController: NavHostController, pr
                 modifier = Modifier
                     .padding(0.dp, 20.dp),
                 items = models,
-                iconContentDescription = "Model Dropdown"
             )
             var year by remember { mutableStateOf(if (bikeDataInput.year != -1) bikeDataInput.year.toString() else "") }
             MTBOracleTextInput(
