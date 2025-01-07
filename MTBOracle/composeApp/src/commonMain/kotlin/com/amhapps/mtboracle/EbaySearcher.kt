@@ -31,7 +31,7 @@ import kotlin.experimental.ExperimentalObjCRefinement
 
 
 class EbaySearcher {
-    suspend fun search(bikeData:BikeData):List<EbayBikeData>{
+    suspend fun search(bikeData:BikeData,offset:Int?=0):List<EbayBikeData>{
         val client = HttpClient(){
             install(ContentNegotiation){
                 json(Json{
@@ -84,12 +84,16 @@ class EbaySearcher {
                     else "Front"
                 }
                 else ""
+            var searchTerm  = (if(bikeData.year<0 || bikeData.year>2050)"" else bikeData.year.toString()+"%20")
+            if (bikeData.brand.length > 0) searchTerm += bikeData.brand.encodeURLPath()+"%20"
+            if(bikeData.model.length >0) searchTerm += bikeData.model.encodeURLPath()
             bikeReqBuilder.url {
                 protocol = URLProtocol.HTTPS
                 host = "api.ebay.com"
                 encodedPath = "/buy/browse/v1/item_summary/search?q=" +
-                        bikeData.year+"%20"+bikeData.brand.encodeURLPath()+"%20"+bikeData.model.encodeURLPath()+
-                        "&category_ids=177831&limit=4"+// 177831 = Bicycles
+                        searchTerm+
+                        "&category_ids=177831&limit=48"+// 177831 = Bicycles
+                        "&offset="+offset.toString()+
                         "&filter=buyingOptions:{FIXED_PRICE}"+
                         "&aspect_filter=categoryId:177831,"+
                         "Frame%20Size:{"+encodedSize+"},"+

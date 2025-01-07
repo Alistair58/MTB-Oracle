@@ -22,11 +22,15 @@ junit = "4.13.2"
 kotlin = "2.0.21"
 kotlinxSerializationCore = "1.6.3"
 kotlinxSerializationJson = "1.6.2"
+ktorClientAndroid = "1.9.0"
+ktorClientAndroidVersion = "3.0.3"
 ktorClientJs = "3.0.0-wasm2"
+ktorClientJsVersion = "3.0.4"
 ktorClientLogging = "3.0.3"
+ktorKtorClientJs = "3.0.3"
 navigationCompose = "2.8.0-alpha10"
 navigationSafeArgsGenerator = "2.8.5"
-ktor = "3.0.2"
+ktor = "3.0.3"
 coroutines = "1.9.0"
 
 [libraries]
@@ -37,6 +41,7 @@ coil-compose-v304 = { module = "io.coil-kt.coil3:coil-compose", version.ref = "c
 coil-kt-coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilComposeVersion" }
 coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
+coil3-coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coilKtCoilCompose" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 gson-v288 = { module = "com.google.code.gson:gson", version.ref = "gsonVersion" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -54,8 +59,12 @@ androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerializationCore" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroid" }
+ktor-client-android-v303 = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroidVersion" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClientLogging" }
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktorClientJs" }
+ktor-client-js-v303 = { module = "io.ktor:ktor-client-js", version.ref = "ktorKtorClientJs" }
+ktor-client-js-v304 = { module = "io.ktor:ktor-client-js", version.ref = "ktorClientJsVersion" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorClientLogging" }
 ktor-serialization-gson = { module = "io.ktor:ktor-serialization-gson", version.ref = "ktorClientLogging" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorClientLogging" }

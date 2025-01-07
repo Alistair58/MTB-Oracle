@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,8 +39,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
+import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.amhapps.mtboracle.EbayBikeData
 import com.amhapps.mtboracle.EbaySearcher
 import com.amhapps.mtboracle.MTBOracleTheme
@@ -54,38 +59,72 @@ open class SimilarBikesPage(private val bikeData: BikeData) {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-            ) {
-                var ebayBikes by remember { mutableStateOf(emptyList<EbayBikeData>()) }
-                var errorText by remember { mutableStateOf("") }
-                val scope = rememberCoroutineScope()
-                val ebaySearcher by remember { mutableStateOf(EbaySearcher()) }
-                LaunchedEffect(true) {
-                    scope.launch {
-                         try {
-                            ebayBikes = ebaySearcher.search(bikeData)
-                             println(ebayBikes.toString())
+            var ebayBikes by remember { mutableStateOf(listOf<EbayBikeData>()) }
+            var errorText by remember { mutableStateOf("") }
+            var moreBikes by remember{ mutableStateOf(true) }
+            val scope = rememberCoroutineScope()
+            val ebaySearcher by remember { mutableStateOf(EbaySearcher()) }
+            LaunchedEffect(true) {
+                scope.launch {
+                    if(ebayBikes.size==0){
+                        try {
+                            ebayBikes = ebaySearcher.search(bikeData,0)
+                            println(ebayBikes.toString())
                         } catch (e: Exception) {
                             errorText = e.toString()
                         }
                     }
+
                 }
-                Text(
+            }
+            LazyColumn(
+                userScrollEnabled = true,
+                state = rememberLazyListState()
+            )
+             {
+
+                item{Text(
                     text = errorText,
                     color = MTBOracleTheme.colors.lightRed
-                )
-                Column {
-                    Row {
-                        if(ebayBikes.size>0) Column (modifier =Modifier.fillMaxWidth(0.5f)) { BikeCard(ebayBikes[0])}
-                        if(ebayBikes.size>1) Column (modifier =Modifier.fillMaxWidth()) {BikeCard(ebayBikes[1])}
-                    } //once the first one is drawn, the second one only has 0.5 for its max width
-                    Row {
-                        if(ebayBikes.size>2) Column (modifier =Modifier.fillMaxWidth(0.5f)) {BikeCard(ebayBikes[2])}
-                        if(ebayBikes.size>3) Column (modifier =Modifier.fillMaxWidth()) {BikeCard(ebayBikes[3])}
-                    }
+                )}
+                println("Loop "+ ebayBikes.size)
+                for(i in 0..<ebayBikes.size step 2){
+                    item{Row {
+                        Column (modifier =Modifier
+                            .fillMaxWidth(0.5f)
+                            .padding(10.dp,5.dp,5.dp,5.dp)
+                        ) {
+                            BikeCard(ebayBikes[i])
+                        }
+                        if(ebayBikes.size>(i+1)){
+                            Column (modifier =Modifier
+                                .fillMaxWidth()
+                                .padding(5.dp,5.dp,10.dp,5.dp)
+                            ) {
+                                BikeCard(ebayBikes[i+1])
+                            }
+                        }
+                    }} //once the first one is drawn, the second one only has 0.5 for its max width
                 }
+
+             item {
+                 //When user scrolls to bottom of the page
+                 LaunchedEffect(true) {
+                     val prevSize = ebayBikes.size
+                     if(prevSize %48==0 && moreBikes){
+                         try { //adding the lists changes the address of the list and so causes a recomposition
+                             ebayBikes = ebayBikes + ebaySearcher.search(bikeData,prevSize)
+                             println(ebayBikes.toString())
+                             if(ebayBikes.size == prevSize) moreBikes = false
+                             println(ebayBikes.size)
+                         } catch (e: Exception) {
+                             errorText = e.toString()
+                         }
+                     }
+
+                 }
+             }
+
 
             }
         }
@@ -97,22 +136,34 @@ open class SimilarBikesPage(private val bikeData: BikeData) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(300.dp)
         ) {
             println(bikeData.imageUrl)
             Column (
                 modifier = Modifier.padding(10.dp)
             ){
-                AsyncImage(
-                    model = bikeData.imageUrl,
-                    contentDescription = bikeData.title + " image",
-                    placeholder = painterResource(Res.drawable.transparent_mtb_oracle_bike_v2),
-                    error = painterResource(Res.drawable.transparent_mtb_oracle_bike_v2),
+                SubcomposeAsyncImage(
+                    model = ImageRequest.Builder(LocalPlatformContext.current)
+                        .data(bikeData.imageUrl)
+                        .crossfade(true)
+                        .build(),
+                    loading = {
+                        CircularProgressIndicator()
+                    },
+                    error = {painterResource(Res.drawable.transparent_mtb_oracle_bike_v2)},
                     onError = { println(it.result.toString()) },
+                    contentDescription = bikeData.title+" image",
+                    modifier = Modifier
+                        .height(80.dp)
                 )
                 Text(
                     bikeData.title ?: "Similar Bike",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize =
+                    (if(bikeData.title == null) 0.sp
+                        else if(bikeData.title.length<=20) 16.sp
+                        else if(bikeData.title.length <=60) 14.sp
+                        else 12.sp) //max eBay title length is 80 characters
                 )
                 Text(bikeData.price ?: "", fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.padding(0.dp,5.dp))
                 SpecText("Condition: ", bikeData.condition ?: "Unknown", fontSize = 14.sp)

@@ -45,7 +45,8 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
-            implementation(libs.ktor.client.okhttp)
+            implementation(libs.ktor.client.android.v303)
+            //implementation(libs.ktor.client.okhttp)
 
         }
         commonMain.dependencies {
@@ -60,20 +61,17 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.kotlinx.serialization.core)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.core)
+            //implementation(libs.ktor.client.core)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.gson.v288)
             implementation(libs.coil.compose.v304)
-            implementation(libs.coil.network.ktor)
-            implementation(libs.coil.network.okhttp)
-            implementation(libs.kotlinx.coroutines.swing)
+            implementation(libs.coil3.coil.network.ktor3)
         }
 
         wasmJsMain.dependencies {
-            implementation(libs.ktor.client.js)
+            implementation(libs.ktor.client.js.v303)
         }
     }
 }
