@@ -1,5 +1,7 @@
 package com.amhapps.mtboracle
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -15,6 +17,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.AlertDialog
+import androidx.compose.ui.window.Dialog
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
@@ -29,9 +32,11 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,7 +56,71 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.PopupProperties
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import mtboracle.composeapp.generated.resources.Res
+import mtboracle.composeapp.generated.resources.frame0
+import mtboracle.composeapp.generated.resources.frame1
+import mtboracle.composeapp.generated.resources.frame10
+import mtboracle.composeapp.generated.resources.frame11
+import mtboracle.composeapp.generated.resources.frame12
+import mtboracle.composeapp.generated.resources.frame13
+import mtboracle.composeapp.generated.resources.frame14
+import mtboracle.composeapp.generated.resources.frame15
+import mtboracle.composeapp.generated.resources.frame16
+import mtboracle.composeapp.generated.resources.frame17
+import mtboracle.composeapp.generated.resources.frame18
+import mtboracle.composeapp.generated.resources.frame19
+import mtboracle.composeapp.generated.resources.frame2
+import mtboracle.composeapp.generated.resources.frame20
+import mtboracle.composeapp.generated.resources.frame3
+import mtboracle.composeapp.generated.resources.frame4
+import mtboracle.composeapp.generated.resources.frame5
+import mtboracle.composeapp.generated.resources.frame6
+import mtboracle.composeapp.generated.resources.frame7
+import mtboracle.composeapp.generated.resources.frame8
+import mtboracle.composeapp.generated.resources.frame9
+import mtboracle.composeapp.generated.resources.frame21
+import mtboracle.composeapp.generated.resources.frame22
+import mtboracle.composeapp.generated.resources.frame23
+import mtboracle.composeapp.generated.resources.frame24
+import mtboracle.composeapp.generated.resources.frame25
+import mtboracle.composeapp.generated.resources.frame26
+import mtboracle.composeapp.generated.resources.frame27
+import mtboracle.composeapp.generated.resources.frame28
+import mtboracle.composeapp.generated.resources.frame29
+import mtboracle.composeapp.generated.resources.frame30
+import mtboracle.composeapp.generated.resources.frame31
+import mtboracle.composeapp.generated.resources.frame32
+import mtboracle.composeapp.generated.resources.frame33
+import mtboracle.composeapp.generated.resources.frame34
+import mtboracle.composeapp.generated.resources.frame35
+import mtboracle.composeapp.generated.resources.frame36
+import mtboracle.composeapp.generated.resources.frame37
+import mtboracle.composeapp.generated.resources.frame38
+import mtboracle.composeapp.generated.resources.frame39
+import mtboracle.composeapp.generated.resources.frame40
+import mtboracle.composeapp.generated.resources.frame41
+import mtboracle.composeapp.generated.resources.frame42
+import mtboracle.composeapp.generated.resources.frame43
+import mtboracle.composeapp.generated.resources.frame44
+import mtboracle.composeapp.generated.resources.frame45
+import mtboracle.composeapp.generated.resources.frame46
+import mtboracle.composeapp.generated.resources.frame47
+import mtboracle.composeapp.generated.resources.frame48
+import mtboracle.composeapp.generated.resources.frame49
+import mtboracle.composeapp.generated.resources.frame50
+import mtboracle.composeapp.generated.resources.frame51
+import mtboracle.composeapp.generated.resources.frame52
+import mtboracle.composeapp.generated.resources.frame53
+import mtboracle.composeapp.generated.resources.frame54
+import mtboracle.composeapp.generated.resources.frame55
+import mtboracle.composeapp.generated.resources.frame56
+import mtboracle.composeapp.generated.resources.frame57
+import mtboracle.composeapp.generated.resources.frame58
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun MTBOracleTextInput(  //has correct colouring, rounded corners and removed some unused TextField features
@@ -292,4 +361,97 @@ fun SpecText(specName:String,specValue:String,fontSize: TextUnit?=18.sp){
         fontSize =fontSize?:18.sp,
         modifier = Modifier.padding(0.dp,5.dp)
     )
+}
+
+@Composable
+fun LoadingAnimation(){
+    val scope = rememberCoroutineScope()
+    var count by remember{mutableStateOf(0)}
+    LaunchedEffect(true) {
+        scope.launch {
+            while(true){
+                delay(500) //33 is 30 fps
+                count = count +1 %59
+                println("Frame: "+count)
+            }
+
+        }
+    }
+    Dialog(onDismissRequest = {}){ //Don't want the user to be able to cancel the animation
+        AnimatedContent(
+            targetState = count,
+            label = "animated content"
+        ) { targetCount ->
+            Text(text = "Count $targetCount")
+            Image(
+                painter = painterResource(
+                    when (targetCount) {
+                        0 -> Res.drawable.frame0
+                        1 -> Res.drawable.frame1
+                        2 -> Res.drawable.frame2
+                        3 -> Res.drawable.frame3
+                        4 -> Res.drawable.frame4
+                        5 -> Res.drawable.frame5
+                        6 -> Res.drawable.frame6
+                        7 -> Res.drawable.frame7
+                        8 -> Res.drawable.frame8
+                        9 -> Res.drawable.frame9
+                        10 -> Res.drawable.frame10
+                        11 -> Res.drawable.frame11
+                        12 -> Res.drawable.frame12
+                        13 -> Res.drawable.frame13
+                        14 -> Res.drawable.frame14
+                        15 -> Res.drawable.frame15
+                        16 -> Res.drawable.frame16
+                        17 -> Res.drawable.frame17
+                        18 -> Res.drawable.frame18
+                        19 -> Res.drawable.frame19
+                        20 -> Res.drawable.frame20
+                        21 -> Res.drawable.frame21
+                        22 -> Res.drawable.frame22
+                        23 -> Res.drawable.frame23
+                        24 -> Res.drawable.frame24
+                        25 -> Res.drawable.frame25
+                        26 -> Res.drawable.frame26
+                        27 -> Res.drawable.frame27
+                        28 -> Res.drawable.frame28
+                        29 -> Res.drawable.frame29
+                        30 -> Res.drawable.frame30
+                        31 -> Res.drawable.frame31
+                        32 -> Res.drawable.frame32
+                        33 -> Res.drawable.frame33
+                        34 -> Res.drawable.frame34
+                        35 -> Res.drawable.frame35
+                        36 -> Res.drawable.frame36
+                        37 -> Res.drawable.frame37
+                        38 -> Res.drawable.frame38
+                        39 -> Res.drawable.frame39
+                        40 -> Res.drawable.frame40
+                        41 -> Res.drawable.frame41
+                        42 -> Res.drawable.frame42
+                        43 -> Res.drawable.frame43
+                        44 -> Res.drawable.frame44
+                        45 -> Res.drawable.frame45
+                        46 -> Res.drawable.frame46
+                        47 -> Res.drawable.frame47
+                        48 -> Res.drawable.frame48
+                        49 -> Res.drawable.frame49
+                        50 -> Res.drawable.frame50
+                        51 -> Res.drawable.frame51
+                        52 -> Res.drawable.frame52
+                        53 -> Res.drawable.frame53
+                        54 -> Res.drawable.frame54
+                        55 -> Res.drawable.frame55
+                        56 -> Res.drawable.frame56
+                        57 -> Res.drawable.frame57
+                        58 -> Res.drawable.frame58
+                        else -> Res.drawable.frame0
+                    }
+                ),
+                contentDescription = "Loading animation"
+            )
+    }
+
+    }
+
 }

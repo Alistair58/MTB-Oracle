@@ -45,8 +45,10 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.amhapps.mtboracle.EbayBikeData
 import com.amhapps.mtboracle.EbaySearcher
+import com.amhapps.mtboracle.LoadingAnimation
 import com.amhapps.mtboracle.MTBOracleTheme
 import com.amhapps.mtboracle.SpecText
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mtboracle.composeapp.generated.resources.Res
 import mtboracle.composeapp.generated.resources.transparent_mtb_oracle_bike_v2
@@ -64,11 +66,15 @@ open class SimilarBikesPage(private val bikeData: BikeData) {
             var moreBikes by remember{ mutableStateOf(true) }
             val scope = rememberCoroutineScope()
             val ebaySearcher by remember { mutableStateOf(EbaySearcher()) }
+            var bikesFound by remember{ mutableStateOf(false) }
+            if(!bikesFound) LoadingAnimation()
             LaunchedEffect(true) {
                 scope.launch {
                     if(ebayBikes.size==0){
                         try {
+
                             ebayBikes = ebaySearcher.search(bikeData,0)
+                            bikesFound = true
                             println(ebayBikes.toString())
                         } catch (e: Exception) {
                             errorText = e.toString()
@@ -110,10 +116,12 @@ open class SimilarBikesPage(private val bikeData: BikeData) {
              item {
                  //When user scrolls to bottom of the page
                  LaunchedEffect(true) {
+                     bikesFound = false
                      val prevSize = ebayBikes.size
                      if(prevSize %48==0 && moreBikes){
                          try { //adding the lists changes the address of the list and so causes a recomposition
                              ebayBikes = ebayBikes + ebaySearcher.search(bikeData,prevSize)
+                             bikesFound = true
                              println(ebayBikes.toString())
                              if(ebayBikes.size == prevSize) moreBikes = false
                              println(ebayBikes.size)

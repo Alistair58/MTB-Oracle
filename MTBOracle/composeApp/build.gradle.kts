@@ -106,6 +106,7 @@ android {
 dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.navigation.safe.args.generator)
+    implementation(libs.androidx.ui.android)
     debugImplementation(compose.uiTooling)
     implementation(libs.kotlinx.coroutines.android)
 }

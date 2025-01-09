@@ -23,6 +23,7 @@ import kotlinx.serialization.Serializable
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.encodeURLPath
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.delay
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
@@ -39,6 +40,7 @@ class EbaySearcher {
                 })
             }
         }
+        delay(10000);
         val accessBuilder = HttpRequestBuilder()
         accessBuilder.url {
             protocol = URLProtocol.HTTPS
