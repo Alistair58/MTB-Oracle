@@ -16,6 +16,7 @@ coilComposeVersion = "2.4.0"
 coilKtCoilCompose = "3.0.4"
 coilNetworkOkhttp = "3.0.4"
 compose-multiplatform = "1.7.0"
+datastorePreferences = "1.1.1"
 gson = "2.10.1"
 gsonVersion = "2.8.8"
 junit = "4.13.2"
@@ -33,9 +34,12 @@ navigationSafeArgsGenerator = "2.8.5"
 ktor = "3.0.3"
 coroutines = "1.9.0"
 uiAndroid = "1.7.6"
+datastorePreferencesCoreJvm = "1.1.1"
 
 [libraries]
 
+androidx-datastore = { module = "androidx.datastore:datastore" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationSafeArgsGenerator" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-compose-v304 = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilKtCoilCompose" }
@@ -43,6 +47,7 @@ coil-kt-coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil
 coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 coil3-coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coilKtCoilCompose" }
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 gson-v288 = { module = "com.google.code.gson:gson", version.ref = "gsonVersion" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -77,6 +82,7 @@ ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "kto
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
+androidx-datastore-preferences-core-jvm = { group = "androidx.datastore", name = "datastore-preferences-core-jvm", version.ref = "datastorePreferencesCoreJvm" }
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }

@@ -46,7 +46,7 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.android.v303)
-            //implementation(libs.ktor.client.okhttp)
+            implementation(libs.datastore.preferences)
 
         }
         commonMain.dependencies {
@@ -68,6 +68,7 @@ kotlin {
             implementation(libs.gson.v288)
             implementation(libs.coil.compose.v304)
             implementation(libs.coil3.coil.network.ktor3)
+
         }
 
         wasmJsMain.dependencies {
@@ -107,6 +108,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.navigation.safe.args.generator)
     implementation(libs.androidx.ui.android)
+    implementation(libs.androidx.datastore.preferences.core.jvm)
     debugImplementation(compose.uiTooling)
     implementation(libs.kotlinx.coroutines.android)
 }

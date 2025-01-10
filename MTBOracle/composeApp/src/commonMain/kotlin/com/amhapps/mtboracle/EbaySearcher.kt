@@ -3,6 +3,7 @@ package com.amhapps.mtboracle
 import Bike
 import BikeData
 import androidx.compose.runtime.Immutable
+import coil3.network.NetworkClient
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.HttpRequestBuilder
@@ -31,16 +32,61 @@ import mtboracle.composeapp.generated.resources.Res
 import kotlin.experimental.ExperimentalObjCRefinement
 
 
-class EbaySearcher {
-    suspend fun search(bikeData:BikeData,offset:Int?=0):List<EbayBikeData>{
-        val client = HttpClient(){
-            install(ContentNegotiation){
-                json(Json{
+abstract class EbaySearcher {
+    suspend fun search(bikeData: BikeData, offset: Int? = 0): List<EbayBikeData> {
+        val client = HttpClient() {
+            install(ContentNegotiation) {
+                json(Json {
                     this.ignoreUnknownKeys = true
                 })
             }
         }
-        delay(10000);
+        var accessToken:String = getCachedToken()
+        if(accessToken.isEmpty()){
+            val accessResponse = getAccessToken(client)
+            if (accessResponse.status.value in 200..299) {
+                val accessResponseBody: AccessResponse = accessResponse.body()
+                accessToken = accessResponseBody.accessToken
+            }
+            else {
+                throw Exception(accessResponse.status.value.toString() + " error received from eBay")
+            }
+        }
+
+        val response =
+            searchBikes(client,accessToken, bikeData, offset ?: 0)
+        val bikes = mutableListOf<EbayBikeData>()
+        if (response.status.value in 200..299) {
+            val bikeResponse: BikeResponse = response.body()
+            val ebayBikes = bikeResponse.itemSummaries ?: emptyList()
+
+            for (ebayBike in ebayBikes) {
+                bikes.add(
+                    EbayBikeData(
+                        title = ebayBike.title,
+                        price = ebayBike.price?.value + " " + ebayBike.price?.currency,
+                        condition = ebayBike.condition,
+                        imageUrl = ebayBike.image?.imageUrl,
+                        itemWebUrl = ebayBike.itemWebUrl,
+                        city = ebayBike.itemLocation?.city,
+                        country = ebayBike.itemLocation?.country
+                    )
+                )
+            }
+            println("Response " + bikeResponse.toString())
+            println("Ebay bikes " + ebayBikes.toString())
+        }
+        else {
+            throw Exception(response.status.value.toString() + " error received from eBay")
+        }
+
+        println("Finished search " + bikes.toString())
+        return bikes.toList()
+
+    }
+
+
+    suspend fun getAccessToken(client: HttpClient): HttpResponse {
         val accessBuilder = HttpRequestBuilder()
         accessBuilder.url {
             protocol = URLProtocol.HTTPS
@@ -48,102 +94,85 @@ class EbaySearcher {
             encodedPath = "/identity/v1/oauth2/token"
         }
         accessBuilder.headers {
-            append(HttpHeaders.ContentType,"application/x-www-form-urlencoded")
-            append(HttpHeaders.Authorization,"Basic REMOVED")
+            append(HttpHeaders.ContentType, "application/x-www-form-urlencoded")
+            append(
+                HttpHeaders.Authorization,
+                "Basic REMOVED"
+            )
         }
         accessBuilder.setBody("grant_type=client_credentials&scope=https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope")
-        val accessResponse = client.post(accessBuilder)
-        if(accessResponse.status.value in 200..299){
-            val accessResult:AccessResponse = accessResponse.body()
-            val bikeReqBuilder = HttpRequestBuilder()
-            val encodedCondition = when(bikeData.condition){
-                "Brand New" -> "New|New%20other%20%28see%20details%29"
-                "For parts/unrideable" -> "For%20parts%20or%20not%20working"
-                "Other" -> "Not%20Specified" //Not sure if this makes logical sense
-                else -> "Used"
-            }
-            val encodedSize = when(bikeData.size){
-                "S" -> "Small"
-                "M" -> "Medium"
-                "L" -> "Large"
-                "XL" -> "X-Large"
-                else -> ""
-            }
-            val encodedWheelSize = bikeData.wheelSize.replace("<","")
-                                .split("/")[0]
-                                .replace("\"","%20in")
-            val encodedCategory =
-                if (bikeData.category == "Children's") "Kids%20Bike"
-                else "Mountain%20Bike"
-            val encodedMaterial =
-                if (bikeData.material=="Carbon fibre") "Carbon%20Fibre"
-                else if(bikeData.material=="Other") "Not%20Specified"
-                else bikeData.material
-            val encodedSuspension =
-                if (bikeData.rearTravel == 0f && bikeData.frontTravel == 0f) "No%20Suspension"
-                else if(bikeData.frontTravel > 0f){
-                    if(bikeData.rearTravel >0f) "Full%20Suspension%20%28Front%20%26%20Rear%29"
-                    else "Front"
-                }
-                else ""
-            var searchTerm  = (if(bikeData.year<0 || bikeData.year>2050)"" else bikeData.year.toString()+"%20")
-            if (bikeData.brand.length > 0) searchTerm += bikeData.brand.encodeURLPath()+"%20"
-            if(bikeData.model.length >0) searchTerm += bikeData.model.encodeURLPath()
-            bikeReqBuilder.url {
-                protocol = URLProtocol.HTTPS
-                host = "api.ebay.com"
-                encodedPath = "/buy/browse/v1/item_summary/search?q=" +
-                        searchTerm+
-                        "&category_ids=177831&limit=48"+// 177831 = Bicycles
-                        "&offset="+offset.toString()+
-                        "&filter=buyingOptions:{FIXED_PRICE}"+
-                        "&aspect_filter=categoryId:177831,"+
-                        "Frame%20Size:{"+encodedSize+"},"+
-                        "Wheel%20Size:{"+encodedWheelSize+"},"+
-                        "Bike%20Type:{"+encodedCategory+"},"+
-                        "Suspension%20Type:{"+encodedSuspension+"},"+
-                        "Material:{"+encodedMaterial+"},"+
-                        "Condition:{"+encodedCondition+"}"
-
-            }
-            bikeReqBuilder.headers {
-                append(HttpHeaders.Authorization,"Bearer "+accessResult.accessToken)
-            }
-
-            val response = client.get(bikeReqBuilder)
-            val bikes = mutableListOf<EbayBikeData>()
-            if(response.status.value in 200..299){
-                val bikeResponse:BikeResponse = response.body()
-                val ebayBikes = bikeResponse.itemSummaries?: emptyList()
-
-                for (ebayBike in ebayBikes){
-                    bikes.add(EbayBikeData(
-                        title = ebayBike.title,
-                        price = ebayBike.price?.value+" "+ebayBike.price?.currency,
-                        condition = ebayBike.condition,
-                        imageUrl = ebayBike.image?.imageUrl,
-                        itemWebUrl = ebayBike.itemWebUrl,
-                        city = ebayBike.itemLocation?.city,
-                        country = ebayBike.itemLocation?.country
-                    ))
-                }
-                println("Response "+bikeResponse.toString())
-                println("Ebay bikes "+ebayBikes.toString())
-            }
-            else{
-                throw Exception(accessResponse.status.value.toString()+" error received from eBay")
-            }
-
-            println("Finished search "+bikes.toString())
-            return bikes.toList()
-
-        }
-        else{
-            throw Exception(accessResponse.status.value.toString()+" error received from eBay")
-        }
-
-
+        return client.post(accessBuilder)
     }
+
+    suspend fun searchBikes(
+        client: HttpClient,
+        accessToken: String,
+        bikeData: BikeData,
+        offset: Int
+    ): HttpResponse {
+        val bikeReqBuilder = HttpRequestBuilder()
+        val encodedCondition = when (bikeData.condition) { //most bikes seem to just say used
+            "Brand new" -> "1000|1500" //new|new other (see details)
+            "Excellent" -> "2750|3000|4000" //like new|used|very good
+            "Good" -> "3000|5000|6000" //used|good|acceptable
+            "Poor" -> "3000|6000" //used|good|acceptable
+            "For parts/unrideable" -> "3000|7000" //used|for parts or not working
+            "Other" -> "1000|1500|2750|3000|4000|5000|6000|7000" //All of them
+            else -> "3000"
+        }
+        val encodedSize = when (bikeData.size) {
+            "S" -> "Small"
+            "M" -> "Medium"
+            "L" -> "Large"
+            "XL" -> "X-Large"
+            else -> ""
+        }
+        val encodedWheelSize = bikeData.wheelSize.replace("<", "")
+            .split("/")[0]
+            .replace("\"", "%20in")
+        val encodedCategory =
+            if (bikeData.category == "Children's") "Kids%20Bike"
+            else "Mountain%20Bike"
+        val encodedMaterial =
+            if (bikeData.material == "Carbon fibre") "Carbon%20Fibre"
+            else if (bikeData.material == "Other") "Not%20Specified"
+            else bikeData.material
+        val encodedSuspension =
+            if (bikeData.rearTravel == 0f && bikeData.frontTravel == 0f) "No%20Suspension"
+            else if (bikeData.frontTravel > 0f) {
+                if (bikeData.rearTravel > 0f) "Full%20Suspension%20%28Front%20%26%20Rear%29"
+                else "Front"
+            } else ""
+        var searchTerm =
+            (if (bikeData.year < 0 || bikeData.year > 2050) "" else bikeData.year.toString() + "%20")
+        if (bikeData.brand.length > 0) searchTerm += bikeData.brand.encodeURLPath() + "%20"
+        if (bikeData.model.length > 0) searchTerm += bikeData.model.encodeURLPath()
+        bikeReqBuilder.url {
+            protocol = URLProtocol.HTTPS
+            host = "api.ebay.com"
+            encodedPath = "/buy/browse/v1/item_summary/search?q=" +
+                    searchTerm +
+                    "&category_ids=177831&limit=48" +// 177831 = Bicycles
+                    "&offset=" + offset.toString() +
+                    "&filter=buyingOptions:{FIXED_PRICE}" +
+                    "&aspect_filter=categoryId:177831," +
+                    "Frame%20Size:{" + encodedSize + "}," +
+                    "Wheel%20Size:{" + encodedWheelSize + "}," +
+                    "Bike%20Type:{" + encodedCategory + "}," +
+                    "Suspension%20Type:{" + encodedSuspension + "}," +
+                    "Material:{" + encodedMaterial + "}" +
+                    "&filter=conditionIds:{" + encodedCondition + "}"
+
+
+        }
+        bikeReqBuilder.headers {
+            append(HttpHeaders.Authorization, "Bearer " + accessToken)
+        }
+        return client.get(bikeReqBuilder)
+    }
+
+    abstract fun getCachedToken():String
+    abstract fun cacheToken(token:String)
 }
 
 @Serializable

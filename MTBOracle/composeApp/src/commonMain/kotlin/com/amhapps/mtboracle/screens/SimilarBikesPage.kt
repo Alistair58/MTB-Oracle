@@ -68,14 +68,14 @@ open class SimilarBikesPage(private val bikeData: BikeData) {
             val ebaySearcher by remember { mutableStateOf(EbaySearcher()) }
             var bikesFound by remember{ mutableStateOf(false) }
             if(!bikesFound) LoadingAnimation()
-            LaunchedEffect(true) {
+            LaunchedEffect(!bikesFound) {
                 scope.launch {
-                    if(ebayBikes.size==0){
+                    if(ebayBikes.isEmpty()){
                         try {
-
                             ebayBikes = ebaySearcher.search(bikeData,0)
-                            bikesFound = true
                             println(ebayBikes.toString())
+                            bikesFound = true
+
                         } catch (e: Exception) {
                             errorText = e.toString()
                         }
