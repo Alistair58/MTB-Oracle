@@ -42,11 +42,13 @@ abstract class EbaySearcher {
             }
         }
         var accessToken:String = getCachedToken()
+
         if(accessToken.isEmpty()){
             val accessResponse = getAccessToken(client)
             if (accessResponse.status.value in 200..299) {
                 val accessResponseBody: AccessResponse = accessResponse.body()
                 accessToken = accessResponseBody.accessToken
+                cacheToken(accessToken,accessResponseBody.expiresIn)
             }
             else {
                 throw Exception(accessResponse.status.value.toString() + " error received from eBay")
@@ -171,8 +173,8 @@ abstract class EbaySearcher {
         return client.get(bikeReqBuilder)
     }
 
-    abstract fun getCachedToken():String
-    abstract fun cacheToken(token:String)
+    abstract suspend fun getCachedToken():String
+    abstract suspend fun cacheToken(token:String,lifespanSeconds:Long)
 }
 
 @Serializable
@@ -180,7 +182,7 @@ data class AccessResponse(
     @SerialName("access_token")
     val accessToken:String,
     @SerialName("expires_in")
-    val expiresIn:Int,
+    val expiresIn:Long,
     @SerialName("token_type")
     val tokenType:String
 )

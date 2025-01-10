@@ -6,6 +6,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -14,7 +17,6 @@ import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val context = applicationContext
@@ -23,6 +25,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AndroidApp(context,dataset,neuralNetwork)
         }
+
     }
 
     @Composable
@@ -86,7 +89,7 @@ class MainActivity : ComponentActivity() {
                     )
                 ) {
                     val args = it.toRoute<AndroidValuationScreen>()
-                    val page = AndroidSimilarBikesPage(navController, args.bikeData)
+                    val page = AndroidSimilarBikesPage(navController, args.bikeData,context)
                     page.show()
                 }
             }
@@ -99,6 +102,10 @@ class MainActivity : ComponentActivity() {
 //        AndroidApp()
 //    }
 }
+
+val Context.tokensDataStore: DataStore<Preferences> by preferencesDataStore(name = "tokens")
+
+
 @Serializable
 object AndroidHomeScreen
 @Serializable

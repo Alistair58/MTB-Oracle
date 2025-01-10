@@ -54,7 +54,7 @@ import mtboracle.composeapp.generated.resources.Res
 import mtboracle.composeapp.generated.resources.transparent_mtb_oracle_bike_v2
 import org.jetbrains.compose.resources.painterResource
 
-open class SimilarBikesPage(private val bikeData: BikeData) {
+abstract class SimilarBikesPage(private val bikeData: BikeData) {
     @Composable
     open fun show(){
         Box(
@@ -65,19 +65,22 @@ open class SimilarBikesPage(private val bikeData: BikeData) {
             var errorText by remember { mutableStateOf("") }
             var moreBikes by remember{ mutableStateOf(true) }
             val scope = rememberCoroutineScope()
-            val ebaySearcher by remember { mutableStateOf(EbaySearcher()) }
+            val ebaySearcher by remember { mutableStateOf(platformEbaySearcher()) }
             var bikesFound by remember{ mutableStateOf(false) }
             if(!bikesFound) LoadingAnimation()
-            LaunchedEffect(!bikesFound) {
+            LaunchedEffect(true) {//LaunchedEffect restarts when one of the key parameters changes
                 scope.launch {
                     if(ebayBikes.isEmpty()){
                         try {
                             ebayBikes = ebaySearcher.search(bikeData,0)
                             println(ebayBikes.toString())
-                            bikesFound = true
 
                         } catch (e: Exception) {
+                            println("Initial problem")
                             errorText = e.toString()
+                        }
+                        finally {
+                            bikesFound = true //stop the loading animation
                         }
                     }
 
@@ -115,22 +118,27 @@ open class SimilarBikesPage(private val bikeData: BikeData) {
 
              item {
                  //When user scrolls to bottom of the page
-                 LaunchedEffect(true) {
-                     bikesFound = false
-                     val prevSize = ebayBikes.size
-                     if(prevSize %48==0 && moreBikes){
-                         try { //adding the lists changes the address of the list and so causes a recomposition
-                             ebayBikes = ebayBikes + ebaySearcher.search(bikeData,prevSize)
-                             bikesFound = true
-                             println(ebayBikes.toString())
-                             if(ebayBikes.size == prevSize) moreBikes = false
-                             println(ebayBikes.size)
-                         } catch (e: Exception) {
-                             errorText = e.toString()
+                 if(ebayBikes.isNotEmpty()){ //On the first composition, this would be on the page
+                     // as the bikes have not been returned from eBay yet and so it would run (which we don't want)
+                     LaunchedEffect(true) {
+                         bikesFound = false
+                         val prevSize = ebayBikes.size
+                         if(prevSize %48==0 && moreBikes){
+                             try { //adding the lists changes the address of the list and so causes a recomposition
+                                 ebayBikes = ebayBikes + ebaySearcher.search(bikeData,prevSize)
+                                 println(ebayBikes.toString())
+                                 if(ebayBikes.size == prevSize) moreBikes = false
+                                 println(ebayBikes.size)
+                             } catch (e: Exception) {
+                                 println("Bottom of page problem")
+                                 errorText = e.toString()
+                             }
                          }
-                     }
+                         bikesFound = true //stop the loading animation
 
+                     }
                  }
+
              }
 
 
@@ -146,7 +154,6 @@ open class SimilarBikesPage(private val bikeData: BikeData) {
                 .fillMaxWidth()
                 .height(300.dp)
         ) {
-            println(bikeData.imageUrl)
             Column (
                 modifier = Modifier.padding(10.dp)
             ){
@@ -203,4 +210,5 @@ open class SimilarBikesPage(private val bikeData: BikeData) {
 
         }
     }
+    abstract fun platformEbaySearcher():EbaySearcher
 }
