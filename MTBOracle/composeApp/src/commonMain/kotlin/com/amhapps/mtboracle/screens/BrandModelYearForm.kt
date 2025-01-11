@@ -71,7 +71,7 @@ abstract class BrandModelYearForm(private val navController: NavHostController, 
                     dialogText = "",
                     confirmExists = false,
                     dismissColor = MTBOracleTheme.colors.forestLight,
-                    onDismiss = {numberErrorDialog = false}
+                    alwaysDismiss = {numberErrorDialog = false}
                 )
             }
         }

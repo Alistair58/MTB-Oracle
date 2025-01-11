@@ -8,6 +8,12 @@ import kotlinx.serialization.Serializable
 // - add notes about accuracy
 // - check bike inputs e.g. for parts/
 // - check what is being searched
+// - Add country searching for eBay
+// - Add currency exchange rates
+// - Change warning messages for Similar Bikes
+// - Bike sorting
+
+//TODO
 // - Non-crucial
 // - see if navigation transition is changeable
 // - app icon

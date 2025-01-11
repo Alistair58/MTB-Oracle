@@ -85,7 +85,7 @@ class AndroidSizeMaterialTravelForm(private val navController: NavHostController
                 dialogText = "",
                 confirmExists = false,
                 dismissColor = MTBOracleTheme.colors.forestLight,
-                onDismiss = {numberErrorDialog = false}
+                alwaysDismiss = {numberErrorDialog = false}
             )
         }
         if(lackOfInfo){
@@ -105,7 +105,7 @@ class AndroidSizeMaterialTravelForm(private val navController: NavHostController
                 confirmExists = true,
                 confirmationColor = MTBOracleTheme.colors.yellowWarning,
                 dismissColor = MTBOracleTheme.colors.forestLight,
-                onDismiss = {lackOfInfo = false}
+                alwaysDismiss = {lackOfInfo = false}
             )
         }
     }

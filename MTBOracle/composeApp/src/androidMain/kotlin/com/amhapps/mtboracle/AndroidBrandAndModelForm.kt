@@ -38,7 +38,7 @@ class AndroidBrandModelYearForm(private val navController: NavHostController, pr
                 dialogText = "",
                 confirmationColor = MTBOracleTheme.colors.lightRed,
                 dismissColor = MTBOracleTheme.colors.forestLight,
-                onDismiss = {showAlert = false}
+                alwaysDismiss = {showAlert = false}
             )
         }
         BackHandler {
@@ -145,7 +145,7 @@ class AndroidBrandModelYearForm(private val navController: NavHostController, pr
                 dialogText = "",
                 confirmExists = false,
                 dismissColor = MTBOracleTheme.colors.forestLight,
-                onDismiss = {numberErrorDialog = false}
+                alwaysDismiss = {numberErrorDialog = false}
             )
         }
         if(lackOfInfo || unknownModel){
@@ -167,7 +167,7 @@ class AndroidBrandModelYearForm(private val navController: NavHostController, pr
                 confirmExists = true,
                 confirmationColor = MTBOracleTheme.colors.yellowWarning,
                 dismissColor = MTBOracleTheme.colors.forestLight,
-                onDismiss = {
+                alwaysDismiss = {
                     lackOfInfo = false
                     unknownModel = false
                 }

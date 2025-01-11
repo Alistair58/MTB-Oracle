@@ -304,8 +304,11 @@ fun SearchableDropdown(
 
 @Composable
 fun WarningDialog(
+    confirmText:String = "Confirm",
     onConfirmation: () -> Unit,
-    onDismiss: () -> Unit,
+    dismissText:String = "Dismiss",
+    alwaysDismiss: () -> Unit, //Typically closes the dialog
+    explicitDismiss: () -> Unit = {}, //Do something only on dismissButton e.g. backNavigation
     dialogTitle: String,
     dialogText: String,
     confirmExists:Boolean? = true,
@@ -320,18 +323,18 @@ fun WarningDialog(
         text = {
             Text(text = dialogText)
         },
-        onDismissRequest = onDismiss,
+        onDismissRequest = { alwaysDismiss() ; explicitDismiss() },
         confirmButton = {
             if(confirmExists == true){ //because it is nullable it actually has to be like this
                 confirmationColor?.let { Modifier.background(color= it) }?.let {
                     TextButton(
                         onClick = {
                             onConfirmation()
-                            onDismiss()
+                            alwaysDismiss()
                         },
                         modifier = it
                     ) {
-                        Text("Confirm",color=Color.White)
+                        Text(confirmText,color=Color.White)
                     }
                 }
             }
@@ -339,12 +342,12 @@ fun WarningDialog(
         dismissButton = {
             TextButton(
                 onClick = {
-                    onDismiss()
+                     alwaysDismiss() ; explicitDismiss()
                 },
                 modifier = Modifier
                     .background(color=dismissColor)
             ) {
-                Text("Dismiss",color=Color.White)
+                Text(dismissText,color=Color.White)
             }
         },
         modifier = modifier
@@ -464,8 +467,7 @@ fun LoadingAnimation(){
                     contentDescription = "Loading animation"
                 )
             }
-    }
-
+        }
     }
 
 }

@@ -1,20 +1,15 @@
 package com.amhapps.mtboracle.screens
 
 import BikeData
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
@@ -37,24 +32,26 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
+import androidx.navigation.NavController
 import coil3.compose.LocalPlatformContext
 import coil3.compose.SubcomposeAsyncImage
-import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.amhapps.mtboracle.EbayBikeData
+import com.amhapps.mtboracle.EbayResponseException
 import com.amhapps.mtboracle.EbaySearcher
 import com.amhapps.mtboracle.LoadingAnimation
 import com.amhapps.mtboracle.MTBOracleTheme
+import com.amhapps.mtboracle.NoInternetException
 import com.amhapps.mtboracle.SpecText
-import kotlinx.coroutines.delay
+import com.amhapps.mtboracle.WarningDialog
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.launch
 import mtboracle.composeapp.generated.resources.Res
 import mtboracle.composeapp.generated.resources.transparent_mtb_oracle_bike_v2
 import org.jetbrains.compose.resources.painterResource
 
-abstract class SimilarBikesPage(private val bikeData: BikeData) {
+abstract class SimilarBikesPage(private val navController:NavController,private val bikeData: BikeData) {
     @Composable
     open fun show(){
         Box(
@@ -62,41 +59,68 @@ abstract class SimilarBikesPage(private val bikeData: BikeData) {
                 .fillMaxSize()
         ) {
             var ebayBikes by remember { mutableStateOf(listOf<EbayBikeData>()) }
-            var errorText by remember { mutableStateOf("") }
             var moreBikes by remember{ mutableStateOf(true) }
             val scope = rememberCoroutineScope()
             val ebaySearcher by remember { mutableStateOf(platformEbaySearcher()) }
             var bikesFound by remember{ mutableStateOf(false) }
+            var retry by remember { mutableStateOf(false) }
+            var connectionError by remember { mutableStateOf(0) }
+            var noMatchingBikes by remember { mutableStateOf(false) }
             if(!bikesFound) LoadingAnimation()
-            LaunchedEffect(true) {//LaunchedEffect restarts when one of the key parameters changes
+            LaunchedEffect(retry) {//LaunchedEffect restarts when one of the key parameters changes
                 scope.launch {
-                    if(ebayBikes.isEmpty()){
+                    if(ebayBikes.isEmpty() && !bikesFound){
                         try {
                             ebayBikes = ebaySearcher.search(bikeData,0)
-                            println(ebayBikes.toString())
-
-                        } catch (e: Exception) {
-                            println("Initial problem")
-                            errorText = e.toString()
+                            if(ebayBikes.isEmpty()) noMatchingBikes = true
                         }
-                        finally {
+                        catch (e: HttpRequestTimeoutException) {
+                            connectionError = 1
+                        }
+                        catch(e: EbayResponseException){ //Kotlin doesn't have multi-catch
+                            connectionError = 1
+                        }
+                        catch(e: NoInternetException){
+                            connectionError = 2
+                        }
+                        finally{
                             bikesFound = true //stop the loading animation
                         }
                     }
 
                 }
             }
+            if(noMatchingBikes){
+                WarningDialog(
+                    confirmText = "Back",
+                    onConfirmation = {navController.popBackStack() },
+                    dismissText = "Home",
+                    alwaysDismiss = {},
+                    explicitDismiss = { navController.popBackStack(platformHomeScreen(),false) },
+                    dialogTitle = "No Bikes Found",
+                    dialogText = "We could not find any bikes that matched the details you provided.\nChanging the model name to something broader may yield more results.",
+                    confirmationColor = MTBOracleTheme.colors.forestLight,
+                    dismissColor = Color.Gray
+                )
+            }
+            if(connectionError > 0){
+                WarningDialog(
+                    confirmText = "Retry",
+                    onConfirmation = {retry = !retry ; bikesFound = false}, //Value doesn't matter only matters that value changes
+                    dismissText = if(connectionError <= 2) "Home" else "Cancel",
+                    alwaysDismiss = {connectionError = 0},
+                    explicitDismiss = { if(connectionError <= 2) navController.popBackStack(platformHomeScreen(),false) },
+                    dialogTitle = "Network Error",
+                    dialogText = if(connectionError % 2 == 0) "No internet connection" else "Could not connect with eBay",
+                    confirmationColor = MTBOracleTheme.colors.forestLight,
+                    dismissColor = Color.Gray,
+                )
+            }
             LazyColumn(
                 userScrollEnabled = true,
                 state = rememberLazyListState()
             )
              {
-
-                item{Text(
-                    text = errorText,
-                    color = MTBOracleTheme.colors.lightRed
-                )}
-                println("Loop "+ ebayBikes.size)
                 for(i in 0..<ebayBikes.size step 2){
                     item{Row {
                         Column (modifier =Modifier
@@ -123,18 +147,22 @@ abstract class SimilarBikesPage(private val bikeData: BikeData) {
                      LaunchedEffect(true) {
                          bikesFound = false
                          val prevSize = ebayBikes.size
-                         if(prevSize %48==0 && moreBikes){
+                         if(prevSize %48==0 && moreBikes){ //More bikes is the case that the number of bikes returned is a multiple of 48
                              try { //adding the lists changes the address of the list and so causes a recomposition
                                  ebayBikes = ebayBikes + ebaySearcher.search(bikeData,prevSize)
-                                 println(ebayBikes.toString())
                                  if(ebayBikes.size == prevSize) moreBikes = false
-                                 println(ebayBikes.size)
-                             } catch (e: Exception) {
-                                 println("Bottom of page problem")
-                                 errorText = e.toString()
+                             }
+                             catch (e: HttpRequestTimeoutException) {
+                                 connectionError = 3
+                             }
+                             catch(e: EbayResponseException){
+                                 connectionError = 3
+                             }
+                             catch(e: NoInternetException){
+                                 connectionError = 4
                              }
                          }
-                         bikesFound = true //stop the loading animation
+                         bikesFound = true //Still want to stop checking if we are not a multiple of 48
 
                      }
                  }
@@ -211,4 +239,5 @@ abstract class SimilarBikesPage(private val bikeData: BikeData) {
         }
     }
     abstract fun platformEbaySearcher():EbaySearcher
+    abstract fun platformHomeScreen():Any
 }

@@ -1,5 +1,6 @@
 package com.amhapps.mtboracle
 
+import BikeData
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -8,6 +9,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -15,6 +17,15 @@ import java.time.Instant
 import kotlin.math.exp
 
 class AndroidEbaySearcher(private val context:Context):EbaySearcher() {
+    override suspend fun search(bikeData: BikeData, offset: Int?): List<EbayBikeData> {
+        try{
+            return super.search(bikeData, offset)
+        }
+        catch(e:java.net.UnknownHostException){ //(No internet)
+            throw NoInternetException()
+        }
+
+    }
     override suspend fun getCachedToken(): String {
         //Check the expiry first as this saves looking up both if it has expired
         val tokenExpiryKey = longPreferencesKey("tokenExpiry")

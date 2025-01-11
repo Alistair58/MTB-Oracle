@@ -6,6 +6,7 @@ import androidx.compose.runtime.Immutable
 import coil3.network.NetworkClient
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
@@ -33,8 +34,12 @@ import kotlin.experimental.ExperimentalObjCRefinement
 
 
 abstract class EbaySearcher {
-    suspend fun search(bikeData: BikeData, offset: Int? = 0): List<EbayBikeData> {
+    open suspend fun search(bikeData: BikeData, offset: Int? = 0): List<EbayBikeData> {
         val client = HttpClient() {
+            install(HttpTimeout){
+                requestTimeoutMillis = 5000
+                //throws a HttpRequestTimeoutException
+            }
             install(ContentNegotiation) {
                 json(Json {
                     this.ignoreUnknownKeys = true
@@ -51,7 +56,7 @@ abstract class EbaySearcher {
                 cacheToken(accessToken,accessResponseBody.expiresIn)
             }
             else {
-                throw Exception(accessResponse.status.value.toString() + " error received from eBay")
+                throw EbayResponseException(accessResponse.status.value)
             }
         }
 
@@ -79,10 +84,9 @@ abstract class EbaySearcher {
             println("Ebay bikes " + ebayBikes.toString())
         }
         else {
-            throw Exception(response.status.value.toString() + " error received from eBay")
+            throw EbayResponseException(response.status.value)
         }
 
-        println("Finished search " + bikes.toString())
         return bikes.toList()
 
     }
@@ -169,6 +173,7 @@ abstract class EbaySearcher {
         }
         bikeReqBuilder.headers {
             append(HttpHeaders.Authorization, "Bearer " + accessToken)
+            append("X-EBAY-C-MARKETPLACE-ID","EBAY_GB") //TODO
         }
         return client.get(bikeReqBuilder)
     }
@@ -176,6 +181,9 @@ abstract class EbaySearcher {
     abstract suspend fun getCachedToken():String
     abstract suspend fun cacheToken(token:String,lifespanSeconds:Long)
 }
+
+class NoInternetException(): Throwable()
+class EbayResponseException(val errorCode:Int? = -1): Throwable()
 
 @Serializable
 data class AccessResponse(

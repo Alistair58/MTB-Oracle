@@ -76,7 +76,7 @@ class AndroidCategoryCountryConditionForm(private val navController: NavHostCont
                 confirmExists = true,
                 confirmationColor = MTBOracleTheme.colors.yellowWarning,
                 dismissColor = MTBOracleTheme.colors.forestLight,
-                onDismiss = {lackOfInfo = false}
+                alwaysDismiss = {lackOfInfo = false}
             )
         }
     }
