@@ -1,18 +1,23 @@
 package com.amhapps.mtboracle
 
+import BikeData
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -22,6 +27,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.ui.window.Dialog
 import androidx.compose.material.DropdownMenu
@@ -370,6 +378,112 @@ fun SpecText(specName:String,specValue:String,fontSize: TextUnit?=18.sp){
         fontSize =fontSize?:18.sp,
         modifier = Modifier.padding(0.dp,5.dp)
     )
+}
+
+@Composable
+fun BikeInputDisplay(bikeData:BikeData){
+    val brandFontSize = if(bikeData.brand.length>15) 14.sp else 18.sp
+    val brandOutput = if(bikeData.brand.length>25) bikeData.brand.subSequence(0,25) else {
+        if (bikeData.brand.length > 12) {
+            "\n" + bikeData.brand
+        } else {
+            bikeData.brand
+        }
+    }
+    val modelFontSize = if(bikeData.model.length>15) 14.sp else 18.sp
+    val modelOutput = if(bikeData.model.length>25) bikeData.model.subSequence(0,25) else{
+        if(bikeData.model.length>12){
+            "\n"+bikeData.model
+        }
+        else{
+            bikeData.model
+        }
+
+    }
+    val countryFontSize = if(bikeData.country.length>15) 14.sp else 18.sp
+    val countryOutput = if(bikeData.country.length>25) bikeData.country.subSequence(0,25) else{
+        if(bikeData.country.length>12){
+            "\n"+bikeData.country
+        }
+        else{
+            bikeData.country
+        }
+
+    }
+    val yearOutput = if(bikeData.year in 0..2999) bikeData.year.toString() else ""
+
+    val frontSusOutput = if(bikeData.frontTravel >=0 && bikeData.frontTravel<1000) bikeData.frontTravel.toString()+"mm" else ""
+    val rearSusOutput = if(bikeData.rearTravel >=0 && bikeData.rearTravel<1000) bikeData.rearTravel.toString()+"mm" else ""
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .padding(0.dp,0.dp,0.dp,30.dp)
+    ){
+        Text(
+            "Based on these inputs:",
+            fontSize = 25.sp,
+            modifier = Modifier
+                .padding(0.dp, 10.dp)
+        )
+        Row(
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Column (
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+            ){
+                SpecText("Brand: ",brandOutput.toString(),brandFontSize)
+                SpecText("Model: ",modelOutput.toString(),modelFontSize)
+                SpecText("Year: ",yearOutput)
+                SpecText("Country: ", countryOutput.toString(),countryFontSize)
+                SpecText("Category: ",bikeData.category)
+                SpecText("Condition: ",bikeData.condition)
+                SpecText("Size: ",bikeData.size)
+
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+            ){
+                SpecText("Wheel Size: ",bikeData.wheelSize)
+                SpecText("Material: ",bikeData.material)
+                SpecText("Front Travel: ",frontSusOutput)
+                SpecText("Rear Travel: ",rearSusOutput)
+            }
+        }
+    }
+}
+
+@Composable
+fun DropdownText(title:String, titleFontSize:TextUnit=16.sp, body:String, bodyFontSize:TextUnit=12.sp,iconContentDescription:String = "Dropdown text icon"){
+    var textShowing by remember { mutableStateOf(false) }
+    val icon = if (textShowing)
+        Icons.Filled.KeyboardArrowUp
+    else
+        Icons.Filled.KeyboardArrowDown
+    Row(verticalAlignment = Alignment.CenterVertically){
+        Text(text=title, fontSize = titleFontSize)
+        Button(onClick = {textShowing = !textShowing},
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.Transparent,
+                contentColor = Color.Gray,
+                disabledBackgroundColor = Color.Transparent,
+                disabledContentColor = Color.Gray
+            ),
+            border = BorderStroke(0.dp,Color.Transparent),
+            elevation = null //Causes a grey shadow
+        ) {
+                Row(verticalAlignment = Alignment.CenterVertically){
+                    Icon(icon, contentDescription = iconContentDescription, modifier = Modifier.width(20.dp).height(20.dp))
+                }
+            }
+    }
+    if(textShowing){
+        Text(text=body, fontSize = bodyFontSize)
+    }
+
+
 }
 
 @Composable

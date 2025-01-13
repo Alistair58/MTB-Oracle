@@ -11,10 +11,7 @@ class AndroidSimilarBikesPage(private val navController: NavController,private v
     @Composable
     override fun show() {
         BackHandler {
-            navController.previousBackStackEntry
-                ?.savedStateHandle
-                ?.set("bikeData",bikeDataInput)
-            navController.popBackStack()
+            back()
         }
         super.show()
     }
@@ -25,5 +22,12 @@ class AndroidSimilarBikesPage(private val navController: NavController,private v
 
     override fun platformHomeScreen(): Any {
         return AndroidHomeScreen
+    }
+
+    override fun back() {
+        navController.previousBackStackEntry
+            ?.savedStateHandle
+            ?.set("bikeData",bikeDataInput)
+        navController.popBackStack()
     }
 }

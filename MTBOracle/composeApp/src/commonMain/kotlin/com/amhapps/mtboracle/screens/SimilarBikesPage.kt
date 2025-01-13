@@ -1,6 +1,7 @@
 package com.amhapps.mtboracle.screens
 
 import BikeData
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -27,6 +29,7 @@ import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
@@ -37,6 +40,7 @@ import coil3.compose.LocalPlatformContext
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.amhapps.mtboracle.BikeInputDisplay
 import com.amhapps.mtboracle.EbayBikeData
 import com.amhapps.mtboracle.EbayResponseException
 import com.amhapps.mtboracle.EbaySearcher
@@ -75,12 +79,15 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                             if(ebayBikes.isEmpty()) noMatchingBikes = true
                         }
                         catch (e: HttpRequestTimeoutException) {
+                            println(e.toString())
                             connectionError = 1
                         }
                         catch(e: EbayResponseException){ //Kotlin doesn't have multi-catch
+                            println(e.toString())
                             connectionError = 1
                         }
                         catch(e: NoInternetException){
+                            println(e.toString())
                             connectionError = 2
                         }
                         finally{
@@ -93,7 +100,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
             if(noMatchingBikes){
                 WarningDialog(
                     confirmText = "Back",
-                    onConfirmation = {navController.popBackStack() },
+                    onConfirmation = { back() },
                     dismissText = "Home",
                     alwaysDismiss = {},
                     explicitDismiss = { navController.popBackStack(platformHomeScreen(),false) },
@@ -116,58 +123,78 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                     dismissColor = Color.Gray,
                 )
             }
-            LazyColumn(
-                userScrollEnabled = true,
-                state = rememberLazyListState()
-            )
-             {
-                for(i in 0..<ebayBikes.size step 2){
-                    item{Row {
-                        Column (modifier =Modifier
-                            .fillMaxWidth(0.5f)
-                            .padding(10.dp,5.dp,5.dp,5.dp)
-                        ) {
-                            BikeCard(ebayBikes[i])
-                        }
-                        if(ebayBikes.size>(i+1)){
-                            Column (modifier =Modifier
-                                .fillMaxWidth()
-                                .padding(5.dp,5.dp,10.dp,5.dp)
-                            ) {
-                                BikeCard(ebayBikes[i+1])
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxSize()
+            ){
+
+                LazyColumn(
+                    userScrollEnabled = true,
+                    state = rememberLazyListState(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                )
+                {
+                    item{
+                        Text(
+                            "Similar Bikes",
+                            fontSize = 35.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .padding(0.dp, 10.dp)
+                        )
+                        BikeInputDisplay(bikeData)
+                    }
+                    for (i in 0..<ebayBikes.size step 2) {
+                        item {
+                            Row {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth(0.5f)
+                                        .padding(10.dp, 5.dp, 5.dp, 5.dp)
+                                ) {
+                                    BikeCard(ebayBikes[i])
+                                }
+                                if (ebayBikes.size > (i + 1)) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(5.dp, 5.dp, 10.dp, 5.dp)
+                                    ) {
+                                        BikeCard(ebayBikes[i + 1])
+                                    }
+                                }
+                            }
+                        } //once the first one is drawn, the second one only has 0.5 for its max width
+                    }
+
+                    item {
+                        //When user scrolls to bottom of the page
+                        if (ebayBikes.isNotEmpty()) { //On the first composition, this would be on the page
+                            // as the bikes have not been returned from eBay yet and so it would run (which we don't want)
+                            LaunchedEffect(true) {
+                                bikesFound = false
+                                val prevSize = ebayBikes.size
+                                if (prevSize % 48 == 0 && moreBikes) { //More bikes is the case that the number of bikes returned is a multiple of 48
+                                    try { //adding the lists changes the address of the list and so causes a recomposition
+                                        ebayBikes =
+                                            ebayBikes + ebaySearcher.search(bikeData, prevSize)
+                                        if (ebayBikes.size == prevSize) moreBikes = false
+                                    } catch (e: HttpRequestTimeoutException) {
+                                        connectionError = 3
+                                    } catch (e: EbayResponseException) {
+                                        connectionError = 3
+                                    } catch (e: NoInternetException) {
+                                        connectionError = 4
+                                    }
+                                }
+                                bikesFound =
+                                    true //Still want to stop checking if we are not a multiple of 48
+
                             }
                         }
-                    }} //once the first one is drawn, the second one only has 0.5 for its max width
+
+                    }
                 }
-
-             item {
-                 //When user scrolls to bottom of the page
-                 if(ebayBikes.isNotEmpty()){ //On the first composition, this would be on the page
-                     // as the bikes have not been returned from eBay yet and so it would run (which we don't want)
-                     LaunchedEffect(true) {
-                         bikesFound = false
-                         val prevSize = ebayBikes.size
-                         if(prevSize %48==0 && moreBikes){ //More bikes is the case that the number of bikes returned is a multiple of 48
-                             try { //adding the lists changes the address of the list and so causes a recomposition
-                                 ebayBikes = ebayBikes + ebaySearcher.search(bikeData,prevSize)
-                                 if(ebayBikes.size == prevSize) moreBikes = false
-                             }
-                             catch (e: HttpRequestTimeoutException) {
-                                 connectionError = 3
-                             }
-                             catch(e: EbayResponseException){
-                                 connectionError = 3
-                             }
-                             catch(e: NoInternetException){
-                                 connectionError = 4
-                             }
-                         }
-                         bikesFound = true //Still want to stop checking if we are not a multiple of 48
-
-                     }
-                 }
-
-             }
 
 
             }
@@ -240,4 +267,5 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
     }
     abstract fun platformEbaySearcher():EbaySearcher
     abstract fun platformHomeScreen():Any
+    abstract fun back()
 }

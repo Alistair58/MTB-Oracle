@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.compose.foundation.layout.Arrangement.Horizontal
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,6 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.navigation.navOptions
+import com.amhapps.mtboracle.BikeInputDisplay
+import com.amhapps.mtboracle.DropdownText
 import com.amhapps.mtboracle.MTBOracleTheme
 import com.amhapps.mtboracle.SpecText
 import mtboracle.composeapp.generated.resources.Res
@@ -72,78 +75,29 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
                         modifier = Modifier
                             .padding(5.dp,0.dp)
                     ) {
-                        val brandFontSize = if(bikeData.brand.length>15) 14.sp else 18.sp
-                        val brandOutput = if(bikeData.brand.length>25) bikeData.brand.subSequence(0,25) else {
-                            if (bikeData.brand.length > 12) {
-                                "\n" + bikeData.brand
-                            } else {
-                                bikeData.brand
-                            }
-                        }
-                        val modelFontSize = if(bikeData.model.length>15) 14.sp else 18.sp
-                        val modelOutput = if(bikeData.model.length>25) bikeData.model.subSequence(0,25) else{
-                            if(bikeData.model.length>12){
-                                "\n"+bikeData.model
-                            }
-                            else{
-                                bikeData.model
-                            }
+                        BikeInputDisplay(bikeData)
+                    }
+                    Row{
 
-                        }
-                        val countryFontSize = if(bikeData.country.length>15) 14.sp else 18.sp
-                        val countryOutput = if(bikeData.country.length>25) bikeData.country.subSequence(0,25) else{
-                            if(bikeData.country.length>12){
-                                "\n"+bikeData.country
-                            }
-                            else{
-                                bikeData.country
-                            }
-
-                        }
-                        val yearOutput = if(bikeData.year in 0..2999) bikeData.year.toString() else ""
-
-                        val frontSusOutput = if(bikeData.frontTravel >=0 && bikeData.frontTravel<1000) bikeData.frontTravel.toString()+"mm" else ""
-                        val rearSusOutput = if(bikeData.rearTravel >=0 && bikeData.rearTravel<1000) bikeData.rearTravel.toString()+"mm" else ""
-
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .padding(0.dp,0.dp,0.dp,30.dp)
-                            ){
-                            Text(
-                                "Based on these inputs:",
-                                fontSize = 25.sp,
-                                modifier = Modifier
-                                    .padding(0.dp, 10.dp)
-                            )
-                            Row(
-                                horizontalArrangement = Arrangement.Start
-                            ) {
-                                Column (
-                                    modifier = Modifier
-                                        .fillMaxWidth(0.5f)
-                                ){
-                                    SpecText("Brand: ",brandOutput.toString(),brandFontSize)
-                                    SpecText("Model: ",modelOutput.toString(),modelFontSize)
-                                    SpecText("Year: ",yearOutput)
-                                    SpecText("Country: ", countryOutput.toString(),countryFontSize)
-                                    SpecText("Category: ",bikeData.category)
-                                    SpecText("Condition: ",bikeData.condition)
-                                    SpecText("Size: ",bikeData.size)
-
-                                }
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth(0.5f)
-                                ){
-                                    SpecText("Wheel Size: ",bikeData.wheelSize)
-                                    SpecText("Material: ",bikeData.material)
-                                    SpecText("Front Travel: ",frontSusOutput)
-                                    SpecText("Rear Travel: ",rearSusOutput)
-                                }
-                            }
+                        Column(modifier = Modifier.fillMaxWidth(0.8f),
+                            horizontalAlignment = Alignment.CenterHorizontally) {
+                            Spacer(modifier = Modifier.height(20.dp))
+                            DropdownText(title = "Note About Accuracy",
+                                body = "The price given is only an estimate. "+
+                                        "\n\nMTB Oracle uses a machine learning model to predict a price for your mountain bike. "+
+                                        "The model is not 100% accurate and does make mistakes. "+
+                                        "Errors could come from:\n" +
+                                        " • Rare bikes\n"+
+                                        " • Lack of info about component upgrades to the bike\n"+
+                                        " • Lack of info about bike maintenance\n"+
+                                                " • Visual factors\n\n"+
+                                        "The only information about your bike that the model is given are the inputs you entered. "+
+                                        "If your information is incorrect, the valuation will be incorrect. "+
+                                        "E.g. putting in no values gives a price of 2000 GBP as this is the median used MTB price.")
+                            Spacer(modifier = Modifier.height(100.dp)) //Stops the text going under the home button
                         }
                     }
+
                 }
             }
             Column(

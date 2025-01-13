@@ -116,6 +116,7 @@ abstract class EbaySearcher {
         bikeData: BikeData,
         offset: Int
     ): HttpResponse {
+        println("Searching bikes")
         val bikeReqBuilder = HttpRequestBuilder()
         val encodedCondition = when (bikeData.condition) { //most bikes seem to just say used
             "Brand new" -> "1000|1500" //new|new other (see details)
@@ -149,6 +150,9 @@ abstract class EbaySearcher {
                 if (bikeData.rearTravel > 0f) "Full%20Suspension%20%28Front%20%26%20Rear%29"
                 else "Front"
             } else ""
+        println(bikeData.country)
+        val countryId:String = ebayCountryIdMap[bikeData.country]?:"EBAY_US"
+
         var searchTerm =
             (if (bikeData.year < 0 || bikeData.year > 2050) "" else bikeData.year.toString() + "%20")
         if (bikeData.brand.length > 0) searchTerm += bikeData.brand.encodeURLPath() + "%20"
@@ -173,9 +177,15 @@ abstract class EbaySearcher {
         }
         bikeReqBuilder.headers {
             append(HttpHeaders.Authorization, "Bearer " + accessToken)
-            append("X-EBAY-C-MARKETPLACE-ID","EBAY_GB") //TODO
+            append("X-EBAY-C-MARKETPLACE-ID",
+                countryId)
         }
-        return client.get(bikeReqBuilder)
+        println("Here")
+        println(bikeData.country)
+        println(countryId)
+        val TMP = client.get(bikeReqBuilder)
+        println("Res body "+TMP.body())
+        return TMP
     }
 
     abstract suspend fun getCachedToken():String
@@ -207,6 +217,30 @@ data class BikeResponse(
     val refinement:Refinement? = null,
     val total:Int? = null,
     val warning:List<Warning>? = null,
+)
+
+val ebayCountryIdMap = hashMapOf( //Tested all on 13/1/25
+    "Australia" to "EBAY_AU",
+    "Austria" to "EBAY_AT",
+    "Belgium" to "EBAY_BE",
+    "Canada" to "EBAY_CA",
+    "Switzerland" to "EBAY_CH",
+    "Germany" to "EBAY_DE",
+    "Spain" to "EBAY_ES",
+    "France" to "EBAY_FR",
+    "United Kingdom UK" to "EBAY_GB",
+    "Hong Kong" to "EBAY_HK", //Not in my country list yet
+    "Ireland" to "EBAY_IE",
+    "Italy" to "EBAY_IT",
+    //"Malaysia" to "EBAY_MY", Not working but Malaysian eBay website does exist
+    "Netherlands" to "EBAY_NL",
+    //"Philippines" to "EBAY_PH", Not working but eBay website does exist
+    "Poland" to "EBAY_PL",
+    "Singapore" to "EBAY_SG",
+    //"Thailand" to "EBAY_TH",
+    //"Taiwan" to "EBAY_TW",
+    "United States of America USA" to "EBAY_US",
+    //"Vietnam" to "EBAY_VN", //Not working but docs say it should https://developer.ebay.com/api-docs/commerce/identity/types/bas:MarketplaceIdEnum
 )
 
 @Serializable
