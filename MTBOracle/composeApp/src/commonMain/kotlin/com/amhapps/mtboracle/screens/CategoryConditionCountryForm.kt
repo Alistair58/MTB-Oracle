@@ -66,7 +66,6 @@ abstract class CategoryConditionCountryForm(private val navController: NavHostCo
             var category by remember { mutableStateOf(bikeData.category) }
             CompleteDropdown(
                 value = category,
-                onValueChange = {category = it},
                 onDropdownClick = {category = it},
                 label = "Category",
                 items = categories,
@@ -80,7 +79,6 @@ abstract class CategoryConditionCountryForm(private val navController: NavHostCo
             var condition by remember { mutableStateOf(bikeData.condition) }
             CompleteDropdown(
                 value = condition,
-                onValueChange = {condition = it},
                 onDropdownClick = {condition = it},
                 label = "Condition",
                 items = conditions,

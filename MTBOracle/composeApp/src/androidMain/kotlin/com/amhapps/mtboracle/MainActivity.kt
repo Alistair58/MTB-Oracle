@@ -80,7 +80,7 @@ class MainActivity : ComponentActivity() {
                     )
                 ) {
                     val args = it.toRoute<AndroidValuationScreen>()
-                    val page = AndroidValuationPage(navController, args.bikeData,dataset,neuralNetwork)
+                    val page = AndroidValuationPage(navController, args.bikeData,context,dataset,neuralNetwork)
                     page.show()
                 }
                 composable<AndroidSimilarBikesScreen>(
@@ -90,7 +90,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val args = it.toRoute<AndroidValuationScreen>()
                     val page = AndroidSimilarBikesPage(navController, args.bikeData,context)
-                    page.show()
+                    page.show(false)
                 }
             }
         }

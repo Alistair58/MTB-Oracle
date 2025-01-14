@@ -17,9 +17,9 @@ import java.time.Instant
 import kotlin.math.exp
 
 class AndroidEbaySearcher(private val context:Context):EbaySearcher() {
-    override suspend fun search(bikeData: BikeData, offset: Int?): List<EbayBikeData> {
+    override suspend fun search(bikeData: BikeData, offset: Int?,sortBy:String): List<EbayBikeData> {
         try{
-            return super.search(bikeData, offset)
+            return super.search(bikeData, offset,sortBy)
         }
         catch(e:java.net.UnknownHostException){ //(No internet)
             throw NoInternetException()
@@ -28,6 +28,7 @@ class AndroidEbaySearcher(private val context:Context):EbaySearcher() {
     }
     override suspend fun getCachedToken(): String {
         //Check the expiry first as this saves looking up both if it has expired
+        println("Android getting token")
         val tokenExpiryKey = longPreferencesKey("tokenExpiry")
         val expiryFlow: Flow<Long> = context.tokensDataStore.data //a flow is an asynchronous stream
             .map { preferences ->
@@ -41,6 +42,7 @@ class AndroidEbaySearcher(private val context:Context):EbaySearcher() {
             .map { preferences ->
                 preferences[tokenKey] ?: ""
             }
+        println(tokenFlow.first())
         return tokenFlow.first()
 
     }

@@ -48,57 +48,7 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
             ){
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    modifier = Modifier
-                        .padding(5.dp,5.dp,0.dp,30.dp)
-                ){
-                    Text("Price Estimation",
-                        fontSize = 40.sp,
-                    )
-                }
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Row(){
-                        val output = "£" + valuation()
-                        Text(
-                            text = output,
-                            fontSize = 40.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                                .padding(40.dp, 40.dp)
-                        )
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .padding(5.dp,0.dp)
-                    ) {
-                        BikeInputDisplay(bikeData)
-                    }
-                    Row{
-
-                        Column(modifier = Modifier.fillMaxWidth(0.8f),
-                            horizontalAlignment = Alignment.CenterHorizontally) {
-                            Spacer(modifier = Modifier.height(20.dp))
-                            DropdownText(title = "Note About Accuracy",
-                                body = "The price given is only an estimate. "+
-                                        "\n\nMTB Oracle uses a machine learning model to predict a price for your mountain bike. "+
-                                        "The model is not 100% accurate and does make mistakes. "+
-                                        "Errors could come from:\n" +
-                                        " • Rare bikes\n"+
-                                        " • Lack of info about component upgrades to the bike\n"+
-                                        " • Lack of info about bike maintenance\n"+
-                                                " • Visual factors\n\n"+
-                                        "The only information about your bike that the model is given are the inputs you entered. "+
-                                        "If your information is incorrect, the valuation will be incorrect. "+
-                                        "E.g. putting in no values gives a price of 2000 GBP as this is the median used MTB price.")
-                            Spacer(modifier = Modifier.height(100.dp)) //Stops the text going under the home button
-                        }
-                    }
-
-                }
+                body()
             }
             Column(
                 modifier = Modifier.align(Alignment.BottomCenter)
@@ -109,6 +59,60 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
 
 
 
+    }
+    @Composable
+    open fun body(){
+        Row(
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier
+                .padding(5.dp,5.dp,0.dp,30.dp)
+        ){
+            Text("Price Estimation",
+                fontSize = 40.sp,
+            )
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(){
+                val output = "£" + valuation()
+                Text(
+                    text = output,
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(40.dp, 40.dp)
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .padding(5.dp,0.dp)
+            ) {
+                BikeInputDisplay(bikeData)
+            }
+            Row{
+
+                Column(modifier = Modifier.fillMaxWidth(0.8f),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    DropdownText(title = "Note About Accuracy",
+                        body = "The price given is only an estimate. "+
+                                "\n\nMTB Oracle uses a machine learning model to predict a price for your mountain bike. "+
+                                "The model is not 100% accurate and does make mistakes. "+
+                                "Errors could come from:\n" +
+                                " • Rare bikes\n"+
+                                " • Lack of info about component upgrades to the bike\n"+
+                                " • Lack of info about bike maintenance\n"+
+                                " • Visual factors\n\n"+
+                                "The only information about your bike that the model is given are the inputs you entered. "+
+                                "If your information is incorrect, the valuation will be incorrect. "+
+                                "E.g. putting in no values gives a price of 2000 GBP as this is the median used MTB price.")
+                    Spacer(modifier = Modifier.height(100.dp)) //Stops the text going under the home button
+                }
+            }
+
+        }
     }
     abstract fun valuation():Float
     @Composable

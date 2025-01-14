@@ -185,12 +185,11 @@ fun MTBOracleTextInput(  //has correct colouring, rounded corners and removed so
 @Composable
 fun CompleteDropdown(
     value: String,
-    onValueChange: (String) -> Unit,
     onDropdownClick: (String) -> Unit,
     label:String,
-    modifier:Modifier,
+    modifier:Modifier = Modifier,
     items:List<String>,
-    iconContentDescription:String
+    iconContentDescription:String = "Dropdown reveal icon"
 ){
     var dropDownExpanded by remember { mutableStateOf(false) }
     var dropDownSize by remember { mutableStateOf(Size.Zero) }
@@ -201,7 +200,7 @@ fun CompleteDropdown(
     Column(modifier = modifier){
         MTBOracleTextInput(
             value = value,
-            onValueChange = onValueChange,
+            onValueChange = {  },
             modifier = Modifier
                 .onGloballyPositioned { coordinates ->
                     // This value is used to assign to
@@ -370,12 +369,13 @@ fun SpecText(specName:String,specValue:String,fontSize: TextUnit?=18.sp){
             withStyle(
                 SpanStyle(
                     fontWeight = FontWeight.Bold,
+                    fontSize =fontSize?:18.sp,
                 )
             ) {
                 append(specValue)
             }
         },
-        fontSize =fontSize?:18.sp,
+        fontSize = 18.sp,
         modifier = Modifier.padding(0.dp,5.dp)
     )
 }
@@ -448,15 +448,15 @@ fun BikeInputDisplay(bikeData:BikeData){
             ){
                 SpecText("Wheel Size: ",bikeData.wheelSize)
                 SpecText("Material: ",bikeData.material)
-                SpecText("Front Travel: ",frontSusOutput)
-                SpecText("Rear Travel: ",rearSusOutput)
+                SpecText("Front Travel: ",frontSusOutput,16.sp)
+                SpecText("Rear Travel: ",rearSusOutput,16.sp)
             }
         }
     }
 }
 
 @Composable
-fun DropdownText(title:String, titleFontSize:TextUnit=16.sp, body:String, bodyFontSize:TextUnit=12.sp,iconContentDescription:String = "Dropdown text icon"){
+fun DropdownText(title:String, titleFontSize:TextUnit=16.sp, body:String, bodyFontSize:TextUnit=12.sp,iconContentDescription:String = "Dropdown text reveal icon"){
     var textShowing by remember { mutableStateOf(false) }
     val icon = if (textShowing)
         Icons.Filled.KeyboardArrowUp

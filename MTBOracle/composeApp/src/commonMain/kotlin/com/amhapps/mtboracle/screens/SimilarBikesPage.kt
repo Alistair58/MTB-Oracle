@@ -5,14 +5,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.DropdownMenu
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,6 +45,7 @@ import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.amhapps.mtboracle.BikeInputDisplay
+import com.amhapps.mtboracle.CompleteDropdown
 import com.amhapps.mtboracle.EbayBikeData
 import com.amhapps.mtboracle.EbayResponseException
 import com.amhapps.mtboracle.EbaySearcher
@@ -57,7 +62,7 @@ import org.jetbrains.compose.resources.painterResource
 
 abstract class SimilarBikesPage(private val navController:NavController,private val bikeData: BikeData) {
     @Composable
-    open fun show(){
+    open fun show(valuationPage:Boolean){
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -70,12 +75,14 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
             var retry by remember { mutableStateOf(false) }
             var connectionError by remember { mutableStateOf(0) }
             var noMatchingBikes by remember { mutableStateOf(false) }
+            var sortBy by remember { mutableStateOf("Best Match") }
             if(!bikesFound) LoadingAnimation()
             LaunchedEffect(retry) {//LaunchedEffect restarts when one of the key parameters changes
                 scope.launch {
+                    println("Scope launched "+ebayBikes+bikesFound)
                     if(ebayBikes.isEmpty() && !bikesFound){
                         try {
-                            ebayBikes = ebaySearcher.search(bikeData,0)
+                            ebayBikes = ebaySearcher.search(bikeData,0,encodeSortBy(sortBy))
                             if(ebayBikes.isEmpty()) noMatchingBikes = true
                         }
                         catch (e: HttpRequestTimeoutException) {
@@ -142,7 +149,13 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                             modifier = Modifier
                                 .padding(0.dp, 10.dp)
                         )
-                        BikeInputDisplay(bikeData)
+                        if(!valuationPage) BikeInputDisplay(bikeData)
+                    }
+                    val options = listOf("Best Match","Price low to high","Price high to low","Newest listings")
+
+                    item{
+                        CompleteDropdown(value = sortBy, //Even if the user hasn't changed the sort, refresh to show some feedback
+                            onDropdownClick = {sortBy = it; retry = !retry;bikesFound = false; ebayBikes = emptyList();println("retry "+retry)},label = "Sort By", modifier = Modifier,items=options)
                     }
                     for (i in 0..<ebayBikes.size step 2) {
                         item {
@@ -166,18 +179,22 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                             }
                         } //once the first one is drawn, the second one only has 0.5 for its max width
                     }
-
+                    //A spacer here breaks the infinite scrolling and causes infinite loading
                     item {
+                        println("At bottom")
+                        println("Bikes found "+bikesFound)
                         //When user scrolls to bottom of the page
                         if (ebayBikes.isNotEmpty()) { //On the first composition, this would be on the page
                             // as the bikes have not been returned from eBay yet and so it would run (which we don't want)
                             LaunchedEffect(true) {
                                 bikesFound = false
                                 val prevSize = ebayBikes.size
+                                println("PrevSize "+prevSize+" more bikes "+moreBikes)
                                 if (prevSize % 48 == 0 && moreBikes) { //More bikes is the case that the number of bikes returned is a multiple of 48
                                     try { //adding the lists changes the address of the list and so causes a recomposition
+                                        println("Searching")
                                         ebayBikes =
-                                            ebayBikes + ebaySearcher.search(bikeData, prevSize)
+                                            ebayBikes + ebaySearcher.search(bikeData, prevSize,encodeSortBy(sortBy))
                                         if (ebayBikes.size == prevSize) moreBikes = false
                                     } catch (e: HttpRequestTimeoutException) {
                                         connectionError = 3
@@ -187,6 +204,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                                         connectionError = 4
                                     }
                                 }
+                                println("Bikes found = true")
                                 bikesFound =
                                     true //Still want to stop checking if we are not a multiple of 48
 
@@ -194,13 +212,35 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                         }
 
                     }
+
                 }
 
 
             }
+            if(!valuationPage){
+                Column(
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                ){
+                    HomeButton()
+                }
+            }
+
         }
 
     }
+
+    private fun encodeSortBy(sortBy:String):String{
+        return when(sortBy){
+            "Best Match" -> "bestMatch"
+            "Price low to high" -> "price"
+            "Price high to low" -> "-price"
+            "Newest listings" -> "newlyListed"
+            else -> "bestMatch"
+        }
+    }
+
+    @Composable
+    abstract fun HomeButton()
 
     @Composable
     fun BikeCard(bikeData:EbayBikeData){

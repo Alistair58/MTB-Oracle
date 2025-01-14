@@ -34,7 +34,7 @@ import kotlin.experimental.ExperimentalObjCRefinement
 
 
 abstract class EbaySearcher {
-    open suspend fun search(bikeData: BikeData, offset: Int? = 0): List<EbayBikeData> {
+    open suspend fun search(bikeData: BikeData, offset: Int? = 0,sortBy:String = "bestMatch"): List<EbayBikeData> {
         val client = HttpClient() {
             install(HttpTimeout){
                 requestTimeoutMillis = 5000
@@ -46,8 +46,9 @@ abstract class EbaySearcher {
                 })
             }
         }
+        println("Getting token")
         var accessToken:String = getCachedToken()
-
+        println("Got token")
         if(accessToken.isEmpty()){
             val accessResponse = getAccessToken(client)
             if (accessResponse.status.value in 200..299) {
@@ -59,9 +60,11 @@ abstract class EbaySearcher {
                 throw EbayResponseException(accessResponse.status.value)
             }
         }
-
+        println(sortBy)
         val response =
-            searchBikes(client,accessToken, bikeData, offset ?: 0)
+            searchBikes(client,accessToken, bikeData, offset ?: 0,sortBy)
+        println("Got response")
+        println(response)
         val bikes = mutableListOf<EbayBikeData>()
         if (response.status.value in 200..299) {
             val bikeResponse: BikeResponse = response.body()
@@ -114,7 +117,8 @@ abstract class EbaySearcher {
         client: HttpClient,
         accessToken: String,
         bikeData: BikeData,
-        offset: Int
+        offset: Int,
+        sortBy: String
     ): HttpResponse {
         println("Searching bikes")
         val bikeReqBuilder = HttpRequestBuilder()
@@ -171,7 +175,8 @@ abstract class EbaySearcher {
                     "Bike%20Type:{" + encodedCategory + "}," +
                     "Suspension%20Type:{" + encodedSuspension + "}," +
                     "Material:{" + encodedMaterial + "}" +
-                    "&filter=conditionIds:{" + encodedCondition + "}"
+                    "&filter=conditionIds:{" + encodedCondition + "}"+
+                    "&sort="+sortBy
 
 
         }
@@ -180,12 +185,7 @@ abstract class EbaySearcher {
             append("X-EBAY-C-MARKETPLACE-ID",
                 countryId)
         }
-        println("Here")
-        println(bikeData.country)
-        println(countryId)
-        val TMP = client.get(bikeReqBuilder)
-        println("Res body "+TMP.body())
-        return TMP
+        return client.get(bikeReqBuilder)
     }
 
     abstract suspend fun getCachedToken():String

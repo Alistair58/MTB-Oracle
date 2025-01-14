@@ -39,7 +39,6 @@ abstract class SizeMaterialTravelForm(private val navController: NavHostControll
             var size by remember { mutableStateOf(bikeData.size) }
             CompleteDropdown(
                 size,
-                onValueChange = { size = it },
                 onDropdownClick = { size = it },
                 iconContentDescription = "Sizes Dropdown",
                 items = sizes,
@@ -50,7 +49,6 @@ abstract class SizeMaterialTravelForm(private val navController: NavHostControll
             val wSizes = listOf("<16\"","20\"","24\"","26\"","27.5\"/650B","29\"","650C","700C")
             var wSize by remember { mutableStateOf(bikeData.wheelSize) }
             CompleteDropdown(wSize,
-                onValueChange = { wSize = it },
                 onDropdownClick = { wSize = it },
                 iconContentDescription = "Wheel Sizes Dropdown",
                 items = wSizes,
@@ -81,7 +79,6 @@ abstract class SizeMaterialTravelForm(private val navController: NavHostControll
             val materials = listOf("Aluminium","Carbon fibre","Chromoly","Steel","Titanium","Other")
             var material by remember { mutableStateOf(bikeData.material) }
             CompleteDropdown(material,
-                onValueChange = { material = it },
                 onDropdownClick = { material = it },
                 iconContentDescription = "Materials Dropdown",
                 items = materials,
