@@ -90,7 +90,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val args = it.toRoute<AndroidValuationScreen>()
                     val page = AndroidSimilarBikesPage(navController, args.bikeData,context)
-                    page.show(false)
+                    page.show()
                 }
             }
         }

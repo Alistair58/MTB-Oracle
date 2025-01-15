@@ -17,22 +17,15 @@ import androidx.navigation.NavController
 import com.amhapps.mtboracle.screens.SimilarBikesPage
 
 class AndroidSimilarBikesPage(private val navController: NavController,private val bikeDataInput:AndroidBikeData,private val context: Context):SimilarBikesPage(navController,bikeDataInput) {
+    override val ebaySearcher = AndroidEbaySearcher(context)
     @Composable
-    override fun show(valuationPage:Boolean) {
+    override fun show() {
         BackHandler {
             back()
         }
-        super.show(false)
+        super.show()
     }
 
-    @Composable
-    fun SubShow(){ //for use in valuation page
-        super.show(true)
-    }
-
-    override fun platformEbaySearcher(): EbaySearcher {
-        return AndroidEbaySearcher(context)
-    }
 
     override fun platformHomeScreen(): Any {
         return AndroidHomeScreen
