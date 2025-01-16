@@ -6,6 +6,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -16,6 +17,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,18 +47,27 @@ class AndroidValuationPage(navController: NavHostController, private val bikeDat
         val similarBikesPage = AndroidSimilarBikesPage(navController,bikeData,context)
         Box( //Needed for the home button
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxSize(),
         ) {
-            similarBikesPage.RetrieveBikes()
+            var ebayBikes by remember { mutableStateOf(listOf<EbayBikeData>()) }
+            var status by remember { mutableIntStateOf(0) }
+            var sortBy by remember { mutableStateOf("Best Match") }
+            getExchangeRates()
+            similarBikesPage.RetrieveBikes(ebayBikes,{ebayBikes = it},status,{status = it},sortBy)
             LazyColumn(
                 userScrollEnabled = true,
                 state = rememberLazyListState(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth() //Funny wiggling if this isn't here
             )
             {
                 item{body()}
-                similarBikesPage.SimilarBikesBody(this@LazyColumn,true)
+                similarBikesPage.SimilarBikesBody(this@LazyColumn,false,
+                    ebayBikes,{ebayBikes = it},
+                    status,{status = it},
+                    sortBy,{sortBy = it})
             }
+
             Column(
                 modifier = Modifier.align(Alignment.BottomCenter)
             ){

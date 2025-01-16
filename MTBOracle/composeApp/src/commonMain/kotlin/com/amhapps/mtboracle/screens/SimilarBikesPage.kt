@@ -22,6 +22,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -60,39 +61,48 @@ import kotlinx.coroutines.launch
 import mtboracle.composeapp.generated.resources.Res
 import mtboracle.composeapp.generated.resources.transparent_mtb_oracle_bike_v2
 import org.jetbrains.compose.resources.painterResource
+import kotlin.math.abs
 
 abstract class SimilarBikesPage(private val navController:NavController,private val bikeData: BikeData) {
-    protected var ebayBikes = listOf<EbayBikeData>()
-    protected var moreBikes =  true
     abstract val ebaySearcher:EbaySearcher //can't use expect inside a class
-    protected var bikesFound = false
-    protected var retry = false
-    protected var connectionError = 0
-    protected var noMatchingBikes = false
-    protected var sortBy = "Best Match"
-    //Doesn't work - a mutable state is needed for a recomposition
+
     //A recomposition only occurs when an argument changes
-    //Need to pass every one of these a lambda so that the value can be changes
-    //Only do this for the necessary ones that are needed to cause a recomposition
-    //However,this needs to work in valuation as well
-    //Some variables can be self contained
-    //However these must take place inside lazyColumn items as other sections of the LazyList are not Composable
-    //eBayBikes must be mutable and affects both functions
+    //Need to pass every composable a lambda so that the value can be changed
+    //There can't be a complete function passed over to Valuation as the composable mutable
+    // variables can't be declared inside the LazyList as they would only have the scope of their item
     @Composable
     open fun show(){
-        println("Composing")
         Box( //Needed for the home button
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            RetrieveBikes()
+            //Status:
+            //0 - bikes not found
+            //1 - bikes found
+            //2 - No matching bikes
+            //3 - no more bikes - the case that the number of bikes returned is a multiple of 48 but that was the end of the bikes
+            //4 - retry
+            //-1 - connection error 1 (HTTPS/eBay error on first bikes)
+            //-2 - connection error 2 (No internet on first bikes)
+            //-3 - connection error 3 (HTTPS/eBay error on bottom bikes)
+            //-4 - connection error 4 (No internet on bottom bikes)
+            var ebayBikes by remember {mutableStateOf(listOf<EbayBikeData>())}
+            var status by remember { mutableIntStateOf(0) }
+            var sortBy by remember { mutableStateOf("Best Match") }
+            RetrieveBikes(ebayBikes,{ebayBikes = it},status,{status = it},sortBy)
             LazyColumn(
                 userScrollEnabled = true,
                 state = rememberLazyListState(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()//Funny wiggling if this isn't here
             )
             {
-                SimilarBikesBody(this@LazyColumn,true)
+                SimilarBikesBody(
+                    this@LazyColumn, true,
+                    ebayBikes,{ebayBikes = it},
+                    status,{status = it},
+                    sortBy,{sortBy = it}
+                )
             }
             Column(
                 modifier = Modifier.align(Alignment.BottomCenter)
@@ -103,18 +113,29 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
     }
 
     @Composable
-    fun RetrieveBikes(){
-        if(!bikesFound) LoadingAnimation()
-        FindBikes()
-        ErrorDialogs()
+    fun RetrieveBikes(ebayBikes:List<EbayBikeData>,
+                      onEbayBikesChange:(List<EbayBikeData>)->Unit,
+                      status:Int,
+                      onStatusChange:(Int)->Unit,
+                      sortBy: String){
+        if(status == 0 || status == 4) LoadingAnimation()
+        FindBikes(ebayBikes,onEbayBikesChange,status,onStatusChange,sortBy)
+        ErrorDialogs(status,onStatusChange)
     }
 
     //Being a receiver makes it hard to access from outside the class
-    fun SimilarBikesBody(lazyListScope: LazyListScope,displayInputs: Boolean){
-        lazyListScope.SimilarBikesHeader(displayInputs)
-        lazyListScope.EbayBikeItems()
+    fun SimilarBikesBody(lazyListScope: LazyListScope,
+                         displayInputs: Boolean,
+                         ebayBikes:List<EbayBikeData>,
+                         onEbayBikesChange:(List<EbayBikeData>)->Unit,
+                         status:Int,
+                         onStatusChange:(Int)->Unit,
+                         sortBy: String,
+                         onSortByChange: (String) -> Unit){
+        lazyListScope.SimilarBikesHeader(displayInputs,onEbayBikesChange,onStatusChange,sortBy,onSortByChange)
+        lazyListScope.EbayBikeItems(ebayBikes)
         //A spacer here breaks the infinite scrolling and causes infinite loading
-        lazyListScope.RefreshBottom()
+        lazyListScope.RefreshBottom(ebayBikes,onEbayBikesChange,status,onStatusChange,sortBy)
     }
 
 
@@ -133,8 +154,9 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
     abstract fun HomeButton()
 
     @Composable
-    fun ErrorDialogs(){
-        if(noMatchingBikes){
+    fun ErrorDialogs(status:Int,
+                     onStatusChange:(Int)->Unit){
+        if(status==2){
             WarningDialog(
                 confirmText = "Back",
                 onConfirmation = { back() },
@@ -147,15 +169,15 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                 dismissColor = Color.Gray
             )
         }
-        if(connectionError > 0){
+        if(status < 0){
             WarningDialog(
                 confirmText = "Retry",
-                onConfirmation = {retry = !retry ; bikesFound = false}, //Value doesn't matter only matters that value changes
-                dismissText = if(connectionError <= 2) "Home" else "Cancel",
-                alwaysDismiss = {connectionError = 0},
-                explicitDismiss = { if(connectionError <= 2) navController.popBackStack(platformHomeScreen(),false) },
+                onConfirmation = {onStatusChange(4)}, //Value doesn't matter only matters that value changes
+                dismissText = if(status >= -2) "Home" else "Cancel",
+                alwaysDismiss = {},
+                explicitDismiss = { if(status >= -2) navController.popBackStack(platformHomeScreen(),false) },
                 dialogTitle = "Network Error",
-                dialogText = if(connectionError % 2 == 0) "No internet connection" else "Could not connect with eBay",
+                dialogText = if(abs(status)% 2 == 0) "No internet connection" else "Could not connect with eBay",
                 confirmationColor = MTBOracleTheme.colors.forestLight,
                 dismissColor = Color.Gray,
             )
@@ -163,39 +185,47 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
     }
 
     @Composable
-    fun FindBikes(){
+    fun FindBikes(ebayBikes:List<EbayBikeData>,
+                  onBikeRetrieval: (List<EbayBikeData>) -> Unit,
+                  status:Int,
+                  onStatusChange: (Int) -> Unit,
+                  sortBy: String){
         val scope = rememberCoroutineScope()
-        LaunchedEffect(retry) {//LaunchedEffect restarts when one of the key parameters changes
+        LaunchedEffect(status) {//LaunchedEffect restarts when one of the key parameters changes
             scope.launch {
-                if(ebayBikes.isEmpty() && !bikesFound){
+                if(ebayBikes.isEmpty() && (status==0||status==4)){
                     try {
-                        ebayBikes = ebaySearcher.search(bikeData,0,encodeSortBy(sortBy))
-                        if(ebayBikes.isEmpty()) noMatchingBikes = true
+                        val newBikes = ebaySearcher.search(bikeData,0,encodeSortBy(sortBy))
+                        onBikeRetrieval(newBikes) //update the mutable ebayBikes
+                        //Which doesn't change the argument as it is passed by value
+                        if(newBikes.isEmpty()) onStatusChange(2)
+                        else onStatusChange(1)
                     }
                     catch (e: HttpRequestTimeoutException) {
                         println(e.toString())
-                        connectionError = 1
+                        onStatusChange(-1)
                     }
                     catch(e: EbayResponseException){ //Kotlin doesn't have multi-catch
                         println(e.toString())
-                        connectionError = 1
+                        onStatusChange(-1)
                     }
                     catch(e: NoInternetException){
                         println(e.toString())
-                        connectionError = 2
+                        onStatusChange(-2)
                     }
-                    finally{
+                    println("bikesFoundFinally "+status)
 
-                        bikesFound = true //stop the loading animation
-                        println("bikesFoundFinally "+bikesFound)
-                    }
                 }
 
             }
         }
     }
 
-    fun LazyListScope.SimilarBikesHeader(displayInputs:Boolean){
+    fun LazyListScope.SimilarBikesHeader(displayInputs:Boolean, 
+                                         onEbayBikesChange: (List<EbayBikeData>) -> Unit,
+                                         onStatusChange: (Int) -> Unit,
+                                         sortBy: String,
+                                         onSortByChange:(String)->Unit){
         item{
             Column(horizontalAlignment = Alignment.CenterHorizontally){
                 Text(
@@ -205,14 +235,17 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                     modifier = Modifier
                         .padding(0.dp, 10.dp)
                 )
-                if(displayInputs) BikeInputDisplay(bikeData)
+                if(displayInputs){
+                    BikeInputDisplay(bikeData)
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
                 val options = listOf("Best Match","Price low to high","Price high to low","Newest listings")
                 CompleteDropdown(value = sortBy, //Even if the user hasn't changed the sort, refresh to show some feedback
                     onDropdownClick = {
-                        sortBy = it
-                        retry = !retry
-                        bikesFound = false
-                        ebayBikes = emptyList()
+                        onSortByChange(it)
+                        onStatusChange(4)
+                        onEbayBikesChange(emptyList())
+                        println("Dropdown change "+it)
                     },
                     label = "Sort By",
                     modifier = Modifier,
@@ -224,7 +257,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
     }
 
 
-    fun LazyListScope.EbayBikeItems(){
+    fun LazyListScope.EbayBikeItems(ebayBikes: List<EbayBikeData>){
         for (i in 0..<ebayBikes.size step 2) {
             item {
                 Row {
@@ -249,32 +282,36 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
         }
     }
 
-    fun LazyListScope.RefreshBottom(){
+    fun LazyListScope.RefreshBottom(ebayBikes: List<EbayBikeData>,
+                                    onEbayBikesChange: (List<EbayBikeData>) -> Unit,
+                                    status:Int,
+                                    onStatusChange: (Int) -> Unit,
+                                    sortBy: String){
         item {
-            println("bottom")
+
             //When user scrolls to bottom of the page
             if (ebayBikes.isNotEmpty()) { //On the first composition, this would be on the page
                 // as the bikes have not been returned from eBay yet and so it would run (which we don't want)
                 LaunchedEffect(true) {
-                    bikesFound = false
+                    onStatusChange(0) //Causes the loading animation
                     val prevSize = ebayBikes.size
-                    if (prevSize % 48 == 0 && moreBikes) { //More bikes is the case that the number of bikes returned is a multiple of 48
+                    if (prevSize % 48 == 0 && status!=3) { 
                         try { //adding the lists changes the address of the list and so causes a recomposition
-                            ebayBikes =
-                                ebayBikes + ebaySearcher.search(bikeData, prevSize,encodeSortBy(sortBy))
-                            if (ebayBikes.size == prevSize) moreBikes = false
+                            val newBikes = ebayBikes + ebaySearcher.search(bikeData, prevSize,encodeSortBy(sortBy))
+                            onEbayBikesChange(newBikes)
+                            if (newBikes.size == prevSize) onStatusChange(3)
+                            else onStatusChange(1)
                         } catch (e: HttpRequestTimeoutException) {
-                            connectionError = 3
+                            onStatusChange(-3)
                         } catch (e: EbayResponseException) {
-                            connectionError = 3
+                            onStatusChange(-3)
                         } catch (e: NoInternetException) {
-                            connectionError = 4
+                            onStatusChange(-4)
                         }
                     }
-                    println("Bikes found = true")
-                    bikesFound =
-                        true //Still want to stop checking if we are not a multiple of 48
-
+                    else{
+                        onStatusChange(3) //Don't keep on searching if there are no more bikes
+                    }
                 }
             }
 

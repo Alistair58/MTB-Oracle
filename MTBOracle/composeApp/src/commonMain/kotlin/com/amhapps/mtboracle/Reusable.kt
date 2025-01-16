@@ -416,9 +416,7 @@ fun BikeInputDisplay(bikeData:BikeData){
     val rearSusOutput = if(bikeData.rearTravel >=0 && bikeData.rearTravel<1000) bikeData.rearTravel.toString()+"mm" else ""
 
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .padding(0.dp,0.dp,0.dp,30.dp)
+        horizontalAlignment = Alignment.CenterHorizontally
     ){
         Text(
             "Based on these inputs:",

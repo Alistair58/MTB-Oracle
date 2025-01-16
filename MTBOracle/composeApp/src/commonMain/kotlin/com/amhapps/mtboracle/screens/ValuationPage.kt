@@ -23,6 +23,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -35,6 +37,7 @@ import com.amhapps.mtboracle.BikeInputDisplay
 import com.amhapps.mtboracle.DropdownText
 import com.amhapps.mtboracle.MTBOracleTheme
 import com.amhapps.mtboracle.SpecText
+import kotlinx.coroutines.launch
 import mtboracle.composeapp.generated.resources.Res
 
 abstract class ValuationPage(protected val navController: NavHostController, private val bikeData: BikeData){
@@ -48,6 +51,7 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
             ){
+                getExchangeRates()
                 body()
             }
             Column(
@@ -60,12 +64,24 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
 
 
     }
+
+    @Composable
+    fun getExchangeRates(){
+        val scope = rememberCoroutineScope()
+        LaunchedEffect(true){
+            scope.launch {
+                val exchangeRates = ExchangeRates()
+                exchangeRates.get()
+            }
+        }
+
+    }
     @Composable
     open fun body(){
         Row(
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier
-                .padding(5.dp,5.dp,0.dp,30.dp)
+                .padding(5.dp,5.dp,0.dp,10.dp)
         ){
             Text("Price Estimation",
                 fontSize = 40.sp,
@@ -81,7 +97,7 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
                     fontSize = 40.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
-                        .padding(40.dp, 40.dp)
+                        .padding(40.dp, 30.dp)
                 )
             }
 
@@ -95,7 +111,7 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
 
                 Column(modifier = Modifier.fillMaxWidth(0.8f),
                     horizontalAlignment = Alignment.CenterHorizontally) {
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                     DropdownText(title = "Note About Accuracy",
                         body = "The price given is only an estimate. "+
                                 "\n\nMTB Oracle uses a machine learning model to predict a price for your mountain bike. "+
@@ -108,7 +124,7 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
                                 "The only information about your bike that the model is given are the inputs you entered. "+
                                 "If your information is incorrect, the valuation will be incorrect. "+
                                 "E.g. putting in no values gives a price of 2000 GBP as this is the median used MTB price.")
-                    Spacer(modifier = Modifier.height(100.dp)) //Stops the text going under the home button
+                    Spacer(modifier = Modifier.height(20.dp))
                 }
             }
 
