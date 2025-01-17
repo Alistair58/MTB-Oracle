@@ -18,6 +18,7 @@ import com.amhapps.mtboracle.screens.SimilarBikesPage
 
 class AndroidSimilarBikesPage(private val navController: NavController,private val bikeDataInput:AndroidBikeData,private val context: Context):SimilarBikesPage(navController,bikeDataInput) {
     override val ebaySearcher = AndroidEbaySearcher(context)
+    override val exchangeRates = AndroidExchangeRates(context)
     @Composable
     override fun show() {
         BackHandler {

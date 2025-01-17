@@ -104,6 +104,7 @@ class MainActivity : ComponentActivity() {
 }
 
 val Context.tokensDataStore: DataStore<Preferences> by preferencesDataStore(name = "tokens")
+val Context.exchangeRatesDataStore: DataStore<Preferences> by preferencesDataStore(name = "exchangeRates")
 
 
 @Serializable

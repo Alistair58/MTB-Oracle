@@ -68,6 +68,7 @@ kotlin {
             implementation(libs.gson.v288)
             implementation(libs.coil.compose.v304)
             implementation(libs.coil3.coil.network.ktor3)
+            implementation(libs.kotlinx.datetime)
 
         }
 

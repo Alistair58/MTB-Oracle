@@ -17,10 +17,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,11 +31,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.navOptions
+import com.amhapps.mtboracle.screens.ExchangeRates
 import com.amhapps.mtboracle.screens.SimilarBikesPage
 import com.amhapps.mtboracle.screens.ValuationPage
+import kotlinx.coroutines.launch
 
-class AndroidValuationPage(navController: NavHostController, private val bikeData: AndroidBikeData, private val context:Context,private val dataset: AndroidDataset,private val neuralNetwork: AndroidNeuralNetwork
+class AndroidValuationPage(navController: NavHostController, private val bikeData: AndroidBikeData, private val context:Context, private val dataset: AndroidDataset, private val neuralNetwork: AndroidNeuralNetwork,
 ) : ValuationPage(navController, bikeData){
+
     @Composable
     override fun show(){
         BackHandler {
@@ -52,8 +57,10 @@ class AndroidValuationPage(navController: NavHostController, private val bikeDat
             var ebayBikes by remember { mutableStateOf(listOf<EbayBikeData>()) }
             var status by remember { mutableIntStateOf(0) }
             var sortBy by remember { mutableStateOf("Best Match") }
-            getExchangeRates()
-            similarBikesPage.RetrieveBikes(ebayBikes,{ebayBikes = it},status,{status = it},sortBy)
+            var exchangeRate by remember { mutableStateOf(-1f) }
+            val currencyCode = countryToCurrency(bikeData.country)
+
+            similarBikesPage.RetrieveBikesAndExchangeRate(ebayBikes,{ebayBikes = it},status,{status = it},sortBy)
             LazyColumn(
                 userScrollEnabled = true,
                 state = rememberLazyListState(),

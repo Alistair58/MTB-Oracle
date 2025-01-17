@@ -24,7 +24,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -39,45 +44,16 @@ import com.amhapps.mtboracle.MTBOracleTheme
 import com.amhapps.mtboracle.SpecText
 import kotlinx.coroutines.launch
 import mtboracle.composeapp.generated.resources.Res
+import kotlin.math.round
 
 abstract class ValuationPage(protected val navController: NavHostController, private val bikeData: BikeData){
-    @Composable
-    open fun show(){
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ){
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-            ){
-                getExchangeRates()
-                body()
-            }
-            Column(
-                modifier = Modifier.align(Alignment.BottomCenter)
-            ){
-                HomeButton()
-            }
-        }
-
-
-
-    }
 
     @Composable
-    fun getExchangeRates(){
-        val scope = rememberCoroutineScope()
-        LaunchedEffect(true){
-            scope.launch {
-                val exchangeRates = ExchangeRates()
-                exchangeRates.get()
-            }
-        }
+    abstract fun show()
 
-    }
+
     @Composable
-    open fun body(){
+    open fun body(exchangeRate:Float){
         Row(
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier
@@ -91,7 +67,9 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(){
-                val output = "£" + valuation()
+                val valuation:Int = (round(valuation()* exchangeRate)).toInt()
+                val currencySymbols = currencySymbol(bikeData.country)
+                val output = if(exchangeRate<0f) "" else "${currencySymbols[0]}$valuation${currencySymbols[1]}"
                 Text(
                     text = output,
                     fontSize = 40.sp,
@@ -133,6 +111,48 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
     abstract fun valuation():Float
     @Composable
     abstract fun HomeButton()
+
+    fun countryToCurrency(country:String):String{
+        return when(country){
+            "Australia" -> "AUD"
+            "Austria" -> "EUR"
+            "Belgium" -> "EUR"
+            "Germany" -> "EUR"
+            "Spain" -> "EUR"
+            "France" -> "EUR"
+            "Ireland" -> "EUR"
+            "Italy" -> "EUR"
+            "Netherlands" -> "EUR"
+            "Canada" -> "CAD"
+            "Switzerland" -> "CHF"
+            "United Kingdom UK" -> "GBP"
+            "Hong Kong" -> "HKD"
+            "Poland" -> "PLN"
+            "Singapore" -> "SGD"
+            else -> "USD"
+        }
+    }
+
+    private fun currencySymbol(country: String):List<String>{
+        return when(country){
+            "Australia" -> listOf("AU$","")
+            "Austria" -> listOf("€","")
+            "Belgium" -> listOf("€","")
+            "Germany" -> listOf("€","")
+            "Spain" -> listOf("€","")
+            "France" -> listOf("€","")
+            "Ireland" -> listOf("€","")
+            "Italy" -> listOf("€","")
+            "Netherlands" -> listOf("€","")
+            "Canada" -> listOf("CA$","")
+            "Switzerland" -> listOf(""," CHF")
+            "United Kingdom UK" -> listOf("£","")
+            "Hong Kong" -> listOf("HK$","")
+            "Poland" -> listOf(""," zł")
+            "Singapore" -> listOf("S$","")
+            else -> listOf("US$","")
+        }
+    }
 
 
 }

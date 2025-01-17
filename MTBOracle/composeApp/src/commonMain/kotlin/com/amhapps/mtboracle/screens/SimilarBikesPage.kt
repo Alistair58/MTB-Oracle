@@ -65,6 +65,7 @@ import kotlin.math.abs
 
 abstract class SimilarBikesPage(private val navController:NavController,private val bikeData: BikeData) {
     abstract val ebaySearcher:EbaySearcher //can't use expect inside a class
+    abstract val exchangeRates:ExchangeRates
 
     //A recomposition only occurs when an argument changes
     //Need to pass every composable a lambda so that the value can be changed
@@ -77,8 +78,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                 .fillMaxSize()
         ) {
             //Status:
-            //0 - bikes not found
-            //1 - bikes found
+            //0x1 - bikes found
             //2 - No matching bikes
             //3 - no more bikes - the case that the number of bikes returned is a multiple of 48 but that was the end of the bikes
             //4 - retry
@@ -86,6 +86,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
             //-2 - connection error 2 (No internet on first bikes)
             //-3 - connection error 3 (HTTPS/eBay error on bottom bikes)
             //-4 - connection error 4 (No internet on bottom bikes)
+            //-5 - connection error 5 (
             var ebayBikes by remember {mutableStateOf(listOf<EbayBikeData>())}
             var status by remember { mutableIntStateOf(0) }
             var sortBy by remember { mutableStateOf("Best Match") }
@@ -118,9 +119,51 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                       status:Int,
                       onStatusChange:(Int)->Unit,
                       sortBy: String){
-        if(status == 0 || status == 4) LoadingAnimation()
+        if(status and 1==0 || status == 4) LoadingAnimation()
         FindBikes(ebayBikes,onEbayBikesChange,status,onStatusChange,sortBy)
         ErrorDialogs(status,onStatusChange)
+    }
+
+    @Composable
+    fun RetrieveBikesAndExchangeRate(ebayBikes:List<EbayBikeData>,
+                      onEbayBikesChange:(List<EbayBikeData>)->Unit,
+                      status:Int,
+                      onStatusChange:(Int)->Unit,
+                      sortBy: String,
+                      currencyCode:String,
+                      onExchangeRateChange:(Float)->Unit){
+        if(status and 1==0 || status == 4) LoadingAnimation()
+        FindBikes(ebayBikes,onEbayBikesChange,status,onStatusChange,sortBy)
+        GetExchangeRate(currencyCode,onExchangeRateChange,status,onStatusChange)
+        ErrorDialogs(status,onStatusChange)
+
+    }
+
+    @Composable
+    fun GetExchangeRate(currencyCode: String,
+                        onExchangeRateChange: (Float) -> Unit,
+                        status: Int,
+                        onStatusChange: (Int) -> Unit) {
+        val scope = rememberCoroutineScope()
+        LaunchedEffect(true) {
+            scope.launch {
+                try{
+                    onExchangeRateChange(
+                        if (currencyCode != "GBP") {
+                            exchangeRates.get(currencyCode)
+                        }
+                        else 1f
+                    )
+                }
+                catch (e:NumberFormatException){
+
+                }
+                catch (e:ExchangeRateResponseException){
+
+                }
+
+            }
+        }
     }
 
     //Being a receiver makes it hard to access from outside the class
@@ -169,7 +212,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                 dismissColor = Color.Gray
             )
         }
-        if(status < 0){
+        if(/*TODO - used to be <0*/){
             WarningDialog(
                 confirmText = "Retry",
                 onConfirmation = {onStatusChange(4)}, //Value doesn't matter only matters that value changes
