@@ -26,14 +26,15 @@ import kotlinx.datetime.format.char
 import kotlinx.serialization.json.Json
 
 abstract class ExchangeRates {
-    suspend fun get(currency:String):Float {
+    open suspend fun get(currency:String):Float {
         val currDate = getCurrHmrcDate()
         var rate = getCachedRate(currency,currDate)
+        println("Cached rate for $currency: $rate")
         if(rate < 0) rate = refreshRates(currency,currDate)
         return rate
     }
 
-    private fun getCurrHmrcDate():String{
+    fun getCurrHmrcDate():String{
         val hmrcFormat = DateTimeComponents.Format {
             year()
             char('-')
@@ -46,7 +47,7 @@ abstract class ExchangeRates {
     abstract suspend fun cacheRate(currency:String,rate:Float)
     abstract suspend fun storeDate(currDate:String)
 
-    private suspend fun refreshRates(currency: String,currDate: String):Float{ //and return the requested currency while we're here
+    suspend fun refreshRates(currency: String,currDate: String):Float{ //and return the requested currency while we're here
         val client = HttpClient() {
             install(HttpTimeout) {
                 requestTimeoutMillis = 5000

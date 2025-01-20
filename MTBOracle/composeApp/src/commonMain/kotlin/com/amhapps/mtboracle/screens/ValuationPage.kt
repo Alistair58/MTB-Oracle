@@ -47,13 +47,14 @@ import mtboracle.composeapp.generated.resources.Res
 import kotlin.math.round
 
 abstract class ValuationPage(protected val navController: NavHostController, private val bikeData: BikeData){
+    private val nnWeight = 0.6f
 
     @Composable
     abstract fun show()
 
 
     @Composable
-    open fun body(exchangeRate:Float){
+    open fun body(exchangeRate:Float,similarBikesMedian:Float){
         Row(
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier
@@ -67,7 +68,14 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(){
-                val valuation:Int = (round(valuation()* exchangeRate)).toInt()
+                println("Similar bikes median: $similarBikesMedian")
+                val valuation:Int = if(similarBikesMedian > 0f) {
+                    (round((nnWeight * valuation()) * exchangeRate) + (1 - nnWeight) * similarBikesMedian).toInt() //SimilarBikesMedian is already in local currency
+                }
+                else{
+                    (round(valuation()* exchangeRate)).toInt()
+                }
+
                 val currencySymbols = currencySymbol(bikeData.country)
                 val output = if(exchangeRate<0f) "" else "${currencySymbols[0]}$valuation${currencySymbols[1]}"
                 Text(

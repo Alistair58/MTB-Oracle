@@ -62,6 +62,7 @@ import mtboracle.composeapp.generated.resources.Res
 import mtboracle.composeapp.generated.resources.transparent_mtb_oracle_bike_v2
 import org.jetbrains.compose.resources.painterResource
 import kotlin.math.abs
+import kotlin.math.floor
 
 abstract class SimilarBikesPage(private val navController:NavController,private val bikeData: BikeData) {
     abstract val ebaySearcher:EbaySearcher //can't use expect inside a class
@@ -79,14 +80,14 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
         ) {
             //Status:
             //0x1 - bikes found
-            //2 - No matching bikes
-            //3 - no more bikes - the case that the number of bikes returned is a multiple of 48 but that was the end of the bikes
-            //4 - retry
-            //-1 - connection error 1 (HTTPS/eBay error on first bikes)
-            //-2 - connection error 2 (No internet on first bikes)
-            //-3 - connection error 3 (HTTPS/eBay error on bottom bikes)
-            //-4 - connection error 4 (No internet on bottom bikes)
-            //-5 - connection error 5 (
+            //0x2 - No matching bikes
+            //0x4 - no more bikes - the case that the number of bikes returned is a multiple of 48 but that was the end of the bikes
+            //0x8 - retry
+            //0x10 - connection error 1 (HTTPS/eBay error on first bikes)
+            //0x20 - connection error 2 (No internet on first bikes/exchange rate)
+            //0x40 - connection error 5 (Exchange rate error)
+            //0x80 - connection error 3 (HTTPS/eBay error on bottom bikes)
+            //0x100 - connection error 4 (No internet on bottom bikes)
             var ebayBikes by remember {mutableStateOf(listOf<EbayBikeData>())}
             var status by remember { mutableIntStateOf(0) }
             var sortBy by remember { mutableStateOf("Best Match") }
@@ -119,9 +120,9 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                       status:Int,
                       onStatusChange:(Int)->Unit,
                       sortBy: String){
-        if(status and 1==0 || status == 4) LoadingAnimation()
+        if(status and 1 == 0 || status and 8 == 8 && status < 0x10) LoadingAnimation()
         FindBikes(ebayBikes,onEbayBikesChange,status,onStatusChange,sortBy)
-        ErrorDialogs(status,onStatusChange)
+        ErrorDialogs(status,onStatusChange,false)
     }
 
     @Composable
@@ -131,11 +132,11 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                       onStatusChange:(Int)->Unit,
                       sortBy: String,
                       currencyCode:String,
-                      onExchangeRateChange:(Float)->Unit){
-        if(status and 1==0 || status == 4) LoadingAnimation()
-        FindBikes(ebayBikes,onEbayBikesChange,status,onStatusChange,sortBy)
+                      onExchangeRateChange:(Float)->Unit, onSimilarBikesMedianChange:(Float)->Unit){
+        if((status and 0x1 == 0 || status and 0x8 == 0x8) && status < 0x10 && status and 0x2 != 0x2) LoadingAnimation() //Don't show the animation if we've had an error or found no bikes
+        FindBikesAndGetMedian(ebayBikes,onEbayBikesChange,status,onStatusChange,sortBy,onSimilarBikesMedianChange)
         GetExchangeRate(currencyCode,onExchangeRateChange,status,onStatusChange)
-        ErrorDialogs(status,onStatusChange)
+        ErrorDialogs(status,onStatusChange,true)
 
     }
 
@@ -156,10 +157,13 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                     )
                 }
                 catch (e:NumberFormatException){
-
+                    onStatusChange(status or 0x40)
                 }
                 catch (e:ExchangeRateResponseException){
-
+                    onStatusChange(status or 0x40)
+                }
+                catch (e:NoInternetException){
+                    onStatusChange(status or 0x20)
                 }
 
             }
@@ -175,8 +179,8 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                          onStatusChange:(Int)->Unit,
                          sortBy: String,
                          onSortByChange: (String) -> Unit){
-        lazyListScope.SimilarBikesHeader(displayInputs,onEbayBikesChange,onStatusChange,sortBy,onSortByChange)
-        lazyListScope.EbayBikeItems(ebayBikes)
+        lazyListScope.SimilarBikesHeader(displayInputs,ebayBikes,onEbayBikesChange,onStatusChange,sortBy,onSortByChange)
+        lazyListScope.EbayBikeItems(ebayBikes,status)
         //A spacer here breaks the infinite scrolling and causes infinite loading
         lazyListScope.RefreshBottom(ebayBikes,onEbayBikesChange,status,onStatusChange,sortBy)
     }
@@ -198,8 +202,9 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
 
     @Composable
     fun ErrorDialogs(status:Int,
-                     onStatusChange:(Int)->Unit){
-        if(status==2){
+                     onStatusChange:(Int)->Unit,
+                     valuation:Boolean){
+        if(status and 0x2 == 0x2 && !valuation){ //Don't prevent the user seeing the valuation if the similar bikes don't load
             WarningDialog(
                 confirmText = "Back",
                 onConfirmation = { back() },
@@ -212,15 +217,15 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                 dismissColor = Color.Gray
             )
         }
-        if(/*TODO - used to be <0*/){
+        if(status >= 0x10){
             WarningDialog(
                 confirmText = "Retry",
-                onConfirmation = {onStatusChange(4)}, //Value doesn't matter only matters that value changes
-                dismissText = if(status >= -2) "Home" else "Cancel",
+                onConfirmation = {onStatusChange(0x8)}, //retry and clear rest of status
+                dismissText = if(status < 0x80 ) "Home" else "Cancel",
                 alwaysDismiss = {},
                 explicitDismiss = { if(status >= -2) navController.popBackStack(platformHomeScreen(),false) },
                 dialogTitle = "Network Error",
-                dialogText = if(abs(status)% 2 == 0) "No internet connection" else "Could not connect with eBay",
+                dialogText = if(status and 0x20 == 0x20 || status and 0x100 == 0x100) "No internet connection" else "Could not connect", //either eBay or HMRC
                 confirmationColor = MTBOracleTheme.colors.forestLight,
                 dismissColor = Color.Gray,
             )
@@ -228,33 +233,60 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
     }
 
     @Composable
-    fun FindBikes(ebayBikes:List<EbayBikeData>,
+    fun FindBikesAndGetMedian(ebayBikes:List<EbayBikeData>,
                   onBikeRetrieval: (List<EbayBikeData>) -> Unit,
                   status:Int,
                   onStatusChange: (Int) -> Unit,
-                  sortBy: String){
+                  sortBy: String,
+                  onSimilarBikesMedianChange:(Float)->Unit){
         val scope = rememberCoroutineScope()
         LaunchedEffect(status) {//LaunchedEffect restarts when one of the key parameters changes
             scope.launch {
-                if(ebayBikes.isEmpty() && (status==0||status==4)){
+                if((ebayBikes.isEmpty() && status and 0x1 == 0) || status and 0x8 == 0x8){
+                    onStatusChange(0)
                     try {
                         val newBikes = ebaySearcher.search(bikeData,0,encodeSortBy(sortBy))
                         onBikeRetrieval(newBikes) //update the mutable ebayBikes
                         //Which doesn't change the argument as it is passed by value
-                        if(newBikes.isEmpty()) onStatusChange(2)
-                        else onStatusChange(1)
+                        if(newBikes.isEmpty()) onStatusChange(0x2) // no matching bikes
+                        else{
+                            val bikePrices = mutableListOf<Float>()
+                            val removeNonNums = Regex("[^0-9.]")
+                            for(bike in newBikes){
+                                if(bike.price != null){
+                                    bikePrices.add(
+                                        removeNonNums.replace(bike.price,"").toFloat()
+                                    )
+                                }
+                            }
+                            bikePrices.sort()
+                            println(bikePrices)
+                            onSimilarBikesMedianChange(
+                                if (bikePrices.size and 1 == 1){
+                                    bikePrices[floor(bikePrices.size/2f).toInt()]
+                                }
+                                else{
+                                    (bikePrices[bikePrices.size/2] + bikePrices[bikePrices.size/2 -1]) /2
+                                }
+                            )
+                            onStatusChange(0x1)//found
+                        }
                     }
                     catch (e: HttpRequestTimeoutException) {
                         println(e.toString())
-                        onStatusChange(-1)
+                        onStatusChange(0x10)
                     }
                     catch(e: EbayResponseException){ //Kotlin doesn't have multi-catch
                         println(e.toString())
-                        onStatusChange(-1)
+                        onStatusChange(0x10)
+                    }
+                    catch(e: NumberFormatException){
+                        println(e.toString())
+                        onStatusChange(0x10)
                     }
                     catch(e: NoInternetException){
                         println(e.toString())
-                        onStatusChange(-2)
+                        onStatusChange(0x20)
                     }
                     println("bikesFoundFinally "+status)
 
@@ -264,7 +296,51 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
         }
     }
 
-    fun LazyListScope.SimilarBikesHeader(displayInputs:Boolean, 
+    @Composable
+    fun FindBikes(ebayBikes:List<EbayBikeData>,
+                              onBikeRetrieval: (List<EbayBikeData>) -> Unit,
+                              status:Int,
+                              onStatusChange: (Int) -> Unit,
+                              sortBy: String){
+        val scope = rememberCoroutineScope()
+        LaunchedEffect(status) {//LaunchedEffect restarts when one of the key parameters changes
+            scope.launch {
+                if((ebayBikes.isEmpty() && status and 0x1 == 0) || status and 0x8 == 0x8){
+                    onStatusChange(0)
+                    try {
+                        val newBikes = ebaySearcher.search(bikeData,0,encodeSortBy(sortBy))
+                        onBikeRetrieval(newBikes) //update the mutable ebayBikes
+                        //Which doesn't change the argument as it is passed by value
+                        if(newBikes.isEmpty()) onStatusChange(0x2) // no matching bikes
+                        else onStatusChange(0x1)//found
+
+                    }
+                    catch (e: HttpRequestTimeoutException) {
+                        println(e.toString())
+                        onStatusChange(0x10)
+                    }
+                    catch(e: EbayResponseException){ //Kotlin doesn't have multi-catch
+                        println(e.toString())
+                        onStatusChange(0x10)
+                    }
+                    catch(e: NumberFormatException){
+                        println(e.toString())
+                        onStatusChange(0x10)
+                    }
+                    catch(e: NoInternetException){
+                        println(e.toString())
+                        onStatusChange(0x20)
+                    }
+                    println("bikesFoundFinally "+status)
+
+                }
+
+            }
+        }
+    }
+
+    fun LazyListScope.SimilarBikesHeader(displayInputs:Boolean,
+                                         ebayBikes: List<EbayBikeData>,
                                          onEbayBikesChange: (List<EbayBikeData>) -> Unit,
                                          onStatusChange: (Int) -> Unit,
                                          sortBy: String,
@@ -283,24 +359,32 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                     Spacer(modifier = Modifier.height(10.dp))
                 }
                 val options = listOf("Best Match","Price low to high","Price high to low","Newest listings")
-                CompleteDropdown(value = sortBy, //Even if the user hasn't changed the sort, refresh to show some feedback
-                    onDropdownClick = {
-                        onSortByChange(it)
-                        onStatusChange(4)
-                        onEbayBikesChange(emptyList())
-                        println("Dropdown change "+it)
-                    },
-                    label = "Sort By",
-                    modifier = Modifier,
-                    items=options
-                )
+                if(!ebayBikes.isEmpty()){
+                    CompleteDropdown(value = sortBy, //Even if the user hasn't changed the sort, refresh to show some feedback
+                        onDropdownClick = {
+                            onSortByChange(it)
+                            onStatusChange(0x8)
+                            onEbayBikesChange(emptyList())
+                            println("Dropdown change "+it)
+                        },
+                        label = "Sort By",
+                        modifier = Modifier,
+                        items=options
+                    )
+                }
+
             }
 
         }
     }
 
 
-    fun LazyListScope.EbayBikeItems(ebayBikes: List<EbayBikeData>){
+    fun LazyListScope.EbayBikeItems(ebayBikes: List<EbayBikeData>,status:Int){
+        if(ebayBikes.isEmpty() && status and 0x2 == 0x2){
+            item{
+                Text("No similar bikes found", fontSize = 20.sp, modifier = Modifier.padding(0.dp,30.dp,0.dp,100.dp)) //Want the home button below it
+            }
+        }
         for (i in 0..<ebayBikes.size step 2) {
             item {
                 Row {
@@ -336,24 +420,24 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
             if (ebayBikes.isNotEmpty()) { //On the first composition, this would be on the page
                 // as the bikes have not been returned from eBay yet and so it would run (which we don't want)
                 LaunchedEffect(true) {
-                    onStatusChange(0) //Causes the loading animation
+                    onStatusChange(0) //Causes the loading animation and resets the retry
                     val prevSize = ebayBikes.size
-                    if (prevSize % 48 == 0 && status!=3) { 
+                    if (prevSize % 48 == 0 && status and 4 != 4) { //If we have more bikes
                         try { //adding the lists changes the address of the list and so causes a recomposition
                             val newBikes = ebayBikes + ebaySearcher.search(bikeData, prevSize,encodeSortBy(sortBy))
                             onEbayBikesChange(newBikes)
-                            if (newBikes.size == prevSize) onStatusChange(3)
-                            else onStatusChange(1)
+                            if (newBikes.size == prevSize) onStatusChange(status or 0x4)
+                            else onStatusChange(status or 1)
                         } catch (e: HttpRequestTimeoutException) {
-                            onStatusChange(-3)
+                            onStatusChange(status or 0x80)
                         } catch (e: EbayResponseException) {
-                            onStatusChange(-3)
+                            onStatusChange(status or 0x80)
                         } catch (e: NoInternetException) {
-                            onStatusChange(-4)
+                            onStatusChange(status or 0x100)
                         }
                     }
                     else{
-                        onStatusChange(3) //Don't keep on searching if there are no more bikes
+                        onStatusChange(status or 0x4) //Don't keep on searching if there are no more bikes
                     }
                 }
             }

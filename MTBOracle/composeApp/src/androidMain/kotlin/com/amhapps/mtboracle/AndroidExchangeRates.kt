@@ -11,6 +11,17 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class AndroidExchangeRates(private val context: Context): ExchangeRates() {
+
+    override suspend fun get(currency:String):Float {
+        try{
+            return super.get(currency)
+        }
+        catch(e:java.net.UnknownHostException){ //(No internet)
+            throw NoInternetException()
+        }
+
+    }
+
     override suspend fun getCachedRate(currency: String,currDate:String): Float {
         val exchangeRateDateKey = stringPreferencesKey("exchangeRateDate")
         val dateFlow: Flow<String> = context.exchangeRatesDataStore.data //a flow is an asynchronous stream

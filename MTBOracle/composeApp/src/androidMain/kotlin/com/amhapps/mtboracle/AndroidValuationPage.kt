@@ -59,8 +59,9 @@ class AndroidValuationPage(navController: NavHostController, private val bikeDat
             var sortBy by remember { mutableStateOf("Best Match") }
             var exchangeRate by remember { mutableStateOf(-1f) }
             val currencyCode = countryToCurrency(bikeData.country)
+            var similarBikesMedian by remember { mutableStateOf(0f) }
 
-            similarBikesPage.RetrieveBikesAndExchangeRate(ebayBikes,{ebayBikes = it},status,{status = it},sortBy)
+            similarBikesPage.RetrieveBikesAndExchangeRate(ebayBikes,{ebayBikes = it},status,{status = it},sortBy,currencyCode,{exchangeRate = it},{similarBikesMedian = it})
             LazyColumn(
                 userScrollEnabled = true,
                 state = rememberLazyListState(),
@@ -68,7 +69,7 @@ class AndroidValuationPage(navController: NavHostController, private val bikeDat
                 modifier = Modifier.fillMaxWidth() //Funny wiggling if this isn't here
             )
             {
-                item{body()}
+                item{body(exchangeRate, similarBikesMedian)}
                 similarBikesPage.SimilarBikesBody(this@LazyColumn,false,
                     ebayBikes,{ebayBikes = it},
                     status,{status = it},

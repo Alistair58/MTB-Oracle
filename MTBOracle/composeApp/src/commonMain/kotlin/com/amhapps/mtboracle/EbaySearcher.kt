@@ -157,10 +157,11 @@ abstract class EbaySearcher {
         println(bikeData.country)
         val countryId:String = ebayCountryIdMap[bikeData.country]?:"EBAY_US"
 
-        var searchTerm =
-            (if (bikeData.year < 0 || bikeData.year > 2050) "" else bikeData.year.toString() + "%20")
+        var searchTerm = ""
         if (bikeData.brand.length > 0) searchTerm += bikeData.brand.encodeURLPath() + "%20"
-        if (bikeData.model.length > 0) searchTerm += bikeData.model.encodeURLPath()
+        if (bikeData.model.length > 0) searchTerm += bikeData.model.encodeURLPath() + "%20"
+        if (bikeData.year < 0 || bikeData.year > 2050) searchTerm+= bikeData.year.toString()
+        //I think putting year last places less emphasis on the year (it is less important than the model)
         bikeReqBuilder.url {
             protocol = URLProtocol.HTTPS
             host = "api.ebay.com"
