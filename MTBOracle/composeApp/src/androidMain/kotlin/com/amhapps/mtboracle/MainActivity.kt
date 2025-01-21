@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
                 startDestination = AndroidHomeScreen
             ) {
                 composable<AndroidHomeScreen> {
-                    val homepage = AndroidHomepage(navController)
+                    val homepage = AndroidHomepage(navController,context)
                     homepage.ShowHomepage()
                 }
                 composable<AndroidBrandModelYearScreen> (
@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
                     val prevBikeData = it.savedStateHandle.get<AndroidBikeData>("bikeData")
                     val args = it.toRoute<AndroidSizeMaterialTravelScreen>()
                     val bikeData = prevBikeData ?: args.bikeData
-                    val form = AndroidSizeMaterialTravelForm(navController, bikeData,args.isValuation)
+                    val form = AndroidSizeMaterialTravelForm(navController, bikeData,args.isValuation,context)
                     form.ShowForm()
                 }
                 composable<AndroidValuationScreen>(
@@ -105,6 +105,7 @@ class MainActivity : ComponentActivity() {
 
 val Context.tokensDataStore: DataStore<Preferences> by preferencesDataStore(name = "tokens")
 val Context.exchangeRatesDataStore: DataStore<Preferences> by preferencesDataStore(name = "exchangeRates")
+val Context.prevBikesDataStore: DataStore<Preferences> by preferencesDataStore(name = "prevBikes")
 
 
 @Serializable

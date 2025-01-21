@@ -412,8 +412,8 @@ fun BikeInputDisplay(bikeData:BikeData){
     }
     val yearOutput = if(bikeData.year in 0..2999) bikeData.year.toString() else ""
 
-    val frontSusOutput = if(bikeData.frontTravel >=0 && bikeData.frontTravel<1000) bikeData.frontTravel.toString()+"mm" else ""
-    val rearSusOutput = if(bikeData.rearTravel >=0 && bikeData.rearTravel<1000) bikeData.rearTravel.toString()+"mm" else ""
+    val frontSusOutput = if(bikeData.frontTravel >=0 && bikeData.frontTravel<1000) bikeData.frontTravel.toInt().toString()+"mm" else ""
+    val rearSusOutput = if(bikeData.rearTravel >=0 && bikeData.rearTravel<1000) bikeData.rearTravel.toInt().toString()+"mm" else ""
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally

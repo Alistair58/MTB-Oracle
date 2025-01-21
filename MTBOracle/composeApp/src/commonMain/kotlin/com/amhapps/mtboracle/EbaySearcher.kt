@@ -167,12 +167,12 @@ abstract class EbaySearcher {
             host = "api.ebay.com"
             encodedPath = "/buy/browse/v1/item_summary/search?q=" +
                     searchTerm +
-                    "&category_ids=177831&limit=48" +// 177831 = Bicycles
+                    "&category_ids=177831&limit=48" +// 177831 = Bikes
                     "&offset=" + offset.toString() +
                     "&filter=buyingOptions:{FIXED_PRICE}" +
                     "&aspect_filter=categoryId:177831," +
                     "Frame%20Size:{" + encodedSize + "}," +
-                    "Wheel%20Size:{" + encodedWheelSize + "}," +
+                    //"Wheel%20Size:{" + encodedWheelSize + "}," + //Wheel size is an optional user input field (on eBay) and so limits results too much
                     "Bike%20Type:{" + encodedCategory + "}," +
                     "Suspension%20Type:{" + encodedSuspension + "}," +
                     "Material:{" + encodedMaterial + "}" +

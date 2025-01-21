@@ -16,6 +16,7 @@ interface  BikeData { //needs to be Serializable AND Parcelable in Android
     var frontTravel: Float
     var rearTravel: Float
     var country: String
+    var price:String
 }
 
 abstract class Bike(

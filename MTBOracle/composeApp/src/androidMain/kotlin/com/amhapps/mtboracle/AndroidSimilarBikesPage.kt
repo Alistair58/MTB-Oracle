@@ -1,5 +1,6 @@
 package com.amhapps.mtboracle
 
+import BikeData
 import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.height
@@ -38,6 +39,11 @@ class AndroidSimilarBikesPage(private val navController: NavController,private v
             ?.set("bikeData",bikeDataInput)
         navController.popBackStack()
     }
+
+    override suspend fun cacheBike(bikeData: BikeData) {
+        androidCacheBike(bikeData,context)
+    }
+
     @Composable
     override fun HomeButton(){
         Button(
@@ -57,4 +63,5 @@ class AndroidSimilarBikesPage(private val navController: NavController,private v
             )
         }
     }
+
 }

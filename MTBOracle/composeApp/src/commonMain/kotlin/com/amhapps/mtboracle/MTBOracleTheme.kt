@@ -25,7 +25,8 @@ data class ExtendedColors(
     val forest: Color,
     val forestLight: Color,
     val lightRed: Color,
-    val yellowWarning:Color
+    val yellowWarning:Color,
+    val lightGrey: Color
 )
 
 val LocalExtendedColors = staticCompositionLocalOf {
@@ -33,7 +34,8 @@ val LocalExtendedColors = staticCompositionLocalOf {
         forest = Color(0xff5b8a6e),
         forestLight = Color(0xff88b89b),
         lightRed = Color(0xffff4747),
-        yellowWarning = Color(0xffffd04e)
+        yellowWarning = Color(0xffffd04e),
+        lightGrey = Color(0xfff2f2f2)
     )
 }
 
@@ -65,7 +67,8 @@ fun MTBOracleTheme( //Extends Material Theme
         forest = Color(0xff5b8a6e),
         forestLight = Color(0xff88b89b),
         lightRed = Color(0xffff4747),
-        yellowWarning = Color(0xffffd04e)
+        yellowWarning = Color(0xffffd04e),
+        lightGrey = Color(0xfff2f2f2)
     )
     CompositionLocalProvider(LocalExtendedColors provides extendedColors) {
         MaterialTheme(

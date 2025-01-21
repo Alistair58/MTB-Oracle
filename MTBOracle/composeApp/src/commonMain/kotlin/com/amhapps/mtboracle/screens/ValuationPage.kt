@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 import mtboracle.composeapp.generated.resources.Res
 import kotlin.math.round
 
-abstract class ValuationPage(protected val navController: NavHostController, private val bikeData: BikeData){
+abstract class ValuationPage(protected val navController: NavHostController, private var bikeData: BikeData){
     private val nnWeight = 0.6f
 
     @Composable
@@ -55,6 +55,7 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
 
     @Composable
     open fun body(exchangeRate:Float,similarBikesMedian:Float){
+        var cached by remember { mutableStateOf(false) }
         Row(
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier
@@ -76,8 +77,23 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
                     (round(valuation()* exchangeRate)).toInt()
                 }
 
+
                 val currencySymbols = currencySymbol(bikeData.country)
                 val output = if(exchangeRate<0f) "" else "${currencySymbols[0]}$valuation${currencySymbols[1]}"
+                bikeData.price = output
+                if(!cached && (similarBikesMedian>0f || similarBikesMedian==-2f)){ //-2f if there are no similar bikes
+                    println("Not cached")
+                    val scope = rememberCoroutineScope()
+                    LaunchedEffect(true){
+                        scope.launch {
+                            println("Caching")
+                            cacheBike(bikeData)
+                            cached = true
+                        }
+                    }
+
+
+                }
                 Text(
                     text = output,
                     fontSize = 40.sp,
@@ -100,7 +116,7 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
                     Spacer(modifier = Modifier.height(10.dp))
                     DropdownText(title = "Note About Accuracy",
                         body = "The price given is only an estimate. "+
-                                "\n\nMTB Oracle uses a machine learning model to predict a price for your mountain bike. "+
+                                "\n\nMTB Oracle uses a machine learning model along with similar bikes to predict a price for your mountain bike. "+
                                 "The model is not 100% accurate and does make mistakes. "+
                                 "Errors could come from:\n" +
                                 " • Rare bikes\n"+
@@ -161,6 +177,9 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
             else -> listOf("US$","")
         }
     }
+
+    protected abstract suspend fun cacheBike(bikeData: BikeData)
+
 
 
 }

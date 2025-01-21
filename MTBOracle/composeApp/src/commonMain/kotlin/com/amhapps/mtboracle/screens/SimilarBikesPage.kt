@@ -57,7 +57,12 @@ import com.amhapps.mtboracle.NoInternetException
 import com.amhapps.mtboracle.SpecText
 import com.amhapps.mtboracle.WarningDialog
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.count
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import mtboracle.composeapp.generated.resources.Res
 import mtboracle.composeapp.generated.resources.transparent_mtb_oracle_bike_v2
 import org.jetbrains.compose.resources.painterResource
@@ -132,9 +137,12 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                       onStatusChange:(Int)->Unit,
                       sortBy: String,
                       currencyCode:String,
-                      onExchangeRateChange:(Float)->Unit, onSimilarBikesMedianChange:(Float)->Unit){
+                      onExchangeRateChange:(Float)->Unit,
+                                     similarBikesMedian: Float,
+                                     onSimilarBikesMedianChange:(Float)->Unit){
+        println("Status: $status CurrencyCode: $currencyCode ebayBikes: ${ebayBikes} similarBikesMedian: ${similarBikesMedian}")
         if((status and 0x1 == 0 || status and 0x8 == 0x8) && status < 0x10 && status and 0x2 != 0x2) LoadingAnimation() //Don't show the animation if we've had an error or found no bikes
-        FindBikesAndGetMedian(ebayBikes,onEbayBikesChange,status,onStatusChange,sortBy,onSimilarBikesMedianChange)
+        FindBikesAndGetMedian(ebayBikes,onEbayBikesChange,status,onStatusChange,sortBy,similarBikesMedian,onSimilarBikesMedianChange)
         GetExchangeRate(currencyCode,onExchangeRateChange,status,onStatusChange)
         ErrorDialogs(status,onStatusChange,true)
 
@@ -238,37 +246,44 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                   status:Int,
                   onStatusChange: (Int) -> Unit,
                   sortBy: String,
+                              similarBikesMedian:Float,
                   onSimilarBikesMedianChange:(Float)->Unit){
         val scope = rememberCoroutineScope()
         LaunchedEffect(status) {//LaunchedEffect restarts when one of the key parameters changes
             scope.launch {
-                if((ebayBikes.isEmpty() && status and 0x1 == 0) || status and 0x8 == 0x8){
+                println("Find bikes status: $status")
+                if(((ebayBikes.isEmpty() && status and 0x1 == 0) || status and 0x8 == 0x8) && status and 0x2 != 0x2){
                     onStatusChange(0)
                     try {
                         val newBikes = ebaySearcher.search(bikeData,0,encodeSortBy(sortBy))
                         onBikeRetrieval(newBikes) //update the mutable ebayBikes
                         //Which doesn't change the argument as it is passed by value
-                        if(newBikes.isEmpty()) onStatusChange(0x2) // no matching bikes
+                        if(newBikes.isEmpty()){// no matching bikes
+                            onStatusChange(0x2)
+                            if(sortBy == "Best Match") onSimilarBikesMedianChange(-2f) //-2f if there are no similar bikes
+                        }
                         else{
-                            val bikePrices = mutableListOf<Float>()
-                            val removeNonNums = Regex("[^0-9.]")
-                            for(bike in newBikes){
-                                if(bike.price != null){
-                                    bikePrices.add(
-                                        removeNonNums.replace(bike.price,"").toFloat()
-                                    )
+                            if(sortBy == "Best Match" && similarBikesMedian < 0f){
+                                val bikePrices = mutableListOf<Float>()
+                                val removeNonNums = Regex("[^0-9.]")
+                                for(bike in newBikes){
+                                    if(bike.price != null){
+                                        bikePrices.add(
+                                            removeNonNums.replace(bike.price,"").toFloat()
+                                        )
+                                    }
                                 }
+                                bikePrices.sort()
+                                println(bikePrices)
+                                onSimilarBikesMedianChange(
+                                    if (bikePrices.size and 1 == 1){
+                                        bikePrices[floor(bikePrices.size/2f).toInt()]
+                                    }
+                                    else{
+                                        (bikePrices[bikePrices.size/2] + bikePrices[bikePrices.size/2 -1]) /2
+                                    }
+                                )
                             }
-                            bikePrices.sort()
-                            println(bikePrices)
-                            onSimilarBikesMedianChange(
-                                if (bikePrices.size and 1 == 1){
-                                    bikePrices[floor(bikePrices.size/2f).toInt()]
-                                }
-                                else{
-                                    (bikePrices[bikePrices.size/2] + bikePrices[bikePrices.size/2 -1]) /2
-                                }
-                            )
                             onStatusChange(0x1)//found
                         }
                     }
@@ -305,7 +320,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
         val scope = rememberCoroutineScope()
         LaunchedEffect(status) {//LaunchedEffect restarts when one of the key parameters changes
             scope.launch {
-                if((ebayBikes.isEmpty() && status and 0x1 == 0) || status and 0x8 == 0x8){
+                if(((ebayBikes.isEmpty() && status and 0x1 == 0) || status and 0x8 == 0x8) && status and 0x2 != 0x2){
                     onStatusChange(0)
                     try {
                         val newBikes = ebaySearcher.search(bikeData,0,encodeSortBy(sortBy))
@@ -346,6 +361,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                                          sortBy: String,
                                          onSortByChange:(String)->Unit){
         item{
+            var cached by remember { mutableStateOf(false) }
             Column(horizontalAlignment = Alignment.CenterHorizontally){
                 Text(
                     "Similar Bikes",
@@ -357,6 +373,15 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                 if(displayInputs){
                     BikeInputDisplay(bikeData)
                     Spacer(modifier = Modifier.height(10.dp))
+                    if(!cached){
+                        val scope = rememberCoroutineScope()
+                        LaunchedEffect(true){
+                            scope.launch {
+                                cacheBike(bikeData)
+                            }
+                        }
+                        cached = true
+                    }
                 }
                 val options = listOf("Best Match","Price low to high","Price high to low","Newest listings")
                 if(!ebayBikes.isEmpty()){
@@ -377,6 +402,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
 
         }
     }
+
 
 
     fun LazyListScope.EbayBikeItems(ebayBikes: List<EbayBikeData>,status:Int){
@@ -422,7 +448,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                 LaunchedEffect(true) {
                     onStatusChange(0) //Causes the loading animation and resets the retry
                     val prevSize = ebayBikes.size
-                    if (prevSize % 48 == 0 && status and 4 != 4) { //If we have more bikes
+                    if (prevSize % 48 == 0 && status and 0x4 != 0x4) { //If we have more bikes
                         try { //adding the lists changes the address of the list and so causes a recomposition
                             val newBikes = ebayBikes + ebaySearcher.search(bikeData, prevSize,encodeSortBy(sortBy))
                             onEbayBikesChange(newBikes)
@@ -510,4 +536,5 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
     }
     abstract fun platformHomeScreen():Any
     abstract fun back()
+    protected abstract suspend fun cacheBike(bikeData: BikeData)
 }

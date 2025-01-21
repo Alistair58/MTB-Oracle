@@ -24,8 +24,30 @@ class AndroidBikeData (
     override var material: String = "",
     override var frontTravel: Float = -1f,
     override var rearTravel: Float = -1f,
-    override var country: String = ""
-): Parcelable, BikeData
+    override var country: String = "",
+    override var price: String = ""
+): Parcelable, BikeData{
+    companion object{ //static
+        fun fromBikeData(bikeData: BikeData):AndroidBikeData{
+            return AndroidBikeData(
+                bikeData.year,
+                bikeData.brand,
+                bikeData.model,
+                bikeData.category,
+                bikeData.condition,
+                bikeData.size,
+                bikeData.wheelSize,
+                bikeData.material,
+                bikeData.frontTravel,
+                bikeData.rearTravel,
+                bikeData.country,
+                bikeData.price
+            )
+        }
+    }
+}
+
+
 
 class AndroidBike(val bikeData: BikeData,val d:AndroidDataset): Bike(bikeData) {
     override fun getValues(): FloatArray{
