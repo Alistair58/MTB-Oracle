@@ -53,13 +53,18 @@ abstract class Homepage(private var navController: NavController){
                 BoxWithConstraints(
                     contentAlignment = Alignment.TopCenter,
                     modifier = Modifier
-                        .background(Brush.verticalGradient(colorStops = colorStops))
                         .fillMaxWidth()
                 )
                 {
+                    Column (modifier = Modifier
+                        .background(Brush.verticalGradient(colorStops = colorStops))
+                        .height(200.dp)
+                        .fillMaxWidth()
+                    ){} //Matches the spacer
                     Text(text="MTB Oracle",
                         color= Color.White,
-                        fontSize = 40.sp)
+                        fontSize = 40.sp,
+                        modifier = Modifier.zIndex(2f))
                     Column(modifier = Modifier.zIndex(2f)){
                         Spacer(modifier = Modifier
                             .height(40.dp)
@@ -70,7 +75,7 @@ abstract class Homepage(private var navController: NavController){
                     Column{
                         Spacer(modifier = Modifier
                             .height(200.dp)
-                            .width(0.dp))
+                            .width(0.dp)) //Box means everything would overlap otherwise
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier

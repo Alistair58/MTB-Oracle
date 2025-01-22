@@ -86,17 +86,15 @@ class AndroidHomepage(private val navController: NavController,private val conte
                     }
                 val prevStoredBikes = prevBikesFlow.first()
                 prevBikes = prevStoredBikes.map{storedBike -> gson.fromJson(storedBike,AndroidBikeData::class.java) }
-                println("coroutine $prevStoredBikes\n$prevBikes")
             }
         }
-        println("main thread $prevBikes")
+
         Column {
             Text("Recent Bikes", fontSize = 25.sp)
             for(bike in prevBikes){
                 RecentBike(bike)
             }
         }
-
     }
 
     override fun platformValuationScreen(bikeData: BikeData):AndroidValuationScreen {

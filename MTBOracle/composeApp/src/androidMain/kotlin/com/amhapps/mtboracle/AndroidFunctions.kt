@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 suspend fun androidCacheBike(bikeData: BikeData,context: Context){
-    println("Android Caching")
     val keyStrs = listOf("bike0","bike1","bike2","bike3","bike4")
     val keys = keyStrs.map{ str -> stringPreferencesKey(str) }
     val prevBikesFlow: Flow<MutableList<String>> = context.prevBikesDataStore.data
@@ -23,30 +22,27 @@ suspend fun androidCacheBike(bikeData: BikeData,context: Context){
                     result.add(preferences[keys[i]]!!)
                 }
             }
-            println("flow result $result")
             result
         }
-    println("Waiting for first")
-    val prevStoredBikes = prevBikesFlow.first()
-    println("Got count")
-    val builder = GsonBuilder()
-    val gson : Gson =  builder.create()
-    val jsonBike = gson.toJson(bikeData)
-    println("Num bikes ${prevStoredBikes.size}")
-    if(prevStoredBikes.size<5){
-        val bikeKey = stringPreferencesKey("bike${prevStoredBikes.size}") // 0 indexed
-        context.prevBikesDataStore.edit { prevBikes ->
-            prevBikes [bikeKey] = jsonBike
-        }
-        println("Stored $bikeKey $jsonBike")
-    }
-    else{
-        context.prevBikesDataStore.edit { prevBikes ->
-            for(i in 0..3){
-                prevBikes[keys[i]] = prevStoredBikes[i+1]
-            }
-            prevBikes[keys[4]] = jsonBike
+    val prevStoredBikeStrs = prevBikesFlow.first() //List of existing stored bikes
+    val gson : Gson =  GsonBuilder().create()
+    val prevStoredBikeObjs = (prevStoredBikeStrs //Turn all bikes in objects and remove duplicates
+        .map{bikeStr -> gson.fromJson(bikeStr,AndroidBikeData::class.java)}
+        .filter {storedBike-> !storedBike.isSameBike(bikeData)} + bikeData)
+    val updatedBikes = prevStoredBikeObjs //Remove oldest item if we have 5 and turn them into json strs
+        .subList(if(prevStoredBikeObjs.size>5) 1 else 0,prevStoredBikeObjs.size)
+        .map{bikeObj -> gson.toJson(bikeObj)}
+
+
+    context.prevBikesDataStore.edit { prevBikes ->
+        for(i in updatedBikes.indices){
+            prevBikes[keys[i]] = updatedBikes[i]
         }
     }
 
 }
+//println("Android Caching")
+//println("flow result $result")
+//println("Waiting for first")
+//println("Got count")
+//println("Num bikes ${updatedBikes.size}")
