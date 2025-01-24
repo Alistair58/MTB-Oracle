@@ -20,8 +20,12 @@ abstract class Dataset {
         return query ?: -1f
     }
 
-    fun getCountryStats(country: String): ArrayList<Float> {
-        var country = country
+    fun getCountryStats(rawCountry: String): ArrayList<Float> {
+        var country = when(rawCountry){
+            "United Kingdom UK"->"united kingdom" //Only edge cases 23/01/25
+            "United States of America USA"->"united states"
+            else -> rawCountry
+        }
         country = country.lowercase()
         val stats: ArrayList<Float> = countryStats!![country]?:ArrayList<Float>()
         if (stats.size == 0) {

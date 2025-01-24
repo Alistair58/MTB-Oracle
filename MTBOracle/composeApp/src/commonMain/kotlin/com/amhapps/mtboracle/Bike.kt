@@ -17,6 +17,7 @@ interface  BikeData { //needs to be Serializable AND Parcelable in Android
     var rearTravel: Float
     var country: String
     var price:String
+    fun isSameBike(bikeData: BikeData):Boolean
 }
 
 abstract class Bike(
@@ -95,6 +96,7 @@ abstract class Bike(
             "26\"" -> 4
             "27.5\"/650b" -> 5
             "29\"" -> 6
+            "29\" Front 27.5\" Rear" -> 6 //Probably closer to a 29er
             "650c" -> 7
             "700c" -> 8
             else -> 0

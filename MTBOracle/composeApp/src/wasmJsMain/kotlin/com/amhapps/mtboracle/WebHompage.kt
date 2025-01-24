@@ -24,7 +24,7 @@ class WebHomepage(private var navController: NavController) : Homepage(navContro
         Button(
             onClick = {
                 navController.navigate(
-                    BrandModelYearScreen(bikeData = WebBikeData())
+                    WebBrandModelYearScreen(bikeData = WebBikeData(), true)
                 )
             },
             colors = MTBOracleTheme.buttonColors,
@@ -33,6 +33,16 @@ class WebHomepage(private var navController: NavController) : Homepage(navContro
                 color = Color.White,
                 fontSize = 30.sp)
         }
+    }
+
+    @Composable
+    override fun SimilarBikesButton() {
+        TODO("Not yet implemented")
+    }
+
+    @Composable
+    override fun RecentBikes() {
+        //Web doesn't have recent bikes currently
     }
 
     @Composable
@@ -45,5 +55,13 @@ class WebHomepage(private var navController: NavController) : Homepage(navContro
                 .width(355.dp)
                 .zIndex(3f) //Will be drawn on top of everything else
         )
+    }
+
+    override fun platformValuationScreen(bikeData: BikeData): Any {
+        TODO("Not yet implemented")
+    }
+
+    override fun platformSimilarBikesScreen(bikeData: BikeData): Any {
+        TODO("Not yet implemented")
     }
 }

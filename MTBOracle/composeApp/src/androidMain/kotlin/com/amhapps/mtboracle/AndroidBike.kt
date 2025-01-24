@@ -27,7 +27,7 @@ class AndroidBikeData (
     override var country: String = "",
     override var price: String = ""
 ): Parcelable, BikeData{
-    fun isSameBike(bikeData: BikeData):Boolean{ //everything except price
+    override fun isSameBike(bikeData: BikeData):Boolean{ //everything except price
         return year==bikeData.year && brand==bikeData.brand &&
                 model==bikeData.model && category==bikeData.category &&
                 condition==bikeData.condition && size==bikeData.size &&

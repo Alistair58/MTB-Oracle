@@ -27,53 +27,10 @@ import com.amhapps.mtboracle.MTBOracleTextInput
 import com.amhapps.mtboracle.MTBOracleTheme
 import com.amhapps.mtboracle.WarningDialog
 
-abstract class BrandModelYearForm(private val navController: NavHostController, private var bikeData:BikeData,private val valuation:Boolean){
+abstract class BrandModelYearForm(private val navController: NavHostController, private var bikeData:BikeData,private val isValuation:Boolean){
     @Composable
-    abstract fun ShowForm()
+    abstract fun ShowForm() //TODO make this not abstract
         @Composable
-        open fun NextButton(brand:String,model:String,year:String,models:List<String>){
-            var numberErrorDialog by remember { mutableStateOf(false) }
-            Button(
-                onClick = {
-                    try{
-                        var yearInt:Int = -1
-                        if(year != "") yearInt = year.toInt()
-                        bikeData.brand = brand.trim()
-                        bikeData.model = model.trim()
-                        bikeData.year = yearInt
-                        navController.navigate(
-                            CategoryConditionCountryScreen(bikeData = bikeData),
-                            navOptions =  navOptions {
-                                restoreState = true
-                            }
-                        )
-                    }
-                    catch(e:NumberFormatException){
-                        numberErrorDialog = true
-                    }
-
-
-                },
-                colors = MTBOracleTheme.buttonColors,
-                modifier = Modifier
-                    .padding(0.dp,30.dp)
-                    .height(50.dp)
-                    .width(100.dp)
-            ){
-                Text(text = "Next",
-                    color = Color.White,
-                    fontSize = 20.sp)
-            }
-            if(numberErrorDialog){
-                WarningDialog(
-                    onConfirmation = {},
-                    dialogTitle = "Year must be a number",
-                    dialogText = "",
-                    confirmExists = false,
-                    dismissColor = MTBOracleTheme.colors.forestLight,
-                    alwaysDismiss = {numberErrorDialog = false}
-                )
-            }
-        }
+    abstract fun NextButton(brand:String,model:String,year:String,models:List<String>)
 
 }

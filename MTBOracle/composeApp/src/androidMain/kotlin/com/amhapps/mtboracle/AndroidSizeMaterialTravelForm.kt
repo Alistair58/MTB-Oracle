@@ -37,8 +37,7 @@ import kotlinx.coroutines.launch
 class AndroidSizeMaterialTravelForm(
     private val navController: NavHostController,
     private var bikeDataInput:AndroidBikeData,
-    private val isValuation:Boolean,
-    private val context: Context
+    private val isValuation:Boolean
 ) : SizeMaterialTravelForm(navController,bikeDataInput,isValuation) {
     @Composable
     override fun ShowForm(){
@@ -72,8 +71,8 @@ class AndroidSizeMaterialTravelForm(
                     bikeData.frontTravel = fTravelInt
                     bikeData.rearTravel = rTravelInt
                     bikeData.material = material
-                    if(bikeData.size=="" ||  bikeData.wheelSize=="" || bikeData.frontTravel==-1f
-                        || bikeData.rearTravel == -1f || material == "") lackOfInfo = true
+                    if(isValuation && (bikeData.size=="" ||  bikeData.wheelSize=="" || bikeData.frontTravel==-1f
+                        || bikeData.rearTravel == -1f || material == "")) lackOfInfo = true
                     else{
                         nextScreen = true
                     }
@@ -120,7 +119,6 @@ class AndroidSizeMaterialTravelForm(
     @Composable
     private fun NextScreen(bikeData: AndroidBikeData){
         //Can't cache here as the coroutine is destroyed when we navigate
-
         navController.navigate(
             if(isValuation)
                 AndroidValuationScreen(bikeData)

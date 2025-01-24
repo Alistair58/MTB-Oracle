@@ -230,14 +230,14 @@ val ebayCountryIdMap = hashMapOf( //Tested all on 13/1/25
     "Spain" to "EBAY_ES",
     "France" to "EBAY_FR",
     "United Kingdom UK" to "EBAY_GB",
-    "Hong Kong" to "EBAY_HK", //Not in my country list yet
+    "Hong Kong" to "EBAY_HK", //Not in dropdown
     "Ireland" to "EBAY_IE",
     "Italy" to "EBAY_IT",
     //"Malaysia" to "EBAY_MY", Not working but Malaysian eBay website does exist
     "Netherlands" to "EBAY_NL",
     //"Philippines" to "EBAY_PH", Not working but eBay website does exist
     "Poland" to "EBAY_PL",
-    "Singapore" to "EBAY_SG",
+    "Singapore" to "EBAY_SG", //Not in dropdown
     //"Thailand" to "EBAY_TH",
     //"Taiwan" to "EBAY_TW",
     "United States of America USA" to "EBAY_US",

@@ -90,7 +90,7 @@ class AndroidHomepage(private val navController: NavController,private val conte
         }
 
         Column {
-            Text("Recent Bikes", fontSize = 25.sp)
+            if(prevBikes.isNotEmpty()) Text("Recent Bikes", fontSize = 25.sp)
             for(bike in prevBikes){
                 RecentBike(bike)
             }

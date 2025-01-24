@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
                     val prevBikeData = it.savedStateHandle.get<AndroidBikeData>("bikeData")
                     val args = it.toRoute<AndroidSizeMaterialTravelScreen>()
                     val bikeData = prevBikeData ?: args.bikeData
-                    val form = AndroidSizeMaterialTravelForm(navController, bikeData,args.isValuation,context)
+                    val form = AndroidSizeMaterialTravelForm(navController, bikeData,args.isValuation)
                     form.ShowForm()
                 }
                 composable<AndroidValuationScreen>(

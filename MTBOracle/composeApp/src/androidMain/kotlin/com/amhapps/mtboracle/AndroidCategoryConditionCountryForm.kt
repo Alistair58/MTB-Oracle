@@ -20,7 +20,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.navOptions
 import com.amhapps.mtboracle.screens.CategoryConditionCountryForm
 
-class AndroidCategoryCountryConditionForm(private val navController: NavHostController, private var bikeDataInput:AndroidBikeData,private val isValuation:Boolean) : CategoryConditionCountryForm(navController,bikeDataInput,isValuation) {
+class AndroidCategoryCountryConditionForm(
+    private val navController: NavHostController,
+    private var bikeDataInput:AndroidBikeData,
+    private val isValuation:Boolean
+) : CategoryConditionCountryForm(navController,bikeDataInput,isValuation) {
     @Composable
     override fun ShowForm(){
         BackHandler {
@@ -41,7 +45,7 @@ class AndroidCategoryCountryConditionForm(private val navController: NavHostCont
                 bikeData.category = category.trim()
                 bikeData.condition = condition.trim()
                 bikeData.country = country.trim()
-                if(bikeData.category=="" ||  bikeData.condition=="" || bikeData.country=="") lackOfInfo = true
+                if(isValuation && (bikeData.category=="" ||  bikeData.condition=="" || bikeData.country=="")) lackOfInfo = true
                 else{
                     navController.navigate(
                         AndroidSizeMaterialTravelScreen(bikeData,isValuation),

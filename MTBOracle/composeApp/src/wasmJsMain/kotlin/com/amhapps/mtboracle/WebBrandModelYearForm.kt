@@ -1,6 +1,5 @@
 package com.amhapps.mtboracle
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -25,10 +24,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.navOptions
 import com.amhapps.mtboracle.screens.BrandModelYearForm
 
-class AndroidBrandModelYearForm(
+class WebBrandModelYearForm(
     private val navController: NavHostController,
-    private var bikeDataInput:AndroidBikeData,
-    private val androidDataset: AndroidDataset,
+    private var bikeDataInput:WebBikeData,
+    //private val androidDataset: WebDataset,
     private val isValuation:Boolean):
     BrandModelYearForm(navController,bikeDataInput,isValuation){
 
@@ -45,9 +44,9 @@ class AndroidBrandModelYearForm(
                 alwaysDismiss = {showAlert = false}
             )
         }
-        BackHandler {
+        /*BackHandler {
             showAlert = !showAlert
-        }
+        }*/
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
@@ -56,12 +55,13 @@ class AndroidBrandModelYearForm(
         ) {
 
             var brand by remember { mutableStateOf(bikeDataInput.brand) }
-            var models by remember { mutableStateOf(androidDataset.findModels(brand.trim())) }
+            //TODO var models by remember { mutableStateOf(androidDataset.findModels(brand.trim())) }
+            var models by remember { mutableStateOf(listOf("Model 1","Model 2")) }
             MTBOracleTextInput(
                 value = brand,
                 onValueChange = {
                     brand = it
-                    models = androidDataset.findModels(it.trim())
+                    //TODO models = androidDataset.findModels(it.trim())
                 },
                 label = { Text("Brand:") },
                 modifier = Modifier
@@ -101,8 +101,9 @@ class AndroidBrandModelYearForm(
 
         }
     }
+
     @Composable
-    override fun NextButton(brand:String,model:String,year:String,models:List<String>){
+    override fun NextButton(brand: String, model: String, year: String, models: List<String>) {
         val bikeData by remember { mutableStateOf(bikeDataInput) }
         var numberErrorDialog by remember { mutableStateOf(false) }
         var lackOfInfo by remember { mutableStateOf(false) }
@@ -119,7 +120,7 @@ class AndroidBrandModelYearForm(
                     if(isValuation && !models.contains(bikeData.model)) unknownModel = true
                     if(!unknownModel && !lackOfInfo){
                         navController.navigate(
-                            AndroidCategoryConditionCountryScreen(bikeData = bikeData,isValuation),
+                            WebCategoryConditionCountryScreen(bikeData = bikeData,isValuation),
                             navOptions =  navOptions {
                                 restoreState = true
                             }
@@ -162,11 +163,11 @@ class AndroidBrandModelYearForm(
             WarningDialog(
                 onConfirmation = {
                     navController.navigate(
-                        AndroidCategoryConditionCountryScreen(bikeData = bikeData,isValuation),
+                        WebCategoryConditionCountryScreen(bikeData = bikeData,isValuation),
                         navOptions =  navOptions {
                             restoreState = true
                         }
-                ) },
+                    ) },
                 dialogTitle = "Warning",
                 dialogText = warningText,
                 confirmExists = true,
@@ -179,5 +180,4 @@ class AndroidBrandModelYearForm(
             )
         }
     }
-
 }

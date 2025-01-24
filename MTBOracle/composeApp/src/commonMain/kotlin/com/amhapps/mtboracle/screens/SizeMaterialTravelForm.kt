@@ -27,7 +27,7 @@ import com.amhapps.mtboracle.MTBOracleTextInput
 import com.amhapps.mtboracle.MTBOracleTheme
 import com.amhapps.mtboracle.ValuationScreen
 
-abstract class SizeMaterialTravelForm(private val navController: NavHostController, private val bikeData: BikeData,private val valuation:Boolean){
+abstract class SizeMaterialTravelForm(private val navController: NavHostController, private val bikeData: BikeData,private val isValuation:Boolean){
     @Composable
     open fun ShowForm(){
         Column(
@@ -46,7 +46,7 @@ abstract class SizeMaterialTravelForm(private val navController: NavHostControll
                 modifier = Modifier.padding(0.dp,20.dp)
             )
 
-            val wSizes = listOf("<16\"","20\"","24\"","26\"","27.5\"/650B","29\"","650C","700C")
+            val wSizes = listOf("<16\"","20\"","24\"","26\"","27.5\"/650B","29\"","29\" Front 27.5\" Rear","650C","700C","Other")
             var wSize by remember { mutableStateOf(bikeData.wheelSize) }
             CompleteDropdown(wSize,
                 onDropdownClick = { wSize = it },
