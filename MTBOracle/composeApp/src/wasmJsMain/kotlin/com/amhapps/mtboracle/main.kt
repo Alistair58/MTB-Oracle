@@ -38,7 +38,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mtboracle.composeapp.generated.resources.Res
-import mtboracle.composeapp.generated.resources.transparent_mtb_oracle_bike_v2
+import mtboracle.composeapp.generated.resources.MTB_Oracle_Bike_V3
 import org.jetbrains.compose.resources.painterResource
 import kotlin.reflect.typeOf
 
@@ -50,89 +50,6 @@ fun main() {
 }
 
 @Composable
-fun temp(){
-    MTBOracleTheme{
-        val colorStops = arrayOf(
-            0.0f to Color.DarkGray,
-            0.3f to MTBOracleTheme.colors.forest,
-            1f to MTBOracleTheme.colors.forestLight
-        )
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ){
-            BoxWithConstraints(
-                contentAlignment = Alignment.TopCenter,
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-            {
-                Column (modifier = Modifier
-                    .background(Brush.verticalGradient(colorStops = colorStops))
-                    .height(200.dp)
-                    .fillMaxWidth()
-                ){} //Matches the spacer
-                Text(text="MTB Oracle",
-                    color= Color.White,
-                    fontSize = 40.sp,
-                    modifier = Modifier.zIndex(2f))
-                Column(modifier = Modifier.zIndex(2f)){
-                    Spacer(modifier = Modifier
-                        .height(40.dp)
-                        .width(0.dp))
-                    Image(
-                        painter = painterResource(Res.drawable.transparent_mtb_oracle_bike_v2),
-                        contentDescription = "Logo",
-                        modifier = Modifier
-                            .height(300.dp) //Bigger than the mobile one - so that it overlaps properly
-                            .width(355.dp)
-                            .zIndex(3f) //Will be drawn on top of everything else
-                    )
-
-                }
-                Column{
-                    Spacer(modifier = Modifier
-                        .height(200.dp)
-                        .width(0.dp)) //Box means everything would overlap otherwise
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .background(color = Color.White)
-                            .fillMaxSize()
-                            .padding(5.dp,0.dp)){
-                        Spacer(modifier = Modifier
-                            .height(20.dp)
-                            .width(0.dp))
-                        HomepageBody()
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun HomepageBody(){
-    Text(text="Mountain Bike Valuations",
-        color=Color.Black,
-        fontSize = 30.sp)
-    Spacer(modifier = Modifier
-        .height(40.dp)
-        .width(0.dp))
-    //ValuationButton()
-    Spacer(modifier = Modifier
-        .height(20.dp)
-        .width(0.dp))
-    //SimilarBikesButton()
-    Spacer(modifier = Modifier
-        .height(20.dp)
-        .width(0.dp))
-    //RecentBikes()
-
-}
-
-@Composable
 fun WebApp(){
     MTBOracleTheme {
         val navController = rememberNavController()
@@ -141,19 +58,23 @@ fun WebApp(){
             startDestination = WebHomeScreen
         ) {
             composable<WebHomeScreen> {
-                Text("Navigation,text and images work", color = Color.Black)
-                //TODO navigation is the problems
-                //val homepage = WebHomepage(navController)
-                //homepage.ShowHomepage()
+                val homepage = WebHomepage(navController)
+                homepage.ShowHomepage()
+                //When you have just this destination and text it works
+                //Images also work
             }
-            composable<WebBrandModelYearScreen> {
+            /*composable<WebBrandModelYearScreen>(
+                typeMap = mapOf(
+                    typeOf<WebBikeData>() to WebBikeDataObject.bikeData
+                )
+            ){
                 val args = it.toRoute<WebBrandModelYearScreen>()
                 val form = WebBrandModelYearForm(navController,args.bikeData,args.isValuation)
                 form.ShowForm()
             }
             composable<WebCategoryConditionCountryScreen>(
                 typeMap = mapOf(
-                    typeOf<BikeData>() to BikeDataObject.bikeData
+                    typeOf<WebBikeData>() to WebBikeDataObject.bikeData
                 )
             ) {
                 val args = it.toRoute<WebCategoryConditionCountryScreen>()
@@ -162,13 +83,13 @@ fun WebApp(){
             }
             composable<WebSizeMaterialTravelScreen>(
                 typeMap = mapOf(
-                    typeOf<BikeData>() to BikeDataObject.bikeData
+                    typeOf<BikeData>() to WebBikeDataObject.bikeData
                 )
             ) {
                 val args = it.toRoute<WebSizeMaterialTravelScreen>()
                 val form = WebSizeMaterialTravelForm(navController, args.bikeData,args.isValuation)
                 form.ShowForm()
-            }
+            }*/
 //            composable<ValuationScreen>{
 //                val args = it.toRoute<ValuationScreen>()
 //                val form = SizeMaterialTravelForm(navController,args.bikeData)
@@ -179,26 +100,28 @@ fun WebApp(){
 }
 
 @Serializable
-object BikeDataObject {
-    val bikeData = object : NavType<BikeData>(isNullableAllowed = false) {
-        override fun get(bundle: Bundle, key: String): BikeData? {
+object WebBikeDataObject {
+    val bikeData = object : NavType<WebBikeData>(isNullableAllowed = false) {
+        override fun get(bundle: Bundle, key: String): WebBikeData? {
             return Json.decodeFromString(bundle.getString(key) ?: return null)
         }
 
-        override fun parseValue(value: String): BikeData {
+        override fun parseValue(value: String): WebBikeData {
             return Json.decodeFromString(value)
         }
 
-        override fun put(bundle: Bundle, key: String, value: BikeData) {
+        override fun put(bundle: Bundle, key: String, value: WebBikeData) {
             bundle.putString(key, Json.encodeToString(value))
         }
 
-        override fun serializeAsValue(value: BikeData): String {
+        override fun serializeAsValue(value: WebBikeData): String {
             return Json.encodeToString(value)
         }
 
     }
 }
+
+
 
 @Serializable
 object WebHomeScreen

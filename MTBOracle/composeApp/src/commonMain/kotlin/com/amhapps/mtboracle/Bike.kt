@@ -18,6 +18,7 @@ interface  BikeData { //needs to be Serializable AND Parcelable in Android
     var country: String
     var price:String
     fun isSameBike(bikeData: BikeData):Boolean
+    fun clone():BikeData
 }
 
 abstract class Bike(

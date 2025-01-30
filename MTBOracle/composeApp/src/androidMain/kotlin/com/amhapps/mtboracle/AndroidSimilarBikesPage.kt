@@ -33,6 +33,10 @@ class AndroidSimilarBikesPage(private val navController: NavController,private v
         return AndroidHomeScreen
     }
 
+    override fun platformHomeScreenDisplayName(): String {
+        return "AndroidHomeScreen"
+    }
+
     override fun back() {
         navController.previousBackStackEntry
             ?.savedStateHandle

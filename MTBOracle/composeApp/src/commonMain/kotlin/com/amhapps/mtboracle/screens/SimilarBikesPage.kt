@@ -64,7 +64,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import mtboracle.composeapp.generated.resources.Res
-import mtboracle.composeapp.generated.resources.transparent_mtb_oracle_bike_v2
+import mtboracle.composeapp.generated.resources.MTB_Oracle_Bike_V3
 import org.jetbrains.compose.resources.painterResource
 import kotlin.math.abs
 import kotlin.math.floor
@@ -213,19 +213,34 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                      onStatusChange:(Int)->Unit,
                      valuation:Boolean){
         if(status and 0x2 == 0x2 && !valuation){ //Don't prevent the user seeing the valuation if the similar bikes don't load
-            WarningDialog(
-                confirmText = "Back",
-                onConfirmation = { back() },
-                dismissText = "Home",
-                alwaysDismiss = {},
-                explicitDismiss = { navController.popBackStack(platformHomeScreen(),false) },
-                dialogTitle = "No Bikes Found",
-                dialogText = "We could not find any bikes that matched the details you provided.\nChanging the model name to something broader may yield more results.",
-                confirmationColor = MTBOracleTheme.colors.forestLight,
-                dismissColor = Color.Gray
-            )
+            println("Display name "+navController.previousBackStackEntry?.destination?.route)
+            if(navController.previousBackStackEntry?.destination?.displayName == platformHomeScreenDisplayName()::class.qualifiedName){
+                //No back button if we have come from the homepage
+                WarningDialog(
+                    onConfirmation = { },
+                    dismissText = "Home",
+                    dialogTitle = "No Bikes Found",
+                    dialogText = "We could not find any bikes that matched the details you provided.",
+                    confirmExists = false,
+                    dismissColor = MTBOracleTheme.colors.forestLight,
+                    alwaysDismiss = {navController.popBackStack() }
+                )
+            }
+            else {
+                WarningDialog(
+                    confirmText = "Back",
+                    onConfirmation = { back() },
+                    dismissText = "Home",
+                    alwaysDismiss = {},
+                    explicitDismiss = { navController.popBackStack(platformHomeScreen(), false) },
+                    dialogTitle = "No Bikes Found",
+                    dialogText = "We could not find any bikes that matched the details you provided.\nChanging the model name to something broader may yield more results.",
+                    confirmationColor = MTBOracleTheme.colors.forestLight,
+                    dismissColor = Color.Gray
+                )
+            }
         }
-        if(status >= 0x10){
+        else if(status >= 0x10){
             WarningDialog(
                 confirmText = "Retry",
                 onConfirmation = {onStatusChange(0x8)}, //retry and clear rest of status
@@ -489,7 +504,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                     loading = {
                         CircularProgressIndicator()
                     },
-                    error = {painterResource(Res.drawable.transparent_mtb_oracle_bike_v2)},
+                    error = {painterResource(Res.drawable.MTB_Oracle_Bike_V3)},
                     onError = { println(it.result.toString()) },
                     contentDescription = bikeData.title+" image",
                     modifier = Modifier
@@ -535,6 +550,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
         }
     }
     abstract fun platformHomeScreen():Any
+    abstract fun platformHomeScreenDisplayName():String
     abstract fun back()
     protected abstract suspend fun cacheBike(bikeData: BikeData)
 }

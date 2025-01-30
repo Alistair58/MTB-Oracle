@@ -109,7 +109,7 @@ class AndroidValuationPage(navController: NavHostController, private val bikeDat
             },
             colors = MTBOracleTheme.buttonColors,
             modifier = Modifier
-                .padding(0.dp, 30.dp)
+                .padding(0.dp, 10.dp)
                 .width(200.dp)
                 .height(60.dp)
         ){

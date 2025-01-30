@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.navigation.NavController
@@ -42,7 +43,7 @@ class AndroidHomepage(private val navController: NavController,private val conte
             },
             colors = MTBOracleTheme.buttonColors,
             ){
-            Text(text = "Value my bike",
+            Text(text = "Value a bike",
                 color = Color.White,
                 fontSize = 30.sp)
         }
@@ -58,7 +59,7 @@ class AndroidHomepage(private val navController: NavController,private val conte
             },
             colors = MTBOracleTheme.buttonColors,
         ){
-            Text(text = "See Similar Bikes",
+            Text(text = "Find Similar Bikes",
                 color = Color.White,
                 fontSize = 30.sp)
         }
@@ -89,10 +90,52 @@ class AndroidHomepage(private val navController: NavController,private val conte
             }
         }
 
-        Column {
+        Column{
             if(prevBikes.isNotEmpty()) Text("Recent Bikes", fontSize = 25.sp)
             for(bike in prevBikes){
                 RecentBike(bike)
+            }
+        }
+    }
+
+    @Composable
+    override fun removeRecentBike(bikeData: BikeData) {
+        val scope = rememberCoroutineScope()
+        LaunchedEffect(true) {
+            scope.launch {
+                val builder = GsonBuilder()
+                val gson: Gson = builder.create()
+                val keyStrs = listOf("bike0", "bike1", "bike2", "bike3", "bike4")
+                val keys = keyStrs.map { str -> stringPreferencesKey(str) }
+                    .reversed() //we want bike 4 first
+                println("Before flow")
+                val prevBikesFlow: Flow<Preferences.Key<String>> = context.prevBikesDataStore.data
+                    .map { preferences ->
+                        var theKey:Preferences.Key<String> = stringPreferencesKey("")
+                        for (key in keys) {
+                            println("Key $key")
+                            if (preferences[key] != null) {
+
+                                val recentBike =
+                                    gson.fromJson(preferences[key], AndroidBikeData::class.java)
+                                println("Key exists $key ${recentBike.brand} ${recentBike.model}")
+                                if (recentBike.isSameBike(bikeData)) {
+                                    println("Found key $key")
+                                    theKey = key
+                                    break
+                                }
+                            }
+                        }
+                        println("In flow $theKey")
+                        theKey
+                    }
+                val keyToRemove = prevBikesFlow.first()
+                println("After flow")
+                context.prevBikesDataStore.edit{ storedBikes ->
+                    storedBikes.remove(keyToRemove)
+                    println("Removed $keyToRemove")
+                }
+
             }
         }
     }

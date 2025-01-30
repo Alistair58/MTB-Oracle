@@ -61,39 +61,23 @@ abstract class EbaySearcher {
             }
         }
         println(sortBy)
-        val response =
+        var bikes =
             searchBikes(client,accessToken, bikeData, offset ?: 0,sortBy)
-        println("Got response")
-        println(response)
-        val bikes = mutableListOf<EbayBikeData>()
-        if (response.status.value in 200..299) {
-            val bikeResponse: BikeResponse = response.body()
-            val ebayBikes = bikeResponse.itemSummaries ?: emptyList()
 
-            for (ebayBike in ebayBikes) {
-                bikes.add(
-                    EbayBikeData(
-                        title = ebayBike.title,
-                        price = ebayBike.price?.value + " " + ebayBike.price?.currency,
-                        condition = ebayBike.condition,
-                        imageUrl = ebayBike.image?.imageUrl,
-                        itemWebUrl = ebayBike.itemWebUrl,
-                        city = ebayBike.itemLocation?.city,
-                        country = ebayBike.itemLocation?.country
-                    )
-                )
+            if(offset == 0 && bikes.isEmpty()){ //Try again with looser search criteria
+                println("No similar bikes found")
+                println("Searching broader bikes")
+                val broaderBikes = bikeData.clone()
+                broaderBikes.size = "" //Not a very important fields
+                broaderBikes.material = ""
+                broaderBikes.frontTravel = -1f
+                broaderBikes.rearTravel = -1f
+                bikes = searchBikes(client,accessToken,broaderBikes,0,sortBy)
+
             }
-            println("Response " + bikeResponse.toString())
-            println("Ebay bikes " + ebayBikes.toString())
-        }
-        else {
-            throw EbayResponseException(response.status.value)
-        }
-
-        return bikes.toList()
+        return bikes
 
     }
-
 
     suspend fun getAccessToken(client: HttpClient): HttpResponse {
         val accessBuilder = HttpRequestBuilder()
@@ -119,7 +103,8 @@ abstract class EbaySearcher {
         bikeData: BikeData,
         offset: Int,
         sortBy: String
-    ): HttpResponse {
+    ): List<EbayBikeData> {
+
         println("Searching bikes")
         val bikeReqBuilder = HttpRequestBuilder()
         val encodedCondition = when (bikeData.condition) { //most bikes seem to just say used
@@ -154,7 +139,6 @@ abstract class EbaySearcher {
                 if (bikeData.rearTravel > 0f) "Full%20Suspension%20%28Front%20%26%20Rear%29"
                 else "Front"
             } else ""
-        println(bikeData.country)
         val countryId:String = ebayCountryIdMap[bikeData.country]?:"EBAY_US"
 
         var searchTerm = ""
@@ -186,7 +170,34 @@ abstract class EbaySearcher {
             append("X-EBAY-C-MARKETPLACE-ID",
                 countryId)
         }
-        return client.get(bikeReqBuilder)
+        val response = client.get(bikeReqBuilder)
+        println("Got response")
+        println(response)
+        val bikes = mutableListOf<EbayBikeData>()
+        if (response.status.value in 200..299) {
+            val bikeResponse: BikeResponse = response.body()
+            val ebayBikes = bikeResponse.itemSummaries ?: emptyList()
+
+            for (ebayBike in ebayBikes) {
+                bikes.add(
+                    EbayBikeData(
+                        title = ebayBike.title,
+                        price = ebayBike.price?.value + " " + ebayBike.price?.currency,
+                        condition = ebayBike.condition,
+                        imageUrl = ebayBike.image?.imageUrl,
+                        itemWebUrl = ebayBike.itemWebUrl,
+                        city = ebayBike.itemLocation?.city,
+                        country = ebayBike.itemLocation?.country
+                    )
+                )
+            }
+            println("Response " + bikeResponse.toString())
+            println("Ebay bikes " + ebayBikes.toString())
+        }
+        else {
+            throw EbayResponseException(response.status.value) //Needs to be handled by caller
+        }
+        return bikes.toList()  //mutable to regular list
     }
 
     abstract suspend fun getCachedToken():String

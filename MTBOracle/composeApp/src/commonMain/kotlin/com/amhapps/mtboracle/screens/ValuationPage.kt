@@ -59,7 +59,7 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
         Row(
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier
-                .padding(5.dp,5.dp,0.dp,10.dp)
+                .padding(5.dp,5.dp,0.dp,5.dp)
         ){
             Text("Price Estimation",
                 fontSize = 40.sp,
@@ -70,11 +70,12 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
         ) {
             Row(){
                 println("Similar bikes median: $similarBikesMedian")
+                val nnValuation = valuation()
                 val valuation:Int = if(similarBikesMedian > 0f) {
-                    (round((nnWeight * valuation()) * exchangeRate) + (1 - nnWeight) * similarBikesMedian).toInt() //SimilarBikesMedian is already in local currency
+                    (round((nnWeight * nnValuation) * exchangeRate) + (1 - nnWeight) * similarBikesMedian).toInt() //SimilarBikesMedian is already in local currency
                 }
                 else{
-                    (round(valuation()* exchangeRate)).toInt()
+                    (round(nnValuation* exchangeRate)).toInt()
                 }
 
 
@@ -99,7 +100,7 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
                     fontSize = 40.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
-                        .padding(40.dp, 30.dp)
+                        .padding(20.dp, 10.dp)
                 )
             }
 
@@ -113,7 +114,7 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
 
                 Column(modifier = Modifier.fillMaxWidth(0.8f),
                     horizontalAlignment = Alignment.CenterHorizontally) {
-                    Spacer(modifier = Modifier.height(10.dp))
+                    //Spacer(modifier = Modifier.height(10.dp))
                     DropdownText(title = "Note About Accuracy",
                         body = "The price given is only an estimate. "+
                                 "\n\nMTB Oracle uses a machine learning model along with similar bikes to predict a price for your mountain bike. "+
@@ -126,7 +127,7 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
                                 "The only information about your bike that the model is given are the inputs you entered. "+
                                 "If your information is incorrect, the valuation will be incorrect. "+
                                 "E.g. putting in no values gives a price of 2000 GBP as this is the median used MTB price.")
-                    Spacer(modifier = Modifier.height(20.dp))
+                    //Spacer(modifier = Modifier.height(20.dp))
                 }
             }
 

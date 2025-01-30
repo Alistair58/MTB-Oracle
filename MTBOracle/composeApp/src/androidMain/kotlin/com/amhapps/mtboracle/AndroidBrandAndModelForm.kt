@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.navOptions
+import capitalise
 import com.amhapps.mtboracle.screens.BrandModelYearForm
 
 class AndroidBrandModelYearForm(
@@ -65,7 +66,7 @@ class AndroidBrandModelYearForm(
                 },
                 label = { Text("Brand:") },
                 modifier = Modifier
-                    .padding(0.dp, 20.dp)
+                    .padding(0.dp, 10.dp,0.dp,10.dp)
             )
             var model by remember { mutableStateOf(bikeDataInput.model) }
 
@@ -75,7 +76,7 @@ class AndroidBrandModelYearForm(
                 onDropdownClick = { model = it },
                 label = "Model:",
                 modifier = Modifier
-                    .padding(0.dp, 20.dp),
+                    .padding(0.dp, 10.dp,0.dp,20.dp),
                 items = models,
             )
             var year by remember { mutableStateOf(if (bikeDataInput.year != -1) bikeDataInput.year.toString() else "") }
@@ -115,8 +116,9 @@ class AndroidBrandModelYearForm(
                     bikeData.brand = brand.trim()
                     bikeData.model = model.trim()
                     bikeData.year = yearInt
+                    val capitalModel = capitalise(listOf(bikeData.model))[0]
                     if(isValuation && (bikeData.year ==-1 ||  bikeData.brand=="" || bikeData.model=="")) lackOfInfo = true
-                    if(isValuation && !models.contains(bikeData.model)) unknownModel = true
+                    if(isValuation && !models.contains(capitalModel)) unknownModel = true
                     if(!unknownModel && !lackOfInfo){
                         navController.navigate(
                             AndroidCategoryConditionCountryScreen(bikeData = bikeData,isValuation),

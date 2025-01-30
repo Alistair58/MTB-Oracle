@@ -12,6 +12,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,10 +55,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
@@ -66,6 +69,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -146,9 +150,10 @@ fun MTBOracleTextInput(  //has correct colouring, rounded corners and removed so
     readOnly :Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions(),
-    singleLine: Boolean = false,
+    singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
-    minLines: Int = 1
+    minLines: Int = 1,
+    onClick: () -> Unit = {}
 ){
     val selectionColors = TextSelectionColors(
         backgroundColor = MTBOracleTheme.colors.forestLight,
@@ -162,6 +167,16 @@ fun MTBOracleTextInput(  //has correct colouring, rounded corners and removed so
             onValueChange = onValueChange,
             modifier = modifier,
             label = label,
+            interactionSource = remember { MutableInteractionSource() }
+                .also { interactionSource -> //Clickable doesn't work for text input unless you disable it
+                    LaunchedEffect(interactionSource) { //But this does
+                        interactionSource.interactions.collect {
+                            if (it is PressInteraction.Release) {
+                                onClick()
+                            }
+                        }
+                    }
+                },
             trailingIcon = trailingIcon,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
@@ -206,8 +221,8 @@ fun CompleteDropdown(
                     // This value is used to assign to
                     // the DropDown the same width
                     dropDownSize = coordinates.size.toSize()
-                }
-                .clickable { dropDownExpanded = !dropDownExpanded },
+                },
+            onClick = {dropDownExpanded = !dropDownExpanded;println("clicked")},
             label = { Text(label) },
             readOnly = true,
             trailingIcon = {
@@ -236,6 +251,8 @@ fun CompleteDropdown(
         }
     }
 }
+
+
 
 @Composable
 fun SearchableDropdown(
@@ -282,9 +299,9 @@ fun SearchableDropdown(
                     // the DropDown the same width
                     dropDownSize = coordinates.size.toSize()
                 },
-                //.clickable { dropDownExpanded = !dropDownExpanded },
             label = { Text(label) },
-            readOnly = false
+            readOnly = false,
+            onClick = {dropDownExpanded = !dropDownExpanded;println("clicked")}
         )
         DropdownMenu(
             expanded = dropDownExpanded,
@@ -347,15 +364,15 @@ fun WarningDialog(
             }
         },
         dismissButton = {
-            TextButton(
-                onClick = {
-                     alwaysDismiss() ; explicitDismiss()
-                },
-                modifier = Modifier
-                    .background(color=dismissColor)
-            ) {
-                Text(dismissText,color=Color.White)
-            }
+                TextButton(
+                    onClick = {
+                        alwaysDismiss() ; explicitDismiss()
+                    },
+                    modifier = Modifier
+                        .background(color=dismissColor)
+                ) {
+                    Text(dismissText,color=Color.White)
+                }
         },
         modifier = modifier
     )
@@ -438,7 +455,6 @@ fun BikeInputDisplay(bikeData:BikeData){
                 SpecText("Category: ",bikeData.category)
                 SpecText("Condition: ",bikeData.condition)
                 SpecText("Size: ",bikeData.size)
-
             }
             Column(
                 modifier = Modifier

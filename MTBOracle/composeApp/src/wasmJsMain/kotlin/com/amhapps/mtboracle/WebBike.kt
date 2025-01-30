@@ -26,6 +26,11 @@ class WebBikeData (
                 frontTravel==bikeData.frontTravel && rearTravel==bikeData.rearTravel &&
                 country==bikeData.country
     }
+    override fun clone():BikeData{
+        return WebBikeData(this.year,this.brand,this.model,this.category,
+            this.condition,this.size,this.wheelSize,this.material,this.rearTravel,
+            this.frontTravel,this.country,this.price)
+    }
     companion object{ //static
         fun fromBikeData(bikeData: BikeData):WebBikeData{
             return WebBikeData(

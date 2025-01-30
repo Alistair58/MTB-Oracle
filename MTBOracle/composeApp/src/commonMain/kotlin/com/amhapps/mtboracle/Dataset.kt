@@ -15,32 +15,32 @@ abstract class Dataset {
 
     fun getExchangeRate(currency: String): Float {
         if (currency == "GBP") return 1f
-        val query:Float? = exchangeRates.get(currency)
+        val query: Float? = exchangeRates.get(currency)
         //Elvis operator - Checks for nullability. If not null, returns value. If null, returns -1
         return query ?: -1f
     }
 
     fun getCountryStats(rawCountry: String): ArrayList<Float> {
-        var country = when(rawCountry){
-            "United Kingdom UK"->"united kingdom" //Only edge cases 23/01/25
-            "United States of America USA"->"united states"
+        var country = when (rawCountry) {
+            "United Kingdom UK" -> "united kingdom" //Only edge cases 23/01/25
+            "United States of America USA" -> "united states"
             else -> rawCountry
         }
         country = country.lowercase()
-        val stats: ArrayList<Float> = countryStats!![country]?:ArrayList<Float>()
+        val stats: ArrayList<Float> = countryStats!![country] ?: ArrayList<Float>()
         if (stats.size == 0) {
             println("Could not get stats for $country")
-            return modelStats!![""]!![""]?:ArrayList<Float>()
+            return modelStats!![""]!![""] ?: ArrayList<Float>()
         }
         return stats
     }
 
-    fun getBrandStats(brand: String):ArrayList<Float> {
+    fun getBrandStats(brand: String): ArrayList<Float> {
         var brand = brand
         brand = brand.lowercase()
         val brandStats: Map<String, ArrayList<Float>>? = modelStats!![brand]
-        return if (null == brandStats) modelStats!![""]!![""]?:ArrayList<Float>()
-        else brandStats[""]?:ArrayList<Float>() //It won't be null
+        return if (null == brandStats) modelStats!![""]!![""] ?: ArrayList<Float>()
+        else brandStats[""] ?: ArrayList<Float>() //It won't be null
     }
 
     fun getModelStats(brand: String, model: String): ArrayList<Float> {
@@ -49,7 +49,8 @@ abstract class Dataset {
         brand = brand.lowercase() //If it wasn't already
         model = model.lowercase()
         val brandStats: Map<String, ArrayList<Float>>? = modelStats!![brand]
-        if (null == brandStats) return modelStats!![""]!![""]?:ArrayList<Float>() //It won't be null - average stats across everything
+        if (null == brandStats) return modelStats!![""]!![""]
+            ?: ArrayList<Float>() //It won't be null - average stats across everything
         else {
             val stats: ArrayList<Float>? = brandStats[model]
             if (null == stats) { //if model doesn't exist
@@ -62,15 +63,17 @@ abstract class Dataset {
                 var similarCount = 0
                 val similarStats: ArrayList<ArrayList<Float>> =
                     ArrayList<ArrayList<Float>>(
-                            arrayListOf( ArrayList<Float>(),
+                        arrayListOf(
                             ArrayList<Float>(),
                             ArrayList<Float>(),
                             ArrayList<Float>(),
                             ArrayList<Float>(),
-                            ArrayList<Float>())
+                            ArrayList<Float>(),
+                            ArrayList<Float>()
+                        )
                     ) //medians are better than means - despite the faf
                 for (otherModel in brandStats.keys) {
-                    val otherStats: ArrayList<Float> = brandStats[otherModel]?:ArrayList<Float>()
+                    val otherStats: ArrayList<Float> = brandStats[otherModel] ?: ArrayList<Float>()
                     if (otherModel.startsWith(firstWord)) { // && (Math.abs(initialValuation-otherStats.get(2))*100/initialValuation)<100){
                         for (i in similarStats.indices) {
                             similarStats.get(i).add(otherStats.get(i))
@@ -78,7 +81,7 @@ abstract class Dataset {
                         similarCount++
                     }
                 }
-                if (similarCount == 0) return brandStats[""]?:ArrayList<Float>()
+                if (similarCount == 0) return brandStats[""] ?: ArrayList<Float>()
                 val medianStats: ArrayList<Float> = ArrayList<Float>(
                     mutableListOf<Float>(0f, 0f, 0f, 0f, 0f, 0f)
                 )
@@ -107,5 +110,22 @@ abstract class Dataset {
         }
     }
 
+}
 
+fun capitalise(inp: List<String>):List<String>{
+    val result:MutableList<String> = mutableListOf()
+    for(item in inp){ //Removes previous uppercasing
+        val splitted: MutableList<String> = item.lowercase().split(" ").toMutableList()
+        splitted.forEachIndexed { i,word ->
+            if(word.length >1){
+                splitted[i] = word.substring(0, 1).uppercase() + word.substring(1)
+            }
+            else{
+                splitted[i] = word.uppercase()
+            }
+        }
+        val newItem = splitted.joinToString(separator = " ")
+        result.add(newItem)
+    }
+    return result
 }

@@ -35,6 +35,11 @@ class AndroidBikeData (
                 frontTravel==bikeData.frontTravel && rearTravel==bikeData.rearTravel &&
                 country==bikeData.country
     }
+    override fun clone():BikeData{
+        return AndroidBikeData(this.year,this.brand,this.model,this.category,
+            this.condition,this.size,this.wheelSize,this.material,this.rearTravel,
+            this.frontTravel,this.country,this.price)
+    }
     companion object{ //static
         fun fromBikeData(bikeData: BikeData):AndroidBikeData{
             return AndroidBikeData(
@@ -73,7 +78,7 @@ class AndroidBike(val bikeData: BikeData,val d:AndroidDataset): Bike(bikeData) {
             nnModel +=" "+ bikeData.model
         }
         var modelWords = nnModel.split(" ")
-        if(modelWords.size > 2) nnModel = modelWords.slice(0..1).joinToString(" ")
+        if(modelWords.size > 2) nnModel = modelWords.slice(0..2).joinToString(" ").trim()
         //everything (as of 28/12/24) in the dataset is a max of 2 words
         brandInfo = d.getBrandStats(nnBrand.lowercase().trim()) //min,LQ,median,UQ,max,SD
         modelInfo = d.getModelStats(nnBrand.lowercase().trim(), nnModel.lowercase().trim())

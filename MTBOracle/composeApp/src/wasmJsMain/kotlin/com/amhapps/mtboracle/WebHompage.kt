@@ -15,7 +15,7 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.amhapps.mtboracle.screens.Homepage
 import mtboracle.composeapp.generated.resources.Res
-import mtboracle.composeapp.generated.resources.transparent_mtb_oracle_bike_v2
+import mtboracle.composeapp.generated.resources.MTB_Oracle_Bike_V3
 import org.jetbrains.compose.resources.painterResource
 
 class WebHomepage(private var navController: NavController) : Homepage(navController){
@@ -48,7 +48,7 @@ class WebHomepage(private var navController: NavController) : Homepage(navContro
     @Composable
     override fun cartoonBike(){
         Image(
-            painter = painterResource(Res.drawable.transparent_mtb_oracle_bike_v2),
+            painter = painterResource(Res.drawable.MTB_Oracle_Bike_V3),
             contentDescription = "Logo",
             modifier = Modifier
                 .height(300.dp) //Bigger than the mobile one - so that it overlaps properly

@@ -2,6 +2,7 @@ package com.amhapps.mtboracle
 
 import Dataset
 import android.content.Context
+import capitalise
 
 class AndroidDataset(private val context: Context):Dataset() {
     init {
@@ -99,21 +100,5 @@ class AndroidDataset(private val context: Context):Dataset() {
 
     }
 
-    private fun capitalise(inp: List<String>):List<String>{
-        val result:MutableList<String> = mutableListOf()
-        for(item in inp){
-            val splitted: MutableList<String> = item.split(" ").toMutableList()
-            splitted.forEachIndexed { i,word ->
-                if(word.length >1){
-                    splitted[i] = word.substring(0, 1).uppercase() + word.substring(1)
-                }
-                else{
-                    splitted[i] = word.uppercase()
-                }
-            }
-            val newItem = splitted.joinToString(separator = " ")
-            result.add(newItem)
-        }
-        return result
-    }
+
 }
