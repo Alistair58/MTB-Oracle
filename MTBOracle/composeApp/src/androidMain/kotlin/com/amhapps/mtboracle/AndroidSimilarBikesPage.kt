@@ -34,7 +34,7 @@ class AndroidSimilarBikesPage(private val navController: NavController,private v
     }
 
     override fun platformHomeScreenDisplayName(): String {
-        return "AndroidHomeScreen"
+        return "com.amhapps.mtboracle.AndroidHomeScreen"
     }
 
     override fun back() {

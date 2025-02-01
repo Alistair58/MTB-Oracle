@@ -44,7 +44,7 @@ class AndroidCategoryCountryConditionForm(
             onClick = {
                 bikeData.category = category.trim()
                 bikeData.condition = condition.trim()
-                bikeData.country = country.trim()
+                bikeData.country =  if (country.length>50)country.substring(0,50).trim() else country.trim()
                 if(isValuation && (bikeData.category=="" ||  bikeData.condition=="" || bikeData.country=="")) lackOfInfo = true
                 else{
                     navController.navigate(

@@ -125,7 +125,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                       status:Int,
                       onStatusChange:(Int)->Unit,
                       sortBy: String){
-        if(status and 1 == 0 || status and 8 == 8 && status < 0x10) LoadingAnimation()
+        if((status and 0x1 == 0 || status and 0x8 == 0x8) && status < 0x10 && status and 0x2 != 0x2) LoadingAnimation()
         FindBikes(ebayBikes,onEbayBikesChange,status,onStatusChange,sortBy)
         ErrorDialogs(status,onStatusChange,false)
     }
@@ -214,7 +214,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                      valuation:Boolean){
         if(status and 0x2 == 0x2 && !valuation){ //Don't prevent the user seeing the valuation if the similar bikes don't load
             println("Display name "+navController.previousBackStackEntry?.destination?.route)
-            if(navController.previousBackStackEntry?.destination?.displayName == platformHomeScreenDisplayName()::class.qualifiedName){
+            if(navController.previousBackStackEntry?.destination?.route== platformHomeScreenDisplayName()){
                 //No back button if we have come from the homepage
                 WarningDialog(
                     onConfirmation = { },
@@ -223,10 +223,10 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                     dialogText = "We could not find any bikes that matched the details you provided.",
                     confirmExists = false,
                     dismissColor = MTBOracleTheme.colors.forestLight,
-                    alwaysDismiss = {navController.popBackStack() }
+                    alwaysDismiss = { navController.popBackStack(platformHomeScreen(), false)}
                 )
             }
-            else {
+            else if(navController.previousBackStackEntry?.destination?.route != null){//Pops up when navigating back from warning above unless this is here
                 WarningDialog(
                     confirmText = "Back",
                     onConfirmation = { back() },

@@ -113,8 +113,8 @@ class AndroidBrandModelYearForm(
                 try{
                     var yearInt:Int = -1
                     if(year != "") yearInt = year.toInt()
-                    bikeData.brand = brand.trim()
-                    bikeData.model = model.trim()
+                    bikeData.brand = if (brand.length>50)brand.substring(0,50).trim() else brand.trim()
+                    bikeData.model =  if (model.length>50)model.substring(0,50).trim() else model.trim()
                     bikeData.year = yearInt
                     val capitalModel = capitalise(listOf(bikeData.model))[0]
                     if(isValuation && (bikeData.year ==-1 ||  bikeData.brand=="" || bikeData.model=="")) lackOfInfo = true
