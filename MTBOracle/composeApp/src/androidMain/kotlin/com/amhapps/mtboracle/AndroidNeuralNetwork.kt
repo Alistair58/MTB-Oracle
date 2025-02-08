@@ -27,7 +27,7 @@ class AndroidNeuralNetwork(private val context: Context): NeuralNetwork(){
             val gson : Gson =  builder.create()
             lWeights = gson.fromJson(data, Array<Array<FloatArray>>::class.java)
         } catch (e: Exception) {
-            println(e)
+            
         }
         return lWeights
     }

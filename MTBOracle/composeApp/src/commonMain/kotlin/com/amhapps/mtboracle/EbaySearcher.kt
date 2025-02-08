@@ -46,9 +46,9 @@ abstract class EbaySearcher {
                 })
             }
         }
-        println("Getting token")
+        
         var accessToken:String = getCachedToken()
-        println("Got token")
+        
         if(accessToken.isEmpty()){
             val accessResponse = getAccessToken(client)
             if (accessResponse.status.value in 200..299) {
@@ -60,13 +60,13 @@ abstract class EbaySearcher {
                 throw EbayResponseException(accessResponse.status.value)
             }
         }
-        println(sortBy)
+        
         var bikes =
             searchBikes(client,accessToken, bikeData, offset ?: 0,sortBy)
 
             if(offset == 0 && bikes.isEmpty()){ //Try again with looser search criteria
-                println("No similar bikes found")
-                println("Searching broader bikes")
+                
+                
                 val broaderBikes = bikeData.clone()
                 broaderBikes.size = "" //Not a very important fields
                 broaderBikes.material = ""
@@ -105,7 +105,7 @@ abstract class EbaySearcher {
         sortBy: String
     ): List<EbayBikeData> {
 
-        println("Searching bikes")
+        
         val bikeReqBuilder = HttpRequestBuilder()
         val encodedCondition = when (bikeData.condition) { //most bikes seem to just say used
             "Brand new" -> "1000|1500" //new|new other (see details)
@@ -171,8 +171,8 @@ abstract class EbaySearcher {
                 countryId)
         }
         val response = client.get(bikeReqBuilder)
-        println("Got response")
-        println(response)
+        
+        
         val bikes = mutableListOf<EbayBikeData>()
         if (response.status.value in 200..299) {
             val bikeResponse: BikeResponse = response.body()
@@ -191,8 +191,8 @@ abstract class EbaySearcher {
                     )
                 )
             }
-            println("Response " + bikeResponse.toString())
-            println("Ebay bikes " + ebayBikes.toString())
+            
+            
         }
         else {
             throw EbayResponseException(response.status.value) //Needs to be handled by caller

@@ -29,7 +29,7 @@ abstract class ExchangeRates {
     open suspend fun get(currency:String):Float {
         val currDate = getCurrHmrcDate()
         var rate = getCachedRate(currency,currDate)
-        println("Cached rate for $currency: $rate")
+        
         if(rate < 0) rate = refreshRates(currency,currDate)
         return rate
     }
@@ -62,6 +62,7 @@ abstract class ExchangeRates {
             encodedPath = "/api/v2/exchange_rates/files/monthly_csv_${currDate}.csv"
         }
         val res = client.get(requestBuilder)
+        var rateToReturn = -1f
         if(res.status.value in 200..299){
             try{
                 storeDate(currDate)
@@ -70,7 +71,7 @@ abstract class ExchangeRates {
                     if(i==0) continue //first row is headings
                     val row = rows[i].split(",")
                     cacheRate(row[2],row[3].toFloat()) //CUR rate
-                    if(row[2]==currency) return row[3].toFloat()
+                    if(row[2]==currency) rateToReturn = row[3].toFloat() //Do not return it here as you miss the rest of the rates
                 }
             }
             catch(e:NumberFormatException){
@@ -80,6 +81,7 @@ abstract class ExchangeRates {
         else{
             throw ExchangeRateResponseException(res.status.value)
         }
+        if(rateToReturn > 0) return rateToReturn
         throw ExchangeRateResponseException(-1)
     }
 

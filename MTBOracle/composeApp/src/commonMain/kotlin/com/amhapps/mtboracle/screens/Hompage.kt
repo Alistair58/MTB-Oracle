@@ -243,7 +243,7 @@ abstract class Homepage(private var navController: NavController){
                         painter = painterResource(Res.drawable.binIcon),
                         contentDescription = "Delete",
                         modifier = Modifier
-                            .clickable { removeBike = true;println("pressed remove") }
+                            .clickable { removeBike = true }
                             .width(25.dp)
                     )
                 }
@@ -258,7 +258,7 @@ abstract class Homepage(private var navController: NavController){
                     //Lambda so we don't keep on calling this and so it actually runs in first place
                 }
             }
-            println("removed bike")
+            
         }
 
     }

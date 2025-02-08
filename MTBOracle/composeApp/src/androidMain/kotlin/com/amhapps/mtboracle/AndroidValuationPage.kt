@@ -56,8 +56,8 @@ class AndroidValuationPage(navController: NavHostController, private val bikeDat
                 ?.set("bikeData",bikeData)
             navController.popBackStack()
         }
-        println("Valuation page")
-        println(context.toString())
+        
+        
         val similarBikesPage = AndroidSimilarBikesPage(navController,bikeData,context)
         Box( //Needed for the home button
             modifier = Modifier

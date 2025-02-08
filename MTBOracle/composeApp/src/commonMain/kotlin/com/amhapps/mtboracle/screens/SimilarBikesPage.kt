@@ -140,7 +140,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                       onExchangeRateChange:(Float)->Unit,
                                      similarBikesMedian: Float,
                                      onSimilarBikesMedianChange:(Float)->Unit){
-        println("Status: $status CurrencyCode: $currencyCode ebayBikes: ${ebayBikes} similarBikesMedian: ${similarBikesMedian}")
+        
         if((status and 0x1 == 0 || status and 0x8 == 0x8) && status < 0x10 && status and 0x2 != 0x2) LoadingAnimation() //Don't show the animation if we've had an error or found no bikes
         FindBikesAndGetMedian(ebayBikes,onEbayBikesChange,status,onStatusChange,sortBy,similarBikesMedian,onSimilarBikesMedianChange)
         GetExchangeRate(currencyCode,onExchangeRateChange,status,onStatusChange)
@@ -213,7 +213,6 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                      onStatusChange:(Int)->Unit,
                      valuation:Boolean){
         if(status and 0x2 == 0x2 && !valuation){ //Don't prevent the user seeing the valuation if the similar bikes don't load
-            println("Display name "+navController.previousBackStackEntry?.destination?.route)
             if(navController.previousBackStackEntry?.destination?.route== platformHomeScreenDisplayName()){
                 //No back button if we have come from the homepage
                 WarningDialog(
@@ -266,8 +265,8 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
         val scope = rememberCoroutineScope()
         LaunchedEffect(status) {//LaunchedEffect restarts when one of the key parameters changes
             scope.launch {
-                println("Find bikes status: $status")
-                if(((ebayBikes.isEmpty() && status and 0x1 == 0) || status and 0x8 == 0x8) && status and 0x2 != 0x2){
+                
+                if(((ebayBikes.isEmpty() && status and 0x1 == 0) || status and 0x8 == 0x8) && status and 0x2 != 0x2 && status < 0x10){ //Don't find any bikes if we've already had an error
                     onStatusChange(0)
                     try {
                         val newBikes = ebaySearcher.search(bikeData,0,encodeSortBy(sortBy))
@@ -289,7 +288,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                                     }
                                 }
                                 bikePrices.sort()
-                                println(bikePrices)
+                                
                                 onSimilarBikesMedianChange(
                                     if (bikePrices.size and 1 == 1){
                                         bikePrices[floor(bikePrices.size/2f).toInt()]
@@ -303,22 +302,22 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                         }
                     }
                     catch (e: HttpRequestTimeoutException) {
-                        println(e.toString())
+                        
                         onStatusChange(0x10)
                     }
                     catch(e: EbayResponseException){ //Kotlin doesn't have multi-catch
-                        println(e.toString())
+                        
                         onStatusChange(0x10)
                     }
                     catch(e: NumberFormatException){
-                        println(e.toString())
+                        
                         onStatusChange(0x10)
                     }
                     catch(e: NoInternetException){
-                        println(e.toString())
+                        
                         onStatusChange(0x20)
                     }
-                    println("bikesFoundFinally "+status)
+                    
 
                 }
 
@@ -335,7 +334,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
         val scope = rememberCoroutineScope()
         LaunchedEffect(status) {//LaunchedEffect restarts when one of the key parameters changes
             scope.launch {
-                if(((ebayBikes.isEmpty() && status and 0x1 == 0) || status and 0x8 == 0x8) && status and 0x2 != 0x2){
+                if(((ebayBikes.isEmpty() && status and 0x1 == 0) || status and 0x8 == 0x8) && status and 0x2 != 0x2 && status < 0x10){
                     onStatusChange(0)
                     try {
                         val newBikes = ebaySearcher.search(bikeData,0,encodeSortBy(sortBy))
@@ -346,22 +345,22 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
 
                     }
                     catch (e: HttpRequestTimeoutException) {
-                        println(e.toString())
+                        
                         onStatusChange(0x10)
                     }
                     catch(e: EbayResponseException){ //Kotlin doesn't have multi-catch
-                        println(e.toString())
+                        
                         onStatusChange(0x10)
                     }
                     catch(e: NumberFormatException){
-                        println(e.toString())
+                        
                         onStatusChange(0x10)
                     }
                     catch(e: NoInternetException){
-                        println(e.toString())
+                        
                         onStatusChange(0x20)
                     }
-                    println("bikesFoundFinally "+status)
+                    
 
                 }
 
@@ -405,7 +404,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                             onSortByChange(it)
                             onStatusChange(0x8)
                             onEbayBikesChange(emptyList())
-                            println("Dropdown change "+it)
+                            
                         },
                         label = "Sort By",
                         modifier = Modifier,
@@ -458,7 +457,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
         item {
 
             //When user scrolls to bottom of the page
-            if (ebayBikes.isNotEmpty()) { //On the first composition, this would be on the page
+            if (ebayBikes.isNotEmpty() && status < 0x10) { //On the first composition, this would be on the page. Also don't reset the error
                 // as the bikes have not been returned from eBay yet and so it would run (which we don't want)
                 LaunchedEffect(true) {
                     onStatusChange(0) //Causes the loading animation and resets the retry
@@ -505,7 +504,7 @@ abstract class SimilarBikesPage(private val navController:NavController,private 
                         CircularProgressIndicator()
                     },
                     error = {painterResource(Res.drawable.MTB_Oracle_Bike_V3)},
-                    onError = { println(it.result.toString()) },
+                    onError = {  },
                     contentDescription = bikeData.title+" image",
                     modifier = Modifier
                         .height(80.dp)

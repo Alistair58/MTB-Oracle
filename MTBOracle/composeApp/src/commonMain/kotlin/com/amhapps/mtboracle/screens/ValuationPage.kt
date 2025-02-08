@@ -69,7 +69,7 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(){
-                println("Similar bikes median: $similarBikesMedian")
+                
                 val nnValuation = valuation()
                 val valuation:Int = if(similarBikesMedian > 0f) {
                     (round((nnWeight * nnValuation) * exchangeRate) + (1 - nnWeight) * similarBikesMedian).toInt() //SimilarBikesMedian is already in local currency
@@ -83,11 +83,11 @@ abstract class ValuationPage(protected val navController: NavHostController, pri
                 val output = if(exchangeRate<0f) "" else "${currencySymbols[0]}$valuation${currencySymbols[1]}"
                 bikeData.price = output
                 if(!cached && (similarBikesMedian>0f || similarBikesMedian==-2f)){ //-2f if there are no similar bikes
-                    println("Not cached")
+                    
                     val scope = rememberCoroutineScope()
                     LaunchedEffect(true){
                         scope.launch {
-                            println("Caching")
+                            
                             cacheBike(bikeData)
                             cached = true
                         }

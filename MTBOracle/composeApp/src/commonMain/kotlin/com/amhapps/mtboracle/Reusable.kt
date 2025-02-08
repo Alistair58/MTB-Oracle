@@ -222,7 +222,7 @@ fun CompleteDropdown(
                     // the DropDown the same width
                     dropDownSize = coordinates.size.toSize()
                 },
-            onClick = {dropDownExpanded = !dropDownExpanded;println("clicked")},
+            onClick = {dropDownExpanded = !dropDownExpanded},
             label = { Text(label) },
             readOnly = true,
             trailingIcon = {
@@ -301,7 +301,7 @@ fun SearchableDropdown(
                 },
             label = { Text(label) },
             readOnly = false,
-            onClick = {dropDownExpanded = !dropDownExpanded;println("clicked")}
+            onClick = {dropDownExpanded = !dropDownExpanded}
         )
         DropdownMenu(
             expanded = dropDownExpanded,

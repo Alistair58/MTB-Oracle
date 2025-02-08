@@ -27,7 +27,7 @@ class AndroidDataset(private val context: Context):Dataset() {
             modelStats =
                 gson.fromJson<Map<String, Map<String, java.util.ArrayList<Float>>>>(data, type)
         } catch (e: Exception) {
-            println(e)
+            
         }
     }
 
@@ -46,7 +46,7 @@ class AndroidDataset(private val context: Context):Dataset() {
                 com.google.gson.reflect.TypeToken<Map<String?, java.util.ArrayList<Float?>?>?>() {}.getType()
             countryStats = gson.fromJson<Map<String, java.util.ArrayList<Float>>>(data, type)
         } catch (e: Exception) {
-            println(e)
+            
         }
     }
 
@@ -69,7 +69,7 @@ class AndroidDataset(private val context: Context):Dataset() {
                 i += 5
             }
         } catch (e: Exception) {
-            println(e)
+            
         }
     }
 

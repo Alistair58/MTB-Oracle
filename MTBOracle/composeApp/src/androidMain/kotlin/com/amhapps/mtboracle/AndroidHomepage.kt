@@ -83,30 +83,30 @@ class AndroidHomepage(private val navController: NavController,private val conte
                     .map { preferences ->
                         val result = mutableListOf<String>()
                         for(key in keys) {
-                            println(key)
+                            
                             if(preferences[key]!=null){
-                                println("here $key ${preferences[key]}")
+                                
                                 result.add(preferences[key]!!)
                             }
                         }
-                        println("Returning $result")
+                        
                         result
                     }
                 val prevStoredBikes = prevBikesFlow.first()
-                println("prevStoredBikes $prevStoredBikes length ${prevStoredBikes.size}")
+                
                 prevBikes = prevStoredBikes
                     .map{storedBike -> gson.fromJson(storedBike,AndroidBikeData::class.java) }
             }
         }
 
         Column{
-            println("Column prev bikes length ${prevBikes.size}")
+            
             if(prevBikes.isNotEmpty()) Text("Recent Bikes", fontSize = 25.sp)
             for(bike in prevBikes){
                 RecentBike(bike,onBikeDelete = {bikeData ->
-                    println("Before prev bikes length ${prevBikes.size} $prevBikes")
+                    
                     prevBikes = prevBikes.filter { item -> !item.isSameBike(bikeData) }
-                    println("After prev bikes length ${prevBikes.size} $prevBikes") })
+                     })
             }
         }
     }
@@ -117,33 +117,33 @@ class AndroidHomepage(private val navController: NavController,private val conte
         val keyStrs = listOf("bike0", "bike1", "bike2", "bike3", "bike4")
         val keys = keyStrs.map { str -> stringPreferencesKey(str) }
             .reversed() //we want bike 4 first
-        println("Before flow")
+        
         val prevBikesFlow: Flow<Preferences.Key<String>> = context.prevBikesDataStore.data
             .map { preferences ->
                 var theKey:Preferences.Key<String> = stringPreferencesKey("")
                 for (key in keys) {
-                    println("Key $key")
+                    
                     if (preferences[key] != null) {
 
                         val recentBike =
                             gson.fromJson(preferences[key], AndroidBikeData::class.java)
-                        println("Key exists $key ${recentBike.brand} ${recentBike.model}")
+                        
                         if (recentBike.isSameBike(bikeData)) {
-                            println("Found key $key")
+                            
                             theKey = key
                             break
                         }
                     }
                 }
-                println("In flow $theKey")
+                
                 theKey
             }
         val keyToRemove = prevBikesFlow.first()
-        println("After flow")
+        
         context.prevBikesDataStore.edit{ storedBikes ->
-            println("Removing")
+            
             storedBikes.remove(keyToRemove)
-            println("Removed $keyToRemove")
+            
             onBikeDelete(bikeData)
         }
     }

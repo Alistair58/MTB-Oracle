@@ -41,8 +41,7 @@ suspend fun androidCacheBike(bikeData: BikeData,context: Context){
     }
 
 }
-//println("Android Caching")
-//println("flow result $result")
-//println("Waiting for first")
-//println("Got count")
-//println("Num bikes ${updatedBikes.size}")
+
+
+
+

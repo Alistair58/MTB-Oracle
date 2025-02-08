@@ -115,7 +115,7 @@ abstract class Bike(
             "titanium" -> 5
             else -> 0
         }
-        //        if(encoded==0) System.out.println("Could not encode material: "+material);
+        //        if(encoded==0) System.out.;
         return encoded
     }
 
@@ -126,7 +126,7 @@ abstract class Bike(
             encoded =
                 round(travel.toFloat() / 10.0).toInt() //round to nearest ten and divide by 10 e.g. 123 -> 12
         } catch (e: NumberFormatException) {
-            println("Could not encode travel: $travel") //A lot of listings don't have travel
+             //A lot of listings don't have travel
             return 0
         }
         encoded = min(encoded.toDouble(), 25.0).toInt()

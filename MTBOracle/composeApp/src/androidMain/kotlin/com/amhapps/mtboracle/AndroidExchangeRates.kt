@@ -30,14 +30,14 @@ class AndroidExchangeRates(private val context: Context): ExchangeRates() {
                 preferences[exchangeRateDateKey] ?: ""
             }
         val date = dateFlow.first()
-        println("Date stored: "+date)
+        
         if(date=="" || date!=currDate) return -1f;
         val currencyKey = floatPreferencesKey(currency)
         val rateFlow: Flow<Float> = context.exchangeRatesDataStore.data
             .map { preferences ->
                 preferences[currencyKey] ?: -1f;
             }
-        println("Rate stored for $currency: "+rateFlow.first())
+        
         return rateFlow.first()
     }
 

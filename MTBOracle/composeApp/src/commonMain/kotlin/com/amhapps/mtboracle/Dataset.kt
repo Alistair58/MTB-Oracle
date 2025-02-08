@@ -29,7 +29,7 @@ abstract class Dataset {
         country = country.lowercase()
         val stats: ArrayList<Float> = countryStats!![country] ?: ArrayList<Float>()
         if (stats.size == 0) {
-            println("Could not get stats for $country")
+            
             return modelStats!![""]!![""] ?: ArrayList<Float>()
         }
         return stats
