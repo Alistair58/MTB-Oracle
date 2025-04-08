@@ -70,6 +70,7 @@ abstract class ExchangeRates {
                 for(i in rows.indices){
                     if(i==0) continue //first row is headings
                     val row = rows[i].split(",")
+                    if(row.size < 4) continue
                     cacheRate(row[2],row[3].toFloat()) //CUR rate
                     if(row[2]==currency) rateToReturn = row[3].toFloat() //Do not return it here as you miss the rest of the rates
                 }

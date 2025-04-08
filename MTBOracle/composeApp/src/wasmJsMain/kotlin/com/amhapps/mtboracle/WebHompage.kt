@@ -57,11 +57,15 @@ class WebHomepage(private var navController: NavController) : Homepage(navContro
         )
     }
 
-    override fun platformValuationScreen(bikeData: BikeData): Any {
+    override suspend fun removeRecentBike(bikeData: BikeData, onBikeDelete: (BikeData) -> Unit) {
         TODO("Not yet implemented")
     }
 
+    override fun platformValuationScreen(bikeData: BikeData): Any {
+        return WebValuationScreen
+    }
+
     override fun platformSimilarBikesScreen(bikeData: BikeData): Any {
-        TODO("Not yet implemented")
+        return WebSimilarBikesScreen
     }
 }

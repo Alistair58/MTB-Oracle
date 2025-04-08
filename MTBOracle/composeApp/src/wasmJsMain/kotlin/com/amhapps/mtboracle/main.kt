@@ -62,6 +62,8 @@ fun WebApp(){
                 homepage.ShowHomepage()
                 //When you have just this destination and text it works
                 //Images also work
+                //Error occurs when executing ShowHomepage()
+                //Don't waste 10 mins on debugging - it doesn't work
             }
             /*composable<WebBrandModelYearScreen>(
                 typeMap = mapOf(

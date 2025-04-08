@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-@Parcelize //Parcelize is android only and that's why bikeData is an interface
+@Parcelize //Parcelize is android only and that's why BikeData is an interface
 @Serializable
 class AndroidBikeData (
     override var year:Int = -1,
