@@ -2,6 +2,7 @@ package com.amhapps.mtboracle
 
 import BikeData
 import android.content.Context
+import com.amhapps.mtboracle.BuildConfig
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -17,6 +18,7 @@ import java.time.Instant
 import kotlin.math.exp
 
 class AndroidEbaySearcher(private val context:Context):EbaySearcher() {
+    override val apiKey = BuildConfig.EBAY_API_KEY
     override suspend fun search(bikeData: BikeData, offset: Int?,sortBy:String): List<EbayBikeData> {
         try{
             return super.search(bikeData, offset,sortBy)

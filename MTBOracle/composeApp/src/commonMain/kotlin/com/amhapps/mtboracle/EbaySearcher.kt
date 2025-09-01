@@ -34,6 +34,7 @@ import kotlin.experimental.ExperimentalObjCRefinement
 
 
 abstract class EbaySearcher {
+    abstract val apiKey:String
     open suspend fun search(bikeData: BikeData, offset: Int? = 0,sortBy:String = "bestMatch"): List<EbayBikeData> {
         val client = HttpClient() {
             install(HttpTimeout){
@@ -90,7 +91,7 @@ abstract class EbaySearcher {
             append(HttpHeaders.ContentType, "application/x-www-form-urlencoded")
             append(
                 HttpHeaders.Authorization,
-                "Basic REMOVED"
+                "Basic "+apiKey
             )
         }
         accessBuilder.setBody("grant_type=client_credentials&scope=https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope")

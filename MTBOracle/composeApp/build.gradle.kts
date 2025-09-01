@@ -88,6 +88,7 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+        buildConfigField("String", "EBAY_API_KEY", "\"${project.findProperty("EBAY_API_KEY") ?: ""}\"")
     }
     packaging {
         resources {
@@ -98,6 +99,10 @@ android {
         getByName("release") {
             isMinifyEnabled = false
         }
+    }
+    buildFeatures {
+        buildConfig = true
+        compose = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
